@@ -21,8 +21,8 @@ define([
   "pentaho/visual/data/_cross/Table",
   "pentaho/visual/data/_cross/Axis",
   "pentaho/visual/data/_cross/MeasureCellSet",
-  "pentaho/visual/_utils"
-], function(Model, Attribute, Structure, CellTuple, Table, Axis, MeasureCellSet, utils) {
+  "pentaho/util/error"
+], function(Model, Attribute, Structure, CellTuple, Table, Axis, MeasureCellSet, error) {
 
   function createModel1() {
     return new Model([
@@ -61,7 +61,7 @@ define([
       it("should throw when `keyArgs.model` is not specified", function() {
         expect(function() {
           new Table({});
-        }).toThrowError(utils.error.argRequired("keyArgs.model").message);
+        }).toThrowError(error.argRequired("keyArgs.model").message);
       });
 
       it("should create empty cols and rows axes and measures list when all these are empty or nully in `spec.layout`", function() {

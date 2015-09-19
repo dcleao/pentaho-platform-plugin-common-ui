@@ -30,15 +30,16 @@
       requireMap     = requireCfg.map,
       requireService = requireCfg.config.service;
 
-  requirePaths["common-ui"     ] = basePath;
-  requirePaths["common-repo"   ] = basePath + "/repo";
-  requirePaths["common-data"   ] = basePath + "/dataapi";
+  requirePaths["common-ui"  ] = basePath;
+  requirePaths["common-repo"] = basePath + "/repo";
+  requirePaths["common-data"] = basePath + "/dataapi";
+
+  requirePaths["pentaho"] = basePath + "/pentaho";
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
-  requirePaths["pentaho/visual"] = basePath + "/visual";
 
   // AMD PLUGINS
   requirePaths["local"  ] = basePath + "/util/local";
-  requirePaths["service"] = basePath + "/util/service";
+  requirePaths["service"] = basePath + "/pentaho/service";
   requirePaths["json"   ] = basePath + "/util/require-json/json";
   requirePaths["text"   ] = basePath + "/util/require-text/text";
   // Using `map` is important for use in r.js and correct AMD config of the other files of the package.
@@ -181,6 +182,6 @@
   requireService["pentaho/visual/ccc/visualApiConfig"] = "IVisualApiConfiguration";
 
   // Sample visualizations
-  requireService["pentaho/visual/sample/visualTypeProvider"] = "IVisualTypeProvider";
+  requireService["pentaho/visual/samples/calc/visualTypeProvider"] = "IVisualTypeProvider";
 
 }());

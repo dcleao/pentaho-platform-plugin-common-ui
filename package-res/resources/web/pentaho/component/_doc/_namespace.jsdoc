@@ -1,0 +1,139 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @name pentaho.component
+ * @namespace
+ *
+ * @description
+ *
+ * The `component` namespace contains the classes and interfaces
+ * that support the Pentaho platform's Web Component Convention.
+ *
+ * ## Web Component Convention
+ *
+ * The Web Component Convention establishes a common-ground around
+ * metadata,
+ * file organization,
+ * messages,
+ * themes and
+ * component identification
+ * amongst disparate component frameworks,
+ * like, for example, the Community Dashboard Framework and the Visualization API.
+ *
+ * It does **not** pose any restrictions on the actual interface and runtime environment of components.
+ * The goals of the Web Component Convention are:
+ *
+ * * Increase developer familiarity with the structure and organization of component-like assets
+ * * Trying to align the multitude of ways of doing the same component-related things
+ * * Provide platform-aware services,
+ *   that can be used seamlessly by component authors,
+ *   in any component-framework to perform tasks like obtaining localized messages and theming
+ * * Leveraging the AMD module system to simplify component frameworks,
+ *   by choosing to identify component types by their AMD module id, instead of by framework local ids.
+ *   This allows to eliminate the need for local registry services (that map from one id to the other).
+ * * Establishing the minimum set of metadata required to describe a component type and a
+ *   common vocabulary for doing so
+ * * Paving the way for a platform component type directory service
+ * * Possibly, enabling a class of component-framework agnostic editors
+ *
+ * ### Component type constituents and organization
+ *
+ * Generally, a web component is made up of several assets,
+ * like scripts, themes and messages.
+ * Ideally (and frequently), these are organized under a single folder,
+ * which is made accessible by some established AMD/RequireJS module id.
+ *
+ * ### Implementation
+ *
+ * A web component necessarily has a JavaScript class that _implements_ its main function,
+ * which is usually the rendering of its visual representation.
+ * By convention, this class is present in a sub-module named _implementation_.
+ *
+ * ### Definition
+ *
+ * The other main constituent of a web component is that which describes
+ * the component type — a JavaScript sub-class of `pentaho.component.Definition`.
+ * By convention, this class is present in a sub-module name _definition_.
+ *
+ * Note that the definition sub-module is only strictly required by editor applications
+ * that handle component types in a generic, abstract way.
+ *
+ * ### Identification
+ *
+ * Identification is naturally provided by the AMD module id of a component's base folder.
+ *
+ * This and the already described conventions for the implementation and definition files are highly convenient.
+ * Given the id of a component type, one can immediately create an instance of it, or obtain its definition,
+ * no intermediaries required (but the module system).
+ *
+ * For instance, if the id of a component type is `"pentaho/component/samples/textBox"`,
+ * then a component instance of it can be created as follows:
+ *
+ * ```javascript
+ * require([
+ *   "pentaho/component/samples/textBox/implementation"
+ * ], function(TextBox) {
+     *
+     *   var component = new TextBox();
+     *
+     *   // Use it
+     *
+     * });
+ * ```
+ *
+ * However, note that apart from the existence of a constructor function,
+ * there's no imposition on the _interface_ of component classes,
+ * so, all of the following are unknowns:
+ * * what constructor arguments it has?
+ * * what methods it exposes?
+ * * how it should be used?
+ *
+ * To use a component effectively, it is necessary to know the _kind_ of its component type.
+ *
+ * ### Component type declaration
+ *
+ * Creating a new type of component consists in sub-classing the appropriate base component definition class.
+ *
+ * Imagine that we wish to create a CDF "TextBox" component.
+ * We choose to inherit the component from the base "Input" component class.
+ *
+ * A definition class for this component type could be written like this:
+ *
+ *```javascript
+ * define([
+ *   "module",
+ *   "cdf/component/input/definition",
+ *   "pentaho/messages!definition",
+ *   "pentaho/theme!definition"
+ * ], function(module, InputComponentDefinition, messages) {
+ *
+ *   return InputComponentDefinition.extend({
+ *     id: module.id,
+ *     name: messages.get("name"),
+ *     description: messages.get("description"),
+ *     className: "pentaho-component-samples-textBox",
+ *     kind: "CDF"
+ *
+ *     // ... CDF specific options ...
+ *
+ *   });
+ *
+ * });
+ *```
+ *
+ *
+ */
