@@ -15,24 +15,33 @@
  */
 
 /**
- * The `ITypeConfiguration` interface represents a sequence of component type
- * configuration rules.
+ * The `ITypeConfigurationRule` interface represents a
+ * configuration that is applied to
+ * certain component types, when under certain _usage contexts_.
  *
- * Properties {@link pentaho.component.ITypeConfiguration#id}
- * and {@link pentaho.component.ITypeConfiguration#context}
- * determine the &lt;component type, context&gt; pairs that the
- * configuration applies to.
+ * Configuration rules are part of a higher concept,
+ * the component type configuration: {@link pentaho.component.ITypeConfiguration}.
  *
- * @name pentaho.component.ITypeConfiguration
+ * Properties {@link pentaho.component.ITypeConfigurationRule#id}
+ * and {@link pentaho.component.ITypeConfigurationRule#context}
+ * determine the &lt;component type, context&gt; pairs that a
+ * configuration rule applies to.
+ *
+ * @name pentaho.component.ITypeConfigurationRule
  * @interface
+ * @see pentaho.component.ITypeConfiguration
  * @see pentaho.component.ITypeDefinition
  *
- * @property {pentaho.component.ITypeConfiguration[]} types An array of configuration rules.
+ * @property {boolean} enabled Indicates if a component type is enabled. The default is `true`.
+ *
+ * @property {string} label A human-readable, localized and short description of the component type.
+ *
+ * @property {string} description A human-readable, localized description of the component type.
  */
 
 /**
  * Id or id pattern, or an array of such, of the component types
- * that the configuration applies to.
+ * that the configuration rule applies to.
  *
  * When unspecified, it applies to **all** component types.
  * Otherwise, when an array, it applies to the union of the component types
@@ -65,12 +74,12 @@
  * // CDF's input and select components
  * ["cdf/component/input", "cdf/component/select"]
  *
- * @name pentaho.component.ITypeConfiguration#id
+ * @name pentaho.component.ITypeConfigurationRule#id
  * @type string | RegExp | (string|RegExp)[]
  */
 
 /**
- * Id, or array of ids, of the contexts that the configuration applies to.
+ * Id, or array of ids, of the contexts that the configuration rule applies to.
  *
  * When unspecified, applies to **all** contexts.
  * Otherwise, when an array, it applies to the union of the contexts
@@ -83,12 +92,12 @@
  * // Analyzer and CDF
  * ["analyzer", "cdf"]
  *
- * @name pentaho.component.ITypeConfiguration#context
+ * @name pentaho.component.ITypeConfigurationRule#context
  * @type string|string[]
  */
 
 /**
- * The priority of the configuration.
+ * The priority of the configuration rule.
  *
  * The greater the number, the higher is the priority.
  *
@@ -101,7 +110,7 @@
  * one that is used unless another configuration intendedly overrides it,
  * with a greater priority value.
  *
- * @name pentaho.component.ITypeConfiguration#priority
+ * @name pentaho.component.ITypeConfigurationRule#priority
  * @type number
  * @default 0
  */

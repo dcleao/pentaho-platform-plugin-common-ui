@@ -48,30 +48,46 @@ define([
   return Base.extend("pentaho.component.TypeRegistry", /** @lends pentaho.component.TypeRegistry# */{
 
     /**
-     * @classdesc The `TypeRegistry` class represents a registry of
-     * component type definitions and their configurations.
-     *
-     * Component types and configurations may be registered using the methods:
-     * {@link pentaho.component.TypeRegistry#add} and
-     * {@link pentaho.component.TypeRegistry#addConfig},
-     * respectively.
-     *
-     * To obtain configured component type definitions use the following methods:
-     * {@link pentaho.component.TypeRegistry#get} and
-     * {@link pentaho.component.TypeRegistry#getAll}.
-     *
-     * The context in which the components will be used can be specified,
-     * to obtain component type definitions configured specifically for that context.
-     *
-     * #### AMD
-     *
-     * **Module Id**: `"pentaho/component/TypeRegistry"`
-     *
      * @alias TypeRegistry
      * @memberOf pentaho.component
      * @class
      * @amd pentaho/component/TypeRegistry
      * @see pentaho/component/registry
+     *
+     * @classdesc The `TypeRegistry` class represents a registry of
+     * component type definitions and associated configurations.
+     *
+     * The component type registry is an intermediary between:
+     * * component authors,
+     * * component editor applications, and
+     * * component users.
+     *
+     * Authors can delegate to it the management of configurations.
+     * Editor applications can rely on it to look for existing component types.
+     * Users can configure components _by context_ in which they are used.
+     *
+     * Usage contexts are typically tied to the editing or viewing application.
+     * For example, the context id of Pentaho Analyzer is `"analyzer"`,
+     * and that of the Community Dashboard Framework is `"cdf"`.
+     *
+     * ### Interface
+     *
+     * Definitions and configurations may be registered using the methods, respectively:
+     * * {@link pentaho.component.TypeRegistry#add} and
+     * * {@link pentaho.component.TypeRegistry#addConfig}.
+     *
+     * To obtain _configured_ component type definitions use the following methods:
+     * * {@link pentaho.component.TypeRegistry#get} and
+     * * {@link pentaho.component.TypeRegistry#getAll}.
+     *
+     * Both of these accept a `contextId` argument which, when specified,
+     * causes obtaining definitions configured specifically for that context.
+     *
+     * ### AMD
+     *
+     * **Module Id**: `"pentaho/component/TypeRegistry"`
+     *
+     * @description Creates a component type registry.
      */
     constructor: function() {
       // -- Container Entries --
@@ -94,11 +110,11 @@ define([
        * {
        *   // Individual component configs
        *   //  (known to apply to a single visual type; their `id` is a string).
-       *   // @type Object.<string, Array.<IComponentTypeConfiguration>>
+       *   // @type Object.<string, Array.<ITypeConfiguration>>
        *   indiv: {},
        *
        *   // Group component configs (apply to more than one component type)
-       *   // @type Array.<IComponentTypeConfiguration>
+       *   // @type Array.<ITypeConfiguration>
        *   group: []
        * }
        */
@@ -116,27 +132,26 @@ define([
      * An error is thrown if a component type having
      * the same _id_ is already registered.
      *
-     * @method add
-     * @param {Class.<pentaho.component.TypeDefinition>} CompTypeDef The component type definition class.
-     * @return {pentaho.component.TypeRegistry} The component registry itself.
+     * @param {Class.<pentaho.component.TypeDefinition>} TypeDef The component type definition class.
+     * @return {pentaho.component.TypeRegistry} The component registry.
      */
-    add: function(CompTypeDef) {
-      if(!CompTypeDef) throw error.argRequired("CompTypeDef");
-      if(!(CompTypeDef.prototype instanceof TypeDefinition))
-        throw error.argInvalidType("CompTypeDef", "Not a sub-class of 'pentaho/component/definition'.");
+    add: function(TypeDef) {
+      if(!TypeDef) throw error.argRequired("TypeDef");
+      if(!(TypeDef.prototype instanceof TypeDefinition))
+        throw error.argInvalidType("TypeDef", "Not a sub-class of 'pentaho/component/definition'.");
 
-      var CompTypeDef0 = this._definitionClasses.get(CompTypeDef.key);
+      var CompTypeDef0 = this._definitionClasses.get(TypeDef.key);
       if(CompTypeDef0) {
-        if(CompTypeDef0 === CompTypeDef) return this;
+        if(CompTypeDef0 === TypeDef) return this;
 
         throw error.argInvalid(
-            "CompTypeDef",
-            "A definition for the component type of id '" + CompTypeDef.key + "' is already registered.");
+            "TypeDef",
+            "A definition for the component type of id '" + TypeDef.key + "' is already registered.");
       }
 
-      this._definitionClasses.push(CompTypeDef);
+      this._definitionClasses.push(TypeDef);
 
-      // Invalidate cache
+      // Invalidate contexts
       invalidateContext.call(this);
 
       return this;
@@ -146,14 +161,13 @@ define([
      * Gets a collection of the component type definitions
      * that are enabled, already with applied configuration.
      *
-     * Optionally, the context id that is to display the components may be specified.
+     * Optionally,
+     * the id of the context in which the components will be used may also be specified.
      *
      * Do **not** modify the returned array or any of its elements.
      *
-     * @method getAll
      * @param {string} [contextId] The context id.
-     *
-     * @return {Collection.<pentaho.component.TypeDefinition>} A collection of component type definitions.
+     * @return {pentaho.lang.Collection.<pentaho.component.TypeDefinition>} A collection of component type definitions.
      */
     getAll: function(contextId) {
       return getContextDefinitions.call(this, contextId);
@@ -164,8 +178,7 @@ define([
      * or `null` if one is not registered or is disabled.
      *
      * Optionally,
-     * the context id that will display the components of the requested type,
-     * may also be specified.
+     * the id of the context in which the components will be used may also be specified.
      *
      * Do **not** modify the returned object.
      *
@@ -173,29 +186,25 @@ define([
      * @param {string} [contextId] The context id.
      * @param {boolean} [assertAvailable=false] Indicates if an error should be thrown
      *    if the specified component type is not registered or is disabled.
-     *
      * @return {?pentaho.component.TypeDefinition} A component type definition, or `null`.
      */
     get: function(typeId, contextId, assertAvailable) {
       if(!typeId) throw error.argRequired("typeId");
 
-      var contextDefs = getContextDefinitions.call(this, contextId),
-          compTypeDef = contextDefs.get(typeId);
-
-      if(!compTypeDef && assertAvailable)
+      var typeDef = this.getAll(contextId).get(typeId);
+      if(!typeDef && assertAvailable)
         throw new Error(
           "A component type with id '" + typeId + "' is not registered, or is disabled" +
           (contextId ? (" for context '" +  contextId + "'") : "") +
           ".");
 
-      return compTypeDef;
+      return typeDef;
     },
 
     /**
      * Adds a component type configuration.
      *
-     * @method addConfig
-     * @param {pentaho.component.IComponentTypeConfiguration} config The component type configuration.
+     * @param {pentaho.component.ITypeConfiguration} config The component type configuration.
      * @return {pentaho.component.TypeRegistry} The component registry.
      */
     addConfig: function(config) {
@@ -290,12 +299,13 @@ define([
     if(!configLevel) {
       configLevel = this._configLevelsMap[priority] = { // @type IComponentConfigLevel
         priority: priority,
+
         // All individual type configs
         // typeId -> configs
         // @type Object.<string, IComponentConfigLevel[]>
         indiv: {},
 
-        // All individual group configs
+        // All group configs
         // @type IComponentConfigLevel[]
         group: []
       };

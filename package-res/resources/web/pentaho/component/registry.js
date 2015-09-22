@@ -15,8 +15,8 @@
  */
 define([
   "./TypeRegistry",
-  "service!ComponentTypeDefinition",
-  "service!IComponentTypeConfiguration"
+  "service!pentaho/component/TypeDefinition",
+  "service!pentaho/component/ITypeConfiguration"
 ], function(TypeRegistry, CompTypeDefs, compTypeConfigs) {
 
   /*global Promise:true*/
