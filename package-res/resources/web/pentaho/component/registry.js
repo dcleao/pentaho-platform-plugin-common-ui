@@ -25,8 +25,8 @@ define([
    * The singleton instance where component type definitions and their configurations are registered.
    *
    * The component type registry comes pre-loaded with the AMD _services_:
-   * 1. {@link pentaho.component.IComponentTypeConfiguration}
-   * 2. {@link pentaho.component.ComponentTypeDefinition}
+   * 1. {@link pentaho.component.ITypeConfiguration}
+   * 2. {@link pentaho.component.TypeDefinition}
    *
    * Additional component types and configurations may be loaded
    * dynamically by using the methods
@@ -45,7 +45,7 @@ define([
    */
   var typeRegistry = new TypeRegistry();
 
-  // Auto-load the registry with IComponentTypeConfiguration instances
+  // Auto-load the registry with ITypeConfiguration instances
   if(compTypeConfigs) compTypeConfigs.forEach(function(compTypeConfig) {
     if(compTypeConfig && compTypeConfig.types)
       compTypeConfig.types.forEach(function(typeConfig) {
