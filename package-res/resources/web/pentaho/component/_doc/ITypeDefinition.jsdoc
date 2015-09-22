@@ -15,9 +15,9 @@
  */
 
 /**
- * The `IDefinitionSpec` interface represents the specification of a component definition.
+ * The `ITypeDefinition` interface represents the information required to define a component type.
  *
- * @name pentaho.component.IDefinitionSpec
+ * @name pentaho.component.ITypeDefinition
  * @interface
  *
  * @property {string} id The id of the component type.

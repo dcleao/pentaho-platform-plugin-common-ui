@@ -22,84 +22,123 @@ define([
   "./IconType"
 ], function(module, Base, arg, error, O, IconType) {
 
-  return Base.extend("pentaho.component.Definition", /** @lends pentaho.component.Definition# */{
+  return Base.extend("pentaho.component.TypeDefinition", /** @lends pentaho.component.TypeDefinition# */{
 
     /**
-     * @alias Definition
+     * @alias TypeDefinition
      * @memberOf pentaho.component
      * @class
+     * @implements pentaho.lang.ICollectionElement
+     * @implements pentaho.lang.IConfigurable
      *
-     * @classdesc The `Definition` class is the base abstract class
+     * @classdesc The `TypeDefinition` class is the base abstract class
      * of definitions of web component types in the Pentaho platform.
      * that represents the common concept of a web component type
      * in the Pentaho platform.
      *
-     * A `Definition` mostly contains  metadata about a type of component.
+     * A `TypeDefinition` mostly contains  metadata about a type of component.
      * Information like: id, name, description, CSS-class, icons and properties.
      *
-     * Specific component frameworks may define sub-classes of `component.Definition`
+     * Specific component frameworks may define sub-classes of `TypeDefinition`
      * to account for additional metadata, specialize existing metadata, or
      * override standard behavior.
      *
-     * A `component.Definition` also contains utility methods that
+     * A `TypeDefinition` also contains utility methods that
      * facilitate working with component definitions and implementations.
      *
      * @description Creates a component definition instance with a given configuration.
      * @param {Object} config A component definition configuration.
      */
     constructor: function(config) {
+      if(config) this.configure(config);
+    },
 
-      // TODO: apply configuration
+    //region IListElement implementation
+    elemName: "component type definition",
+    //endregion
 
+    //region IWithKey implementation
+    keyName: "id",
+
+    get key() {
+      return this.id;
     }
+    //endregion
 
-  }, /** @lends pentaho.component.Definition */{
+  }, /** @lends pentaho.component.TypeDefinition */{
+
+    //region IListElement implementation
+    elemName: "component type definition class",
+    //endregion
+
+    //region IWithKey implementation
+    keyName: "id",
+
+    get key() {
+      return this.prototype.id;
+    },
+    //endregion
+
+    //region IConfigurable implementation
+    /**
+     * Applies a configuration to the component type.
+     *
+     * @param {pentaho.component.ITypeConfiguration} config A component type configuration.
+     */
+    configure: function(config) {
+      if(!config) throw error.argRequired("config");
+
+      if(config.enabled != null) this.enabled = config.enabled;
+
+      if(config.label) this.label = String(config.label);
+      if(config.description) this.description = String(config.description);
+    },
+    //endregion
 
     /**
      * Creates a component type by sub-classing its base component type.
      *
-     * @param {pentaho.component.IDefinitionSpec} instSpec A component definition _instance_ specification.
-     * @param {Object} classSpec A component definition _class_ specification.
+     * @param {pentaho.component.ITypeDefinition} instTypeDef The component type definition.
+     * @param {Object} classTypeDef Class-level members of the definition class.
      */
-    extend: function(instSpec, classSpec) {
-      if(!instSpec) throw error.argRequired("instSpec");
+    extend: function(instTypeDef, classTypeDef) {
+      if(!instTypeDef) throw error.argRequired("instTypeDef");
 
       // Normalize/validate standard instance options.
 
-      instSpec.id = arg.required(instSpec, "id").replace(/\/definition$/, "");
-      instSpec.label = arg.required(instSpec, "label") || undefined;
-      instSpec.description = instSpec.description || undefined;
-      instSpec["abstract"] = !!instSpec["abstract"];
+      instTypeDef.id = arg.required(instTypeDef, "id").replace(/\/definition$/, "");
+      instTypeDef.label = arg.required(instTypeDef, "label") || undefined;
+      instTypeDef.description = instTypeDef.description || undefined;
+      instTypeDef["abstract"] = !!instTypeDef["abstract"];
 
-      instSpec.kind = instSpec.kind;
+      instTypeDef.kind = instTypeDef.kind;
 
-      var className = arg.optional(instSpec, "className");
+      var className = arg.optional(instTypeDef, "className");
       if(!className) {
-        delete instSpec.className;
+        delete instTypeDef.className;
       } else {
-        var iconTypes = instSpec.icons;
-        instSpec.icons = (!iconTypes || !iconTypes.length)
+        var iconTypes = instTypeDef.icons;
+        instTypeDef.icons = (!iconTypes || !iconTypes.length)
             ? IconType.wellKnown.slice()
             : iconTypes.map(IconType.to).sort(IconType.areaComparer);
       }
 
-      this.base(instSpec, classSpec);
+      this.base(instTypeDef, classTypeDef);
 
       /**
-       * Gets the component type's declared specification.
+       * Gets the definition used in the component type's declaration.
        *
-       * The declared specification does not contains any inherited specification properties.
-       * It is the instance specification passed to {@link pentaho.component.Definition.extend}.
+       * The argument `instTypeDef` of {@link pentaho.component.TypeDefinition.extend}.
        *
-       * @name declarationSpec
-       * @memberOf pentaho.component.Definition
-       * @type pentaho.component.IDefinitionSpec
+       * @name declaredDefinition
+       * @memberOf pentaho.component.TypeDefinition
+       * @type pentaho.component.ITypeDefinition
        * @readonly
        */
-      this.prototype.declarationSpec = instSpec;
+      this.declaredDefinition = instTypeDef;
     }
   })
-  .implement(/** @lends pentaho.component.Definition# */{
+  .implement(/** @lends pentaho.component.TypeDefinition# */{
     /**
      * The id of the component type.
      *
@@ -138,8 +177,8 @@ define([
     /**
      * Indicates if the component type is abstract.
      *
-     * An abstract component type is meant to be inherited from
-     * and a direct component of it cannot be created.
+     * An abstract component type is meant to be inherited from.
+     * A component of this exact type cannot be instantiated.
      *
      * The default value is `false`.
 

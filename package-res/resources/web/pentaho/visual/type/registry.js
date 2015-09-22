@@ -89,7 +89,7 @@ define([
 
       // The unconfigured, base entry holds **all** registered VisualTypes.
       // They apply to any container type.
-      this._baseEntry = {
+      this._definitionClasses = {
         list: [], // @type IVisualType[]
         map:  {}  // @type Object.<string, IVisualType>  (the key is the id of the visual type)
       };
@@ -140,7 +140,7 @@ define([
       if(!type) throw error.argRequired("type");
       if(!type.id) throw error.argRequired("type.id");
 
-      var baseEntry = this._baseEntry,
+      var baseEntry = this._definitionClasses,
           type0  = O.getOwn(baseEntry.map, type.id, null);
 
       if(type0) {
@@ -373,7 +373,7 @@ define([
     var list = [], map = {};
 
     // For every base visual type...
-    this._baseEntry.list.forEach(function(baseVisualType) {
+    this._definitionClasses.list.forEach(function(baseVisualType) {
       // Has specific configs for <type,container>?
       var type = applyContainerConfigs.call(this, containerTypeId, baseVisualType) ||
                  baseVisualType;
