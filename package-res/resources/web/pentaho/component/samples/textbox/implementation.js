@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 define([
-  "cdf/component/unmanaged/implementation",
+  "cdf/component/input/implementation",
   "pentaho/messages!implementation",
   "pentaho/theme!implementation"
-], function(UnmanagedComponent, messages) {
+], function(InputComponent, messages) {
 
-  return UnmanagedComponent.extend({
+  return InputComponent.extend({
     /**
      * A CDF text box component.
      *
      * @alias TextBox
      * @memberOf pentaho.component.samples
      * @class
+     * @extend cdf.component.Input
      */
     constructor: function(options) {
       // ...
