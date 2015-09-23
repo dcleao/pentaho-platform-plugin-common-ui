@@ -1,0 +1,92 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IPropertySpec` interface represents the information that is used to define a component property.
+ *
+ * @name pentaho.component.IPropertySpec
+ * @interface
+ *
+ * @see pentaho.component.IDataBindingPropertySpec
+ *
+ * @property {string} id The id of the property.
+ *
+ * @property {string} label The name of the property.
+ *
+ * @property {string} valueType The type of _atomic_ value that the property supports.
+ *
+ * When a property accepts multiple values the type of its compound value is actually
+ * an array of `valueType`.
+ *
+ * See {@link pentaho.component.IPropertySpec#allowMultiple}.
+ *
+ * @property {boolean} required Indicates if components of this type require this property to be specified to
+ *    be able to do their work.
+ *
+ * A value is considered unspecified if its value is one of the JavaScript values:
+ * `undefined`, an empty string, `""`, or `NaN`.
+ *
+ * @property {boolean} allowMultiple Indicates if the property accepts multiple values,
+ *    each of the property's type.
+ *
+ * Specifying this option with value `false` is equivalent to
+ * specifying {@link pentaho.component.IPropertySpec#maxOccur} with value `1`.
+ *
+ * The most restrictive (minimum of occurrence limits) between
+ * this property and {@link pentaho.component.IPropertySpec#maxOccur} wins.
+ *
+ * The default value is `false`
+ *
+ * @property {number} minOccur The minimum number of values that a property must have.
+ *
+ * A number greater than or equal to `1`.
+ *
+ * The most restrictive (maximum of occurrence limits) between
+ * this property and {@link pentaho.component.IPropertySpec#required} wins.
+ *
+ * The default value is `0`.
+ *
+ * @property {number} maxOccur The maximum number of values that a property accepts.
+ *
+ * A number greater than or equal to `1`.
+ *
+ * The most restrictive (minimum of occurrence limits) between
+ * this property and {@link pentaho.component.IPropertySpec#allowMultiple} wins.
+ *
+ * The default value is `Infinity`.
+ *
+ * @property {Array} values A list of possible values that the property can take.
+ *
+ * The type of each value should be consistent with
+ * the value of {@link pentaho.component.IPropertySpec#valueType}.
+ *
+ * When a default value is not defined and the property is _required_,
+ * as many values as the minimum required are chosen as default.
+ *
+ * @property {*} minimum The minimum value that the property can take as a value.
+ *
+ * Applies only to properties whose {@link pentaho.component.IPropertySpec#valueType}
+ * can be meaningfully compared using the JavaScript's `<` and `>` operators.
+ *
+ * The default value is `undefined`.
+ *
+ * @property {*} maximum The maximum value that the property can take as value.
+ *
+ * Applies only to properties whose {@link pentaho.component.IPropertySpec#valueType}
+ * can be meaningfully compared using the JavaScript's `<` and `>` operators.
+ *
+ * The default is `undefined`.
+ */

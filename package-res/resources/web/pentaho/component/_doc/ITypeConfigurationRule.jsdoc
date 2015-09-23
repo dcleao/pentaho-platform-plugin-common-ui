@@ -18,7 +18,7 @@
  * @name pentaho.component.ITypeConfigurationRule
  * @interface
  *
- * @classdesc The `ITypeConfigurationRule` interface represents a
+ * @description The `ITypeConfigurationRule` interface represents a
  * configuration that is applied to
  * certain component types, when under certain _usage contexts_.
  *
@@ -37,12 +37,30 @@
  *
  * @see pentaho.component.ITypeConfiguration
  * @see pentaho.component.ITypeDefinition
+ */
+
+/**
+ * Indicates if a component type is enabled.
  *
- * @property {boolean} enabled Indicates if a component type is enabled. The default is `true`.
+ * The default value is `true`.
  *
- * @property {string} label A human-readable, localized and short description of the component type.
+ * @name pentaho.component.ITypeConfigurationRule#enabled
+ * @type boolean
+ * @default true
+ */
+
+/**
+ * A human-readable, localized and short description of the component type.
  *
- * @property {string} description A human-readable, localized description of the component type.
+ * @name pentaho.component.ITypeConfigurationRule#label
+ * @type string
+ */
+
+/**
+ * A human-readable, localized description of the component type.
+ *
+ * @name pentaho.component.ITypeConfigurationRule#description
+ * @type string
  */
 
 /**
@@ -54,11 +72,11 @@
  * that each entry applies to.
  *
  * When a string is specified, it applies only to a component type having
- * that exact id and constitutes an _individual_ configuration.
+ * that exact id and constitutes an **individual configuration**.
  *
  * When a regular expression object is specified,
  * it applies to every component type whose id matches it,
- * and constitutes a _group_ configuration.
+ * and constitutes a **group configuration**.
  *
  * See [RegExp]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp}
  * for more information on the JavaScript's regular expression syntax.
@@ -107,12 +125,12 @@
  *
  * The greater the number, the higher is the priority.
  *
- * The default priority is <tt>0</tt>.
+ * The default priority value is <tt>0</tt>.
  *
- * Use a value of <tt>-1</tt> for a weak configuration —
+ * Use a value of <tt>-1</tt> for a weak, or default, configuration —
  * one that is only used if no other "normal" configuration is made.
  *
- * Use a value of <tt>+1</tt> for a strong configuration —
+ * Use a value of <tt>+1</tt> for a strong, or overriding, configuration —
  * one that is used unless another configuration intendedly overrides it,
  * with a greater priority value.
  *

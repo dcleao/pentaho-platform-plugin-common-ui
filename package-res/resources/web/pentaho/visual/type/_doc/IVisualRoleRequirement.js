@@ -81,68 +81,6 @@
  */
 
 /**
- * Indicates if a visual role requirement supports
- * multiple data attributes.
- *
- * Specifying this option with value `false` is equivalent to
- * specifying {{#crossLink "IVisualRoleRequirement/maxOccur:property"}}{{/crossLink}}
- * with a value of `1`.
- *
- * The most restrictive (minimum of occurrence limits) between
- * this property and {{#crossLink "IVisualRoleRequirement/maxOccur:property"}}{{/crossLink}} wins.
- *
- * @property allowMultiple
- * @type boolean
- * @optional
- * @default true
- */
-
-/**
- * The maximum number of data attributes that a
- * visual role requirement supports.
- *
- * A number greater than or equal to `1`.
- *
- * The most restrictive (minimum of occurrence limits) between
- * this property and {{#crossLink "IVisualRoleRequirement/allowMultiple:property"}}{{/crossLink}} wins.
- *
- * @property maxOccur
- * @type number
- * @optional
- * @default Infinity
- */
-
-/**
- * Indicates if a requirement is, actually, _required_.
- *
- * The visual role must be bound to at least one data attribute.
- *
- * Specifying this option with value `true` is equivalent to
- * specifying {{#crossLink "IVisualRoleRequirement/minOccur:property"}}{{/crossLink}}
- * with a value of `1`.
- *
- * The most restrictive (maximum of occurrence limits) between
- * this property and {{#crossLink "IVisualRoleRequirement/minOccur:property"}}{{/crossLink}} wins.
- *
- * @property required
- * @type boolean
- * @optional
- * @default false
- */
-
-/**
- * The minimum number of data attributes that a visual role requirement must be bound to.
- *
- * The most restrictive (maximum of occurrence limits) between
- * this property and {{#crossLink "IVisualRoleRequirement/required:property"}}{{/crossLink}} wins.
- *
- * @property minOccur
- * @type number
- * @optional
- * @default 0
- */
-
-/**
  * The name of the visual role.
  *
  * The value of this property can be the name of a resource key

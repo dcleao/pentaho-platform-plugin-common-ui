@@ -15,7 +15,13 @@
  */
 
 /**
- * The `ITypeConfiguration` interface represents a sequence of component type
+ * @name pentaho.component.ITypeConfiguration
+ *
+ * @interface
+ *
+ * @see pentaho.component.ITypeDefinition
+ *
+ * @description The `ITypeConfiguration` interface represents a sequence of component type
  * configuration rules.
  *
  * When more than one configuration rule applies to a visual type,
@@ -32,9 +38,5 @@
  * However, note that for the configurations that are automatically loaded by the {@link pentaho.component.registry},
  * by using the {@link pentaho.service} AMD plugin, their relative order is actually undefined.
  *
- * @name pentaho.component.ITypeConfiguration
- * @interface
- * @see pentaho.component.ITypeDefinition
- *
- * @property {pentaho.component.ITypeConfiguration[]} types An array of configuration rules.
+ * @property {pentaho.component.ITypeConfigurationRule[]} types An array of configuration rules.
  */

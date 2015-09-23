@@ -21,9 +21,8 @@ define([
   "../lang/_Annotatable",
   "../lang/Base",
   "../util/arg",
-  "../util/error",
-  "../util/object"
-], function(Cell, Member, StructurePosition, MemberCollection, Annotatable, Base, arg, error, O) {
+  "../util/error"
+], function(Cell, Member, StructurePosition, MemberCollection, Annotatable, Base, arg, error) {
 
   var annotProto = Annotatable.prototype;
 
@@ -248,10 +247,11 @@ define([
       return cell;
     },
 
+    // @ignore Structure and StructurePosition are not documented.
     /**
-     * @ignore Structure and StructurePosition are not documented.
+     * @ignore
      *
-     * Creates structure position of this attribute.
+     * @description Creates structure position of this attribute.
      *
      * Preferably,
      * to create a structure position,

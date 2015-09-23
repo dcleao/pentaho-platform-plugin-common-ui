@@ -15,7 +15,7 @@
  */
 
 /**
- * The `ITypeDefinition` interface represents the information required to define a component type.
+ * The `ITypeDefinition` interface represents the information that is used to define a component type.
  *
  * @name pentaho.component.ITypeDefinition
  * @interface
@@ -32,5 +32,7 @@
  *
  * @property {boolean} abstract Indicates if the component type is abstract.
  *
- * @property {} properties
+ * @property {IPropertySpec[]} properties An array of property specifications.
+ *
+ * @property {Object} defaults A dictionary with default values for the properties of new components.
  */

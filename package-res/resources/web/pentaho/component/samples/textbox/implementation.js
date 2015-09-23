@@ -26,7 +26,7 @@ define([
      * @alias TextBox
      * @memberOf pentaho.component.samples
      * @class
-     * @extend cdf.component.Input
+     * @extends cdf.component.Input
      */
     constructor: function(options) {
       // ...

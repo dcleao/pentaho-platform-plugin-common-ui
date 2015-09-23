@@ -17,15 +17,20 @@ define([
   "module",
   "cdf/component/input/definition",
   "pentaho/messages!definition",
+  "pentaho/common/Messages",
   "pentaho/theme!definition"
-], function(module, InputComponentDefinition, messages) {
+], function(module, InputComponentDefinition, messages, GlobalMessages) {
+
+  // This facade is used by the pentaho.common.PropertiesPanel class
+  // to automatically translate known localizable properties.
+  // Not used by this textbox class... but put it here for demonstration only.
+  GlobalMessages.addBundle(messages.source);
 
   /**
    * @name pentaho.component.samples.TextBoxDefinition
    * @class
    * @extends cdf.component.InputDefinition
    */
-
   return InputComponentDefinition.extend(/** @lends pentaho.component.samples.TextBoxDefinition# */{
     id: module.id,
     name: messages.get("name"),
