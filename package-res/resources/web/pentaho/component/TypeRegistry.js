@@ -123,7 +123,7 @@ define([
 
       // Holds configured and enabled component type definitions.
       // Context "" is the global context.
-      this._definitionByContext = {};
+      this._definitionsByContext = {};
     },
 
     /**
@@ -244,7 +244,7 @@ define([
             if(id == null || id === "") {
               // All ids - like an all-group config.
               hasAllGroup = true;
-              config._matchGroupId = F_true;
+              config._matchGroup = F_true;
               ensureConfigLevel().group.push(config);
             } else {
               if(typeof id === "string") {
@@ -268,7 +268,7 @@ define([
         processId.call(this, ids);
 
       if(!hasAllGroup && reIds.length) {
-        config._matchGroupId = function(id) {
+        config._matchGroup = function(id) {
           return reIds.some(function(reId) { return reId.test(id); });
         };
         ensureConfigLevel().group.push(config);
@@ -297,7 +297,7 @@ define([
   function getConfigLevel(priority) {
     var configLevel = O.getOwn(this._configLevelsMap, priority);
     if(!configLevel) {
-      configLevel = this._configLevelsMap[priority] = { // @type IComponentConfigLevel
+      configLevel = this._configLevelsMap[priority] = { // @type pentaho.component.IComponentConfigLevel
         priority: priority,
 
         // All individual type configs
@@ -323,74 +323,123 @@ define([
 
   // @private
   function getContextDefinitions(contextId) {
-    var cache = this._definitionByContext;
+    var cache = this._definitionsByContext;
     return (cache && O.getOwn(cache, contextId || "")) ||
            createContextDefinitions.call(this, contextId);
   }
 
   // @private
   function createContextDefinitions(contextId) {
-    var entry = new TypeDefinitionCollection();
+    var typeDefCol = new TypeDefinitionCollection();
 
-    // For every TypeDefinition class
-    this._definitionClasses.forEach(function(CompTypeDef) {
+    // For every non-abstract TypeDefinition class
+    this._definitionClasses.forEach(function(TypeDef) {
+      if(!TypeDef.prototype["abstract"]) {
 
-      // Configure
-      var compTypeDef = applyContextConfigs.call(this, contextId, CompTypeDef);
-      if(compTypeDef.enabled)
-        entry.push(compTypeDef);
+        var typeDef = createDefinitionForContext.call(this, TypeDef, contextId);
+        if(typeDef.enabled)
+          typeDefCol.push(typeDef);
 
+      }
     }, this);
 
-    var cache = this._definitionByContext || (this._definitionByContext = {});
-    cache[contextId || ""] = entry;
-    return entry;
+    var cache = this._definitionsByContext || (this._definitionsByContext = {});
+    cache[contextId || ""] = typeDefCol;
+    return typeDefCol;
   }
 
-  // Maps all applicable configurations to a given component type,
-  // from lowest to highest precedence config.
-  // @private
-  function mapConfigs(typeId, fun) {
+  /**
+   * Creates a component type definition of the given class,
+   * and for the given context id.
+   *
+   * @param {Class.<pentaho.component.TypeDefinition>} TypeDef A non-abstract component type definition class.
+   * @param {function(pentaho.component.ITypeConfigurationRule)} fun The mapping function.
+   * @return {pentaho.component.TypeDefinition} A new, configured component type definition.
+   * @ignore
+   */
+  function createDefinitionForContext(TypeDef, contextId) {
+    var typeDef = new TypeDef();
+
+    mapConfigs.call(this, TypeDef, function(config) {
+      var matches = !config._matchContext || // any context
+          (contextId && config._matchContext(contextId)); // matches specific context
+      if(matches) typeDef.configure(config);
+    });
+
+    return typeDef;
+  }
+
+  /**
+   * Maps the configuration rules applicable to a given component type,
+   * from lowest to highest precedence.
+   *
+   * @param {Class.<pentaho.component.TypeDefinition>} TypeDef The component type definition class.
+   * @param {function(pentaho.component.ITypeConfigurationRule)} fun The mapping function.
+   * @ignore
+   */
+  function mapConfigs(TypeDef, fun) {
     var levels = this._configLevelsList,
-        L = levels.length,
-        i = -1;
-    while(++i < L) mapConfigLevelConfigs.call(this, levels[i], typeId, fun);
+        i = -1,
+        L = levels.length;
+    while(++i < L) mapConfigsOfLevel.call(this, levels[i], TypeDef, fun);
   }
 
-  // Maps all configurations of a given configuration level that
-  // are applicable to a given component type,
-  // from lowest to highest precedence configuration.
-  // @private
-  function mapConfigLevelConfigs(configLevel, typeId, fun) {
-    var configsMap  = {},
-        configsList = []; // from highest to lowest precedence.
+  /**
+   * Maps the configuration rules of a configuration level,
+   * applicable to a given component type,
+   * from lowest to highest precedence.
+   *
+   * @param {pentaho.component.IComponentConfigLevel} configLevel The configuration level.
+   * @param {Class.<pentaho.component.TypeDefinition>} TypeDef The component type definition class.
+   * @param {function(pentaho.component.ITypeConfigurationRule)} fun The mapping function.
+   * @ignore
+   */
+  function mapConfigsOfLevel(configLevel, TypeDef, fun) {
+    var visitedConfigsMap  = {},
+        configsList = [], // from highest to lowest precedence.
+        me = this;
 
     function mapConfigList(configs, fun2) {
       if(configs) {
         var i = configs.length;
         while(i--)
-          if(configsMap[configs[i]._id] !== true)
-            fun2.call(this, configs[i]);
+          if(visitedConfigsMap[configs[i]._id] !== true)
+            fun2.call(me, configs[i]);
       }
     }
 
     function addConfig(config) {
-      configsMap[config._id] = true;
+      visitedConfigsMap[config._id] = true;
       configsList.push(config);
     }
 
-    // We need to do this in two phases or a config that
-    // matches both individually and as a group (an array of string and regexp)
-    // could end up mapping that config in group position, loosing precedence.
+    function eachAncestorType(BaseTypeDef, fun) {
+      // Walk-up the class hierarchy, until the root, TypeDefinition is found.
+      do {
+        fun(BaseTypeDef);
+      } while((BaseTypeDef !== TypeDefinition) && (BaseTypeDef = BaseTypeDef.ancestor));
+    }
+
+    // The following needs to be done in two phases: individual and group.
+    // Otherwise, a config that matches both individually and as a group (e.g.: an array of string and regexp)
+    // could end up being placed in group position and loose precedence.
 
     // Process Individual configurations
-    mapConfigList.call(this, configLevel.indiv[typeId], addConfig);
+    eachAncestorType(TypeDef, function(BaseTypeDef) {
+      mapConfigList(configLevel.indiv[BaseTypeDef.key], addConfig);
+    });
 
     // Process Group configurations
-    mapConfigList.call(this, configLevel.group, function(config) {
-      if(!config._matchGroupId || config._matchGroupId(typeId))
-        addConfig(config);
+    eachAncestorType(TypeDef, function(BaseTypeDef) {
+      var typeId = BaseTypeDef.key;
+
+      mapConfigList(configLevel.group, function(config) {
+        if(!config._matchGroup || config._matchGroup(typeId))
+          addConfig(config);
+      });
     });
+
+    // ---
 
     // Finally, map (from lowest to highest precedence).
     var j = configsList.length;
@@ -398,26 +447,13 @@ define([
   }
 
   // @private
-  function applyContextConfigs(contextId, CompTypeDef) {
-    var compTypeDef = new CompTypeDef();
-
-    mapConfigs.call(this, CompTypeDef.key, function(config) {
-      var matches = !config._matchContext || // any context
-                    (contextId && config._matchContext(contextId)); // matches specific context
-      if(matches) compTypeDef.configure(config);
-    });
-
-    return compTypeDef;
-  }
-
-  // @private
   function invalidateContext(contextIds) {
-    var cache = this._definitionByContext;
+    var cache = this._definitionsByContext;
     if(!cache) return;
 
     if(!contextIds) {
       // Affects every context
-      this._definitionByContext = null;
+      this._definitionsByContext = null;
       return;
     }
 
@@ -441,7 +477,7 @@ define([
           return;
 
       // No contexts left. Clear the field.
-      this._definitionByContext = null;
+      this._definitionsByContext = null;
     }
   }
 });
