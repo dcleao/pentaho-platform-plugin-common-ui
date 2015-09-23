@@ -18,10 +18,19 @@
  * The `ITypeConfiguration` interface represents a sequence of component type
  * configuration rules.
  *
- * Properties {@link pentaho.component.ITypeConfiguration#id}
- * and {@link pentaho.component.ITypeConfiguration#context}
- * determine the &lt;component type, context&gt; pairs that the
- * configuration applies to.
+ * When more than one configuration rule applies to a visual type,
+ * the rules are applied in reverse order (last rule wins) of the following precedence rules:
+ *
+ * 1. {@link pentaho.component.ITypeConfigurationRule#priority} property, from greater to lower values.
+ * 2. First _Individual_ then _Group_ rules — see {@link pentaho.component.ITypeConfigurationRule#id}.
+ * 3. Rules of a component type definition class hierarchy, from more specialized to more abstract.
+ * 3. Inverse document order — last in document order has higher precedence.
+ *
+ * These apply also between configuration rules of different {@link pentaho.component.ITypeConfiguration} objects,
+ * in which case the order by which these are registered in
+ * the {@link pentaho.component.TypeRegistry} impacts their _document order_.
+ * However, note that for the configurations that are automatically loaded by the {@link pentaho.component.registry},
+ * by using the {@link pentaho.service} AMD plugin, their relative order is actually undefined.
  *
  * @name pentaho.component.ITypeConfiguration
  * @interface

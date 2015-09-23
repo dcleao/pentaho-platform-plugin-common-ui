@@ -83,7 +83,7 @@ define([
     /**
      * Applies a configuration to the component type.
      *
-     * @param {pentaho.component.ITypeConfiguration} config A component type configuration.
+     * @param {!pentaho.component.ITypeConfigurationRule} config A component type configuration rule.
      */
     configure: function(config) {
       if(!config) throw error.argRequired("config");

@@ -15,11 +15,14 @@
  */
 
 /**
- * The `ITypeConfigurationRule` interface represents a
+ * @name pentaho.component.ITypeConfigurationRule
+ * @interface
+ *
+ * @classdesc The `ITypeConfigurationRule` interface represents a
  * configuration that is applied to
  * certain component types, when under certain _usage contexts_.
  *
- * Configuration rules are part of a higher concept,
+ * Configuration rules are part of a bigger structure,
  * the component type configuration: {@link pentaho.component.ITypeConfiguration}.
  *
  * Properties {@link pentaho.component.ITypeConfigurationRule#id}
@@ -27,8 +30,11 @@
  * determine the &lt;component type, context&gt; pairs that a
  * configuration rule applies to.
  *
- * @name pentaho.component.ITypeConfigurationRule
- * @interface
+ * Editors and viewer applications may define extensions to this interface,
+ * consisting of additional properties that they give meaning to.
+ * As an example, Pentaho Analyzer supports the additional `maxValues` and `keepLevelOnDrilldown` properties.
+ * These properties _can_ be specified in `ITypeConfigurationRule` objects.
+ *
  * @see pentaho.component.ITypeConfiguration
  * @see pentaho.component.ITypeDefinition
  *
