@@ -29,7 +29,7 @@
  * @name pentaho.component.IDataBindingPropertySpec
  *
  * @interface
- * @extends pentaho.component.IPropertySpec
+ * @extends pentaho.component.IPropertyTypeDefinition
  *
  * @property {string} valueType The type of value of a data binding property is fixed to `"string"`.
  *

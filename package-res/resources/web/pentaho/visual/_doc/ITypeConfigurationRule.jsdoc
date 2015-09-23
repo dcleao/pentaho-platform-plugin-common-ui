@@ -31,15 +31,6 @@
  */
 
 /**
- * Default property values for visualization properties.
- *
- * Overrides defaults set by the visualization type definition.
- *
- * @name pentaho.visual.ITypeConfigurationRule#defaults
- * @type Object
- */
-
-/**
  * Overrides {{#crossLink "IVisualType/args:menuOrdinal"}}{{/crossLink}}.
  *
  * @name pentaho.visual.ITypeConfigurationRule#menuOrdinal

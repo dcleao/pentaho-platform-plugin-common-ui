@@ -32,7 +32,7 @@
  *
  * @property {boolean} abstract Indicates if the component type is abstract.
  *
- * @property {IPropertySpec[]} properties An array of property specifications.
+ * @property {pentaho.component.IPropertyTypeUsageDefinition[]} properties An array of property type usage definitions.
  *
  * @property {Object} defaults A dictionary with default values for the properties of new components.
  */

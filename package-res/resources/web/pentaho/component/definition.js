@@ -47,7 +47,7 @@ define([
      * facilitate working with component definitions and implementations.
      *
      * @description Creates a component definition instance with a given configuration.
-     * @param {Object} config A component definition configuration.
+     * @param {pentaho.component.ITypeConfigurationRule} [config] A component type configuration rule.
      */
     constructor: function(config) {
       if(config) this.configure(config);

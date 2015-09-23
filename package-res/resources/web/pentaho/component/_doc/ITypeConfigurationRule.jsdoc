@@ -40,32 +40,8 @@
  */
 
 /**
- * Indicates if a component type is enabled.
- *
- * The default value is `true`.
- *
- * @name pentaho.component.ITypeConfigurationRule#enabled
- * @type boolean
- * @default true
- */
-
-/**
- * A human-readable, localized and short description of the component type.
- *
- * @name pentaho.component.ITypeConfigurationRule#label
- * @type string
- */
-
-/**
- * A human-readable, localized description of the component type.
- *
- * @name pentaho.component.ITypeConfigurationRule#description
- * @type string
- */
-
-/**
  * Id or id pattern, or an array of such, of the component types
- * that the configuration rule applies to.
+ * that the rule applies to.
  *
  * When unspecified, it applies to **all** component types.
  * Otherwise, when an array, it applies to the union of the component types
@@ -103,7 +79,7 @@
  */
 
 /**
- * Id, or array of ids, of the contexts that the configuration rule applies to.
+ * Id, or array of ids, of the contexts that the rule applies to.
  *
  * When unspecified, applies to **all** contexts.
  * Otherwise, when an array, it applies to the union of the contexts
@@ -139,3 +115,36 @@
  * @default 0
  */
 
+/**
+ * Indicates if a component type is enabled.
+ *
+ * The default value is `true`.
+ *
+ * @name pentaho.component.ITypeConfigurationRule#enabled
+ * @type boolean
+ * @default true
+ */
+
+/**
+ * A human-readable, localized and short description of the component type.
+ *
+ * @name pentaho.component.ITypeConfigurationRule#label
+ * @type string
+ * @see pentaho.component.ITypeDefinition#label
+ */
+
+/**
+ * A human-readable, localized description of the component type.
+ *
+ * @name pentaho.component.ITypeConfigurationRule#description
+ * @type string
+ * @see pentaho.component.ITypeDefinition#description
+ */
+
+/**
+ * Default property values for new components.
+ *
+ * @name pentaho.component.ITypeConfigurationRule#defaults
+ * @type Object
+ * @see pentaho.component.ITypeDefinition#defaults
+ */
