@@ -24,7 +24,7 @@
  * 1. {@link pentaho.component.ITypeConfigurationRule#priority} property, from greater to lower values.
  * 2. First _Individual_ then _Group_ rules — see {@link pentaho.component.ITypeConfigurationRule#id}.
  * 3. Rules of a component type definition class hierarchy, from more specialized to more abstract.
- * 3. Inverse document order — last in document order has higher precedence.
+ * 4. Inverse document order — last in document order has higher precedence.
  *
  * These apply also between configuration rules of different {@link pentaho.component.ITypeConfiguration} objects,
  * in which case the order by which these are registered in
@@ -38,80 +38,3 @@
  *
  * @property {pentaho.component.ITypeConfiguration[]} types An array of configuration rules.
  */
-
-/**
- * Id or id pattern, or an array of such, of the component types
- * that the configuration applies to.
- *
- * When unspecified, it applies to **all** component types.
- * Otherwise, when an array, it applies to the union of the component types
- * that each entry applies to.
- *
- * When a string is specified, it applies only to a component type having
- * that exact id and constitutes an _individual_ configuration.
- *
- * When a regular expression object is specified,
- * it applies to every component type whose id matches it,
- * and constitutes a _group_ configuration.
- *
- * See [RegExp]{@link https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp}
- * for more information on the JavaScript's regular expression syntax.
- *
- * @example
- * // a single component type
- * "pentaho/visual/ccc/bar"
- *
- * // all "pentaho" component types
- * /^pentaho\//
- *
- * // all of the "twelve days of big data visualizations" plugin
- * // visualization components
- * /^twelveDaysViz\//
- *
- * // all component types
- * null
- *
- * // CDF's input and select components
- * ["cdf/component/input", "cdf/component/select"]
- *
- * @name pentaho.component.ITypeConfiguration#id
- * @type string | RegExp | (string|RegExp)[]
- */
-
-/**
- * Id, or array of ids, of the contexts that the configuration applies to.
- *
- * When unspecified, applies to **all** contexts.
- * Otherwise, when an array, it applies to the union of the contexts
- * that each of the entries applies to.
- *
- * @example
- * // Analyzer
- * "analyzer"
- *
- * // Analyzer and CDF
- * ["analyzer", "cdf"]
- *
- * @name pentaho.component.ITypeConfiguration#context
- * @type string|string[]
- */
-
-/**
- * The priority of the configuration.
- *
- * The greater the number, the higher is the priority.
- *
- * The default priority is <tt>0</tt>.
- *
- * Use a value of <tt>-1</tt> for a weak configuration —
- * one that is only used if no other "normal" configuration is made.
- *
- * Use a value of <tt>+1</tt> for a strong configuration —
- * one that is used unless another configuration intendedly overrides it,
- * with a greater priority value.
- *
- * @name pentaho.component.ITypeConfiguration#priority
- * @type number
- * @default 0
- */
-

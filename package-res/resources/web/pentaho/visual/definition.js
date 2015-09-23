@@ -32,7 +32,7 @@ define([
    * @classdesc The `pentaho.visual.TypeDefinition` is the base abstract class of
    *     the Visualization API component type definitions.
    *
-   * A visualization component type is also called, loosely, a **visualization type**.
+   * A visualization component type can also be called, simply, a **visualization type**.
    *
    * Visualization types are defined by creating a class that directly or indirectly inherits from this one.
    */

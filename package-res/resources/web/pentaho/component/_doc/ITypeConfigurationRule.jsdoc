@@ -81,7 +81,7 @@
  * ["cdf/component/input", "cdf/component/select"]
  *
  * @name pentaho.component.ITypeConfigurationRule#id
- * @type string | RegExp | (string|RegExp)[]
+ * @type string | RegExp | Array.<(string|RegExp)>
  */
 
 /**

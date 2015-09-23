@@ -32,8 +32,6 @@ define([
     description: messages.get("description"),
     className: "pentaho-component-samples-textBox",
 
-    kind: "CDF",
-
     // CDF specific?
     properties: {
 

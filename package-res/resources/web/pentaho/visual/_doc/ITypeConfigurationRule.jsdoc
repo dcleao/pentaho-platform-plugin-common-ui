@@ -28,16 +28,49 @@
  *
  * @see pentaho.visual.ITypeConfiguration
  * @see pentaho.visual.ITypeDefinition
- *
- * @class IVisualTypeConfiguration
- * @constructor
  */
 
 /**
+ * Default property values for visualization properties.
  *
- * @property priority
- * @type number
- * @default 0
+ * Overrides defaults set by the visualization type definition.
+ *
+ * @name pentaho.visual.ITypeConfigurationRule#defaults
+ * @type Object
  */
 
-/
+/**
+ * Overrides {{#crossLink "IVisualType/args:menuOrdinal"}}{{/crossLink}}.
+ *
+ * @name pentaho.visual.ITypeConfigurationRule#menuOrdinal
+ * @type number
+ */
+
+/**
+ * Overrides {{#crossLink "IVisualType/args:menuSeparator"}}{{/crossLink}}.
+ *
+ * @name pentaho.visual.ITypeConfigurationRule#menuSeparator
+ * @type boolean
+ */
+
+/**
+ * **Optional** method that gets the visualization properties exposed by a visualization editor's document.
+ *
+ * This method is called with the configured visual type,
+ * {{#crossLink "IVisualType"}}{{/crossLink}}, as the `this` JavaScript context.
+ *
+ * @method getEditorProperties
+ *
+ * @param {IVisualEditorDocument} editorDoc An object that allows accessing the editor's document and properties.
+ * @param {string|string[]} [filterPropsList] A string or an array of strings with
+   *   the editor property names
+   *   that should be processed. When this is unspecified, _nully_,
+   *   or has zero length, then all properties should be processed.
+   *
+   *   This argument can be seen to indicate a set of editor properties
+   *   whose value has changed and need to be updated.
+ * @param {Object} filterPropsMap A map whose keys are the property names in _filterPropsList_
+ *   and whose values are all `true`.
+ *
+ * @return {Object} A map of "visual properties".
+ */

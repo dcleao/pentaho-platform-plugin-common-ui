@@ -136,6 +136,37 @@ define([
        * @readonly
        */
       this.declaredDefinition = instTypeDef;
+    },
+
+
+    /**
+     * Updates a properties model based on its current property values.
+     *
+     * @param {pentaho.component.PropertiesModel} propsModel The properties model.
+     * @param {Object} [keyArgs] The keyword arguments object.
+     *    When unspecified, it is assumed that all properties have changed.
+     * @param {string} [keyArgs.changedProp] The name of the property that has changed.
+     *    When unspecified, it is assumed that all properties have changed.
+     */
+    updateProperties: function(propsModel, changedProp) {
+
+    },
+
+    /**
+     * Validates a properties model based on its current property values.
+     *
+     * This implementation performs basic properties validation —
+     * "requiredness" and minimum occurrence —
+     * has been performed and was successful.
+     *
+     * The returned `Error` objects can have a string `code` property with an error code.
+     *
+     * @param {pentaho.component.PropertiesModel} propsModel The properties model.
+     * @return {Error[]|null} A non-empty array of error objects,
+     *    or `null`, when there are no validation errors.
+     */
+    validateProperties: function(propsModel) {
+
     }
   })
   .implement(/** @lends pentaho.component.TypeDefinition# */{

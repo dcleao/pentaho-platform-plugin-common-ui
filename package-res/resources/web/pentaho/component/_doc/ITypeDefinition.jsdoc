@@ -30,7 +30,7 @@
  *
  * @property {string} className The _CSS_ class name used to style components of this type.
  *
- * @property {string} kind The kind of component type this is. Is it a CDF component? A VizAPI component?
- *
  * @property {boolean} abstract Indicates if the component type is abstract.
+ *
+ * @property {} properties
  */
