@@ -15,23 +15,21 @@
  */
 define([
   "./TypeRegistry",
-  "service!pentaho/component/TypeDefinition",
+  "service!pentaho/component/Type",
   "service!pentaho/component/ITypeConfiguration"
-], function(TypeRegistry, CompTypeDefs, compTypeConfigs) {
+], function(TypeRegistry, Types, typeConfigs) {
 
   /*global Promise:true*/
 
   /**
-   * The singleton instance where component type definitions and their configurations are registered.
+   * The singleton instance where component types and their configurations are registered.
    *
    * The component type registry comes pre-loaded with the AMD _services_:
-   * 1. {@link pentaho.component.ITypeConfiguration}
-   * 2. {@link pentaho.component.TypeDefinition}
+   * 1. {@link pentaho.component.TypeConfigurationSpec}
+   * 2. {@link pentaho.component.Type}
    *
-   * Additional component types and configurations may be loaded
-   * dynamically by using the methods
-   * {@link pentaho.component.TypeRegistry#add} and
-   * {@link pentaho.component.TypeRegistry#addConfig},
+   * Additional component types and configurations may be loaded dynamically by using the methods
+   * {@link pentaho.component.TypeRegistry#add} and {@link pentaho.component.TypeRegistry#addConfig},
    * respectively.
    *
    * #### AMD
@@ -39,24 +37,24 @@ define([
    * **Module Id**: `"pentaho/component/registry"`
    *
    * @alias registry
-   * @type pentaho.component.TypeRegistry
    * @memberOf pentaho.component
+   * @type pentaho.component.TypeRegistry
    * @amd pentaho/component/registry
    */
   var typeRegistry = new TypeRegistry();
 
   // Auto-load the registry with ITypeConfiguration instances
-  if(compTypeConfigs) compTypeConfigs.forEach(function(compTypeConfig) {
-    if(compTypeConfig && compTypeConfig.types)
-      compTypeConfig.types.forEach(function(typeConfig) {
+  if(typeConfigs) typeConfigs.forEach(function(typeConfig) {
+    if(typeConfig && typeConfig.types)
+      typeConfig.types.forEach(function(typeConfig) {
       if(typeConfig)
         typeRegistry.addConfig(typeConfig);
     });
   });
 
-  // Auto-load the registry with TypeDefinition classes.
-  CompTypeDefs.forEach(function(CompTypeDef) {
-    typeRegistry.add(CompTypeDef);
+  // Auto-load the registry with Type classes.
+  Types.forEach(function(Type) {
+    typeRegistry.add(Type);
   });
 
   return typeRegistry;

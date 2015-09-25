@@ -62,12 +62,9 @@ define([
      *     visualizations may use this color, when appropriate,
      *     to enable easy distinction between the representation of members
      *
-     * @description An initialization constructor that
-     * initializes a member instance assuming it was
-     * converted from a member specification object,
-     * {@link pentaho.data.IMemberSpec}.
+     * @description Creates a member from a member specification.
      *
-     * Members cannot be constructed directly.
+     * Members should not be constructed directly.
      * Instead, because members always have an associated attribute,
      * they should be created by using its attribute's
      * {@link pentaho.data.Attribute#toMemberOf} method.

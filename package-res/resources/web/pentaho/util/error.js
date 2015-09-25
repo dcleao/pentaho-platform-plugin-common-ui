@@ -47,7 +47,11 @@ define(function() {
 
     argOutOfRange: function(name) {
       return error.argInvalid(name, "Out of range.");
-    }
+    },
+
+    operInvalid: function(text) {
+      return new Error("Operation invalid." + (text ? (" " + text) : ""));
+    },
   };
 
   return error;

@@ -15,12 +15,11 @@
  */
 
 /**
- * @name pentaho.visual.ITypeConfiguration
- * @interface
- * @extends pentaho.component.ITypeConfiguration
+ * The `TypeConfigurationRuleSetSpec` type is an array of component type configuration rules.
  *
- * @classdesc The `pentaho.visual.ITypeConfiguration` interface represents a sequence of visualization type
- * configuration rules.
+ * This type can be used generically, having as argument the type of configurations
+ * that its rules contain.
+ * For example: {@link pentaho.component.TypeConfigurationRuleSetSpec.<pentaho.component.ITypeConfigurationSpec>}.
  *
- * @property {pentaho.visual.ITypeConfigurationRule} types An array of visualization type configuration rules.
+ * @typedef {Array.pentaho.component.ITypeConfigurationRuleSpec[]} pentaho.component.TypeConfigurationRuleSetSpec
  */

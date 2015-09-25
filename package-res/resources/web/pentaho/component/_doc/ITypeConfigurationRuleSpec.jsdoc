@@ -15,28 +15,43 @@
  */
 
 /**
- * @name pentaho.component.ITypeConfigurationRule
+ * @name pentaho.component.ITypeConfigurationRuleSpec
+ *
  * @interface
  *
- * @description The `ITypeConfigurationRule` interface represents a
- * configuration that is applied to
- * certain component types, when under certain _usage contexts_.
+ * @description The `ITypeConfigurationRuleSpec` interface represents a
+ * configuration rule that controls the scope of application of a given type configuration.
  *
- * Configuration rules are part of a bigger structure,
- * the component type configuration: {@link pentaho.component.ITypeConfiguration}.
- *
- * Properties {@link pentaho.component.ITypeConfigurationRule#id}
- * and {@link pentaho.component.ITypeConfigurationRule#context}
+ * The properties {@link pentaho.component.ITypeConfigurationRuleSpec#id}
+ * and {@link pentaho.component.ITypeConfigurationRuleSpec#context}
  * determine the &lt;component type, context&gt; pairs that a
- * configuration rule applies to.
+ * configuration applies to.
  *
- * Editors and viewer applications may define extensions to this interface,
- * consisting of additional properties that they give meaning to.
- * As an example, Pentaho Analyzer supports the additional `maxValues` and `keepLevelOnDrilldown` properties.
- * These properties _can_ be specified in `ITypeConfigurationRule` objects.
+ * The property {@link pentaho.component.ITypeConfigurationRuleSpec#priority}
+ * affects the order of application of rules.
  *
- * @see pentaho.component.ITypeConfiguration
- * @see pentaho.component.ITypeDefinition
+ * The property {@link pentaho.component.ITypeConfigurationRuleSpec#config}
+ * contains the rule's actual component type configuration.
+ * This type can be used _generically_, having as argument the type of configuration it can have.
+ * For example: {@link pentaho.component.ITypeConfigurationRuleSpec.<pentaho.component.ITypeConfigurationSpec>}.
+ *
+ * ### Configuration Rules Precedence
+ *
+ * When more than one configuration rules applies to a component type,
+ * these are applied in reverse order (last wins) of the following precedence rules:
+ *
+ * 1. {@link pentaho.component.ITypeConfigurationSpec#priority} property, from greater to lower values.
+ * 2. First _Individual_ then _Group_ configurations — see {@link pentaho.component.ITypeConfigurationSpec#id}.
+ * 3. Configuration rules applicable to the component type,
+ *    and all applicable to each of its base component types,
+ *    from more specific to more abstract.
+ * 4. Inverse document order — last in registration order has higher precedence.
+ *
+ * Note that for the configuration rules that are automatically loaded by the {@link pentaho.component.registry},
+ * by using the {@link pentaho.service} AMD plugin, their relative order is actually undefined.
+ *
+ * @see pentaho.component.TypeConfigurationRuleSpec
+ * @see pentaho.component.ITypeSpec
  */
 
 /**
@@ -74,7 +89,7 @@
  * // CDF's input and select components
  * ["cdf/component/input", "cdf/component/select"]
  *
- * @name pentaho.component.ITypeConfigurationRule#id
+ * @name pentaho.component.ITypeConfigurationRuleSpec#id
  * @type string | RegExp | Array.<(string|RegExp)>
  */
 
@@ -92,12 +107,12 @@
  * // Analyzer and CDF
  * ["analyzer", "cdf"]
  *
- * @name pentaho.component.ITypeConfigurationRule#context
+ * @name pentaho.component.ITypeConfigurationRuleSpec#context
  * @type string|string[]
  */
 
 /**
- * The priority of the configuration rule.
+ * The priority of the rule.
  *
  * The greater the number, the higher is the priority.
  *
@@ -110,9 +125,16 @@
  * one that is used unless another configuration intendedly overrides it,
  * with a greater priority value.
  *
- * @name pentaho.component.ITypeConfigurationRule#priority
+ * @name pentaho.component.ITypeConfigurationRuleSpec#priority
  * @type number
  * @default 0
+ */
+
+/**
+ * The component type configuration of the rule.
+ *
+ * @name pentaho.component.ITypeConfigurationRuleSpec#config
+ * @type !pentaho.component.ITypeConfigurationSpec
  */
 
 /**
@@ -120,31 +142,31 @@
  *
  * The default value is `true`.
  *
- * @name pentaho.component.ITypeConfigurationRule#enabled
- * @type boolean
+ * @name pentaho.component.ITypeConfigurationSpec#enabled
+ * @type boolean|undefined|null
  * @default true
  */
 
 /**
  * A human-readable, localized and short description of the component type.
  *
- * @name pentaho.component.ITypeConfigurationRule#label
+ * @name pentaho.component.ITypeConfigurationSpec#label
  * @type string
- * @see pentaho.component.ITypeDefinition#label
+ * @see pentaho.component.ITypeSpec#label
  */
 
 /**
  * A human-readable, localized description of the component type.
  *
- * @name pentaho.component.ITypeConfigurationRule#description
+ * @name pentaho.component.ITypeConfigurationSpec#description
  * @type string
- * @see pentaho.component.ITypeDefinition#description
+ * @see pentaho.component.ITypeSpec#description
  */
 
 /**
- * Default property values for new components.
+ * The default property values to use when designing new component instances.
  *
- * @name pentaho.component.ITypeConfigurationRule#defaults
- * @type Object
- * @see pentaho.component.ITypeDefinition#defaults
+ * @name pentaho.component.ITypeConfigurationSpec#defaults
+ * @type Object.<string, pentaho.common.PropertyValue>
+ * @see pentaho.component.ITypeSpec#defaults
  */

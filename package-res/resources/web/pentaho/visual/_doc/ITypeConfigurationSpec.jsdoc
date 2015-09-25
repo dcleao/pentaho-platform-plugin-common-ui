@@ -15,32 +15,28 @@
  */
 
 /**
- * @name pentaho.visual.ITypeConfigurationRule
+ * @name pentaho.visual.ITypeConfigurationSpec
  * @interface
- * @extends pentaho.component.ITypeConfigurationRule
+ * @extends pentaho.component.ITypeConfigurationSpec
  *
- * @classdesc The `ITypeConfigurationRule` interface represents a
+ * @classdesc The `ITypeConfigurationSpec` interface represents a
  * configuration that is applied to
  * certain visualization types, when under certain _usage contexts_.
  *
- * Configuration rules are part of a bigger structure,
- * the visualization type configuration: {@link pentaho.visual.ITypeConfiguration}.
- *
- * @see pentaho.visual.ITypeConfiguration
- * @see pentaho.visual.ITypeDefinition
+ * @see pentaho.visual.ITypeSpec
  */
 
 /**
  * Overrides {{#crossLink "IVisualType/args:menuOrdinal"}}{{/crossLink}}.
  *
- * @name pentaho.visual.ITypeConfigurationRule#menuOrdinal
+ * @name pentaho.visual.ITypeConfigurationSpec#menuOrdinal
  * @type number
  */
 
 /**
  * Overrides {{#crossLink "IVisualType/args:menuSeparator"}}{{/crossLink}}.
  *
- * @name pentaho.visual.ITypeConfigurationRule#menuSeparator
+ * @name pentaho.visual.ITypeConfigurationSpec#menuSeparator
  * @type boolean
  */
 

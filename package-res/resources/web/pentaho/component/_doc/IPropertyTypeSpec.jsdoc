@@ -1,0 +1,52 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `IPropertyTypeSpec` interface represents the information that is used to define a
+ * component property type.
+ *
+ * @name pentaho.component.IPropertyTypeSpec
+ *
+ * @interface
+ *
+ * @see pentaho.component.PropertyType
+ * @see pentaho.component.IDataBindingPropertySpec
+ *
+ * @property {string} [id] The id of the property.
+ *
+ * @property {string} [valueType="string"] The name of the type of value that properties of this type support.
+ *
+ * See also {@link pentaho.component.PropertyValue}.
+ *
+ * @property {string} [label] The default human-readable, localized and short description of properties of this type.
+ *
+ * @property {boolean} [required=false] Indicates if properties of this type must be specified.
+ *
+ * @property {boolean} [allowMultiple=false] Indicates if properties of this type can have more than one value.
+ *
+ * @property {number} [countMin=0] The default minimum number of values that properties of this type must have.
+ *
+ * @property {number} [countMax=1] The default maximum number of values that properties of this type can have.
+ *
+ * @property {Array.<pentaho.component.PropertyAtomicValueLabelSpec>} [values] The default list of possible values that properties
+ *    of this type can have.
+ *
+ * @property {pentaho.component.PropertyAtomicValue} [min] The default minimum value that properties of this type can have.
+ *
+ * @property {pentaho.component.PropertyAtomicValue} [max] The default maximum value that properties of this type can have.
+ *
+ * @property {pentaho.component.PropertyValue} [value] The default default-value of properties of this type.
+ */

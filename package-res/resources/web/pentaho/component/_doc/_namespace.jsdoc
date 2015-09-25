@@ -66,10 +66,10 @@
  * ### Definition
  *
  * The other main constituent of a web component is that which describes
- * the component type — a JavaScript sub-class of `pentaho.component.Definition`.
- * By convention, this class is present in a sub-module name _definition_.
+ * the component type — a JavaScript sub-class of `pentaho.component.Type`.
+ * By convention, this class is the value of the sub-module name _definition_.
  *
- * Note that the definition sub-module is only strictly required by editor applications
+ * Note that the _definition_ sub-module is only strictly required by editor applications
  * that handle component types in a generic, abstract way.
  *
  * ### Identification
@@ -78,7 +78,7 @@
  *
  * This and the already described conventions for the implementation and definition files are highly convenient.
  * Given the id of a component type, one can immediately create an instance of it, or obtain its definition,
- * no intermediaries required (but the module system).
+ * no intermediaries required (apart from the module system).
  *
  * For instance, if the id of a component type is `"pentaho/component/samples/textBox"`,
  * then a component instance of it can be created as follows:
@@ -104,14 +104,14 @@
  *
  * To use a component effectively, it is necessary to know the _kind_ of its component type.
  *
- * ### Component type declaration
+ * ### Component type
  *
- * Creating a new type of component consists in sub-classing the appropriate base component definition class.
+ * Creating a new type of component consists in sub-classing the appropriate base component type class.
  *
  * Imagine that we wish to create a CDF "TextBox" component.
- * We choose to inherit the component from the base "Input" component class.
+ * We choose to inherit the component from the base CDF "Input" component class.
  *
- * A definition class for this component type could be written like this:
+ * A component type class could then be written like this:
  *
  *```javascript
  * define([
@@ -119,14 +119,13 @@
  *   "cdf/component/input/definition",
  *   "pentaho/messages!definition",
  *   "pentaho/theme!definition"
- * ], function(module, InputComponentDefinition, messages) {
+ * ], function(module, InputComponentType, messages) {
  *
- *   return InputComponentDefinition.extend({
+ *   return InputComponentType.extend({
  *     id: module.id,
  *     name: messages.get("name"),
  *     description: messages.get("description"),
  *     className: "pentaho-component-samples-textBox",
- *     kind: "CDF"
  *
  *     // ... CDF specific options ...
  *

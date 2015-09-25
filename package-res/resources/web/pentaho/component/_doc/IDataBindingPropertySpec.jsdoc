@@ -17,7 +17,7 @@
 /**
  * The `IDataBindingPropertySpec` interface represents the information that is used to
  * define properties whose value defines a data-binding between a list of data attributes and
- * a component role.
+ * a component role, represented by the property.
  *
  * A good example of a data binding property is that of property that represent visual roles
  * of visualizations. Common visual roles are "Series", "X-axis", "Color-By", "Size-By", etc.
@@ -29,7 +29,7 @@
  * @name pentaho.component.IDataBindingPropertySpec
  *
  * @interface
- * @extends pentaho.component.IPropertyTypeDefinition
+ * @extends pentaho.component.IPropertyTypeSpec
  *
  * @property {string} valueType The type of value of a data binding property is fixed to `"string"`.
  *

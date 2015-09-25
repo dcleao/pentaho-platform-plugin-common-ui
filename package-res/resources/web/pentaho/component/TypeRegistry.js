@@ -21,7 +21,7 @@ define([
   "../util/object",
   "../util/fun",
   "es6-promise-shim"
-], function(TypeDefinition, Base, Collection, error, O, fun) {
+], function(Type, Base, Collection, error, O, fun) {
 
   /*global Promise:true*/
 
@@ -29,20 +29,20 @@ define([
 
       F_true = function() { return true; };
 
-  var TypeDefinitionClassCollection = Collection.extend({
+  var TypeClassCollection = Collection.extend({
 
-    // The class of TypeDefinition classes...
+    // The class of Type classes...
     elemClass: {
       to: function(v) { return v; },
       prototype: {
-        elemName: TypeDefinition.elemName,
-        keyName:  TypeDefinition.keyName
+        elemName: Type.elemName,
+        keyName:  Type.keyName
       }
     }
   });
 
-  var TypeDefinitionCollection = Collection.extend({
-    elemClass: TypeDefinition
+  var TypeCollection = Collection.extend({
+    elemClass: Type
   });
 
   return Base.extend("pentaho.component.TypeRegistry", /** @lends pentaho.component.TypeRegistry# */{
@@ -55,7 +55,7 @@ define([
      * @see pentaho/component/registry
      *
      * @classdesc The `TypeRegistry` class represents a registry of
-     * component type definitions and associated configurations.
+     * component types and their configurations.
      *
      * The component type registry is an intermediary between:
      * * component authors,
@@ -72,16 +72,16 @@ define([
      *
      * ### Interface
      *
-     * Definitions and configurations may be registered using the methods, respectively:
+     * Types and their configurations may be registered using the methods, respectively:
      * * {@link pentaho.component.TypeRegistry#add} and
      * * {@link pentaho.component.TypeRegistry#addConfig}.
      *
-     * To obtain _configured_ component type definitions use the following methods:
+     * To obtain _configured_ component types, use the following methods:
      * * {@link pentaho.component.TypeRegistry#get} and
      * * {@link pentaho.component.TypeRegistry#getAll}.
      *
      * Both of these accept a `contextId` argument which, when specified,
-     * causes obtaining definitions configured specifically for that context.
+     * causes obtaining component types configured specifically for that context.
      *
      * ### AMD
      *
@@ -92,8 +92,8 @@ define([
     constructor: function() {
       // -- Container Entries --
 
-      // Collection.<Class.<TypeDefinition>>
-      this._definitionClasses = new TypeDefinitionClassCollection();
+      // Collection.<Class.<Type>>
+      this._typeClasses = new TypeClassCollection();
 
       // -- Configs --
 
@@ -119,37 +119,37 @@ define([
        * }
        */
 
-      // -- Configured definitions --
+      // -- Configured types --
 
-      // Holds configured and enabled component type definitions.
+      // Holds configured and enabled component types.
       // Context "" is the global context.
-      this._definitionsByContext = {};
+      this._typesByContext = {};
     },
 
     /**
-     * Registers a component type definition class.
+     * Registers the class of a component type.
      *
      * An error is thrown if a component type having
      * the same _id_ is already registered.
      *
-     * @param {Class.<pentaho.component.TypeDefinition>} TypeDef The component type definition class.
+     * @param {Class.<pentaho.component.Type>} Type The component type class.
      * @return {pentaho.component.TypeRegistry} The component registry.
      */
-    add: function(TypeDef) {
-      if(!TypeDef) throw error.argRequired("TypeDef");
-      if(!(TypeDef.prototype instanceof TypeDefinition))
-        throw error.argInvalidType("TypeDef", "Not a sub-class of 'pentaho/component/definition'.");
+    add: function(Type) {
+      if(!Type) throw error.argRequired("Type");
+      if(!(Type.prototype instanceof Type))
+        throw error.argInvalidType("Type", "Not a sub-class of 'pentaho/component/definition'.");
 
-      var CompTypeDef0 = this._definitionClasses.get(TypeDef.key);
-      if(CompTypeDef0) {
-        if(CompTypeDef0 === TypeDef) return this;
+      var Type0 = this._typeClasses.get(Type.key);
+      if(Type0) {
+        if(Type0 === Type) return this;
 
         throw error.argInvalid(
-            "TypeDef",
-            "A definition for the component type of id '" + TypeDef.key + "' is already registered.");
+            "Type",
+            "Another component type with id '" + Type.key + "' is already registered.");
       }
 
-      this._definitionClasses.push(TypeDef);
+      this._typeClasses.push(Type);
 
       // Invalidate contexts
       invalidateContext.call(this);
@@ -158,8 +158,7 @@ define([
     },
 
     /**
-     * Gets a collection of the component type definitions
-     * that are enabled, already with applied configuration.
+     * Gets a collection with the configured component types that are enabled.
      *
      * Optionally,
      * the id of the context in which the components will be used may also be specified.
@@ -167,14 +166,14 @@ define([
      * Do **not** modify the returned array or any of its elements.
      *
      * @param {string} [contextId] The context id.
-     * @return {pentaho.lang.Collection.<pentaho.component.TypeDefinition>} A collection of component type definitions.
+     * @return {pentaho.lang.Collection.<pentaho.component.Type>} A collection of component types.
      */
     getAll: function(contextId) {
-      return getContextDefinitions.call(this, contextId);
+      return getContextTypes.call(this, contextId);
     },
 
     /**
-     * Gets a component type definition, already configured, given its id,
+     * Gets a configured component type, given its id,
      * or `null` if one is not registered or is disabled.
      *
      * Optionally,
@@ -186,19 +185,19 @@ define([
      * @param {string} [contextId] The context id.
      * @param {boolean} [assertAvailable=false] Indicates if an error should be thrown
      *    if the specified component type is not registered or is disabled.
-     * @return {?pentaho.component.TypeDefinition} A component type definition, or `null`.
+     * @return {?pentaho.component.Type} A component type or `null`.
      */
     get: function(typeId, contextId, assertAvailable) {
       if(!typeId) throw error.argRequired("typeId");
 
-      var typeDef = this.getAll(contextId).get(typeId);
-      if(!typeDef && assertAvailable)
+      var type = this.getAll(contextId).get(typeId);
+      if(!type && assertAvailable)
         throw new Error(
           "A component type with id '" + typeId + "' is not registered, or is disabled" +
           (contextId ? (" for context '" +  contextId + "'") : "") +
           ".");
 
-      return typeDef;
+      return type;
     },
 
     /**
@@ -322,79 +321,79 @@ define([
   }
 
   // @private
-  function getContextDefinitions(contextId) {
-    var cache = this._definitionsByContext;
+  function getContextTypes(contextId) {
+    var cache = this._typesByContext;
     return (cache && O.getOwn(cache, contextId || "")) ||
-           createContextDefinitions.call(this, contextId);
+           createContextTypes.call(this, contextId);
   }
 
   // @private
-  function createContextDefinitions(contextId) {
-    var typeDefCol = new TypeDefinitionCollection();
+  function createContextTypes(contextId) {
+    var typeCol = new TypeCollection();
 
-    // For every non-abstract TypeDefinition class
-    this._definitionClasses.forEach(function(TypeDef) {
-      if(!TypeDef.prototype["abstract"]) {
+    // For every non-abstract Type class
+    this._typeClasses.forEach(function(Type) {
+      if(!Type.prototype["abstract"]) {
 
-        var typeDef = createDefinitionForContext.call(this, TypeDef, contextId);
-        if(typeDef.enabled)
-          typeDefCol.push(typeDef);
+        var type = createTypeForContext.call(this, Type, contextId);
+        if(type.enabled)
+          typeCol.push(type);
 
       }
     }, this);
 
-    var cache = this._definitionsByContext || (this._definitionsByContext = {});
-    cache[contextId || ""] = typeDefCol;
-    return typeDefCol;
+    var cache = this._typesByContext || (this._typesByContext = {});
+    cache[contextId || ""] = typeCol;
+    return typeCol;
   }
 
   /**
-   * Creates a component type definition of the given class,
+   * Creates a component type of the given class,
    * and for the given context id.
    *
-   * @param {Class.<pentaho.component.TypeDefinition>} TypeDef A non-abstract component type definition class.
-   * @param {function(pentaho.component.ITypeConfigurationRule)} fun The mapping function.
-   * @return {pentaho.component.TypeDefinition} A new, configured component type definition.
+   * @param {Class.<pentaho.component.Type>} Type A non-abstract component type class.
+   * @param {function(pentaho.component.ITypeConfigurationSpec)} fun The mapping function.
+   * @return {pentaho.component.Type} A new, configured component type.
    * @ignore
    */
-  function createDefinitionForContext(TypeDef, contextId) {
-    var typeDef = new TypeDef();
+  function createTypeForContext(Type, contextId) {
+    var type = new Type();
 
-    mapConfigs.call(this, TypeDef, function(config) {
+    mapConfigs.call(this, Type, function(config) {
       var matches = !config._matchContext || // any context
           (contextId && config._matchContext(contextId)); // matches specific context
-      if(matches) typeDef.configure(config);
+      if(matches) type.configure(config);
     });
 
-    return typeDef;
+    return type;
   }
 
   /**
-   * Maps the configuration rules applicable to a given component type,
+   * Maps the configurations applicable to a given component type,
    * from lowest to highest precedence.
    *
-   * @param {Class.<pentaho.component.TypeDefinition>} TypeDef The component type definition class.
-   * @param {function(pentaho.component.ITypeConfigurationRule)} fun The mapping function.
+   * @param {Class.<pentaho.component.Type>} Type The component type class.
+   * @param {function(pentaho.component.ITypeConfigurationSpec)} fun The mapping function.
    * @ignore
    */
-  function mapConfigs(TypeDef, fun) {
+  function mapConfigs(Type, fun) {
     var levels = this._configLevelsList,
         i = -1,
         L = levels.length;
-    while(++i < L) mapConfigsOfLevel.call(this, levels[i], TypeDef, fun);
+    while(++i < L) mapConfigsOfLevel.call(this, levels[i], Type, fun);
   }
 
   /**
-   * Maps the configuration rules of a configuration level,
+   * Maps the configurations of a configuration level,
    * applicable to a given component type,
    * from lowest to highest precedence.
    *
    * @param {pentaho.component.IComponentConfigLevel} configLevel The configuration level.
-   * @param {Class.<pentaho.component.TypeDefinition>} TypeDef The component type definition class.
-   * @param {function(pentaho.component.ITypeConfigurationRule)} fun The mapping function.
+   * @param {Class.<pentaho.component.Type>} Type The component type class.
+   * @param {function(pentaho.component.ITypeConfigurationSpec)} fun The mapping function.
    * @ignore
    */
-  function mapConfigsOfLevel(configLevel, TypeDef, fun) {
+  function mapConfigsOfLevel(configLevel, Type, fun) {
     var visitedConfigsMap  = {},
         configsList = [], // from highest to lowest precedence.
         me = this;
@@ -413,11 +412,11 @@ define([
       configsList.push(config);
     }
 
-    function eachAncestorType(BaseTypeDef, fun) {
-      // Walk-up the class hierarchy, until the root, TypeDefinition is found.
+    function eachAncestorType(BaseType, fun) {
+      // Walk-up the class hierarchy, until the root, Type is found.
       do {
-        fun(BaseTypeDef);
-      } while((BaseTypeDef !== TypeDefinition) && (BaseTypeDef = BaseTypeDef.ancestor));
+        fun(BaseType);
+      } while((BaseType !== Type) && (BaseType = BaseType.ancestor));
     }
 
     // The following needs to be done in two phases: individual and group.
@@ -425,13 +424,13 @@ define([
     // could end up being placed in group position and loose precedence.
 
     // Process Individual configurations
-    eachAncestorType(TypeDef, function(BaseTypeDef) {
-      mapConfigList(configLevel.indiv[BaseTypeDef.key], addConfig);
+    eachAncestorType(Type, function(BaseType) {
+      mapConfigList(configLevel.indiv[BaseType.key], addConfig);
     });
 
     // Process Group configurations
-    eachAncestorType(TypeDef, function(BaseTypeDef) {
-      var typeId = BaseTypeDef.key;
+    eachAncestorType(Type, function(BaseType) {
+      var typeId = BaseType.key;
 
       mapConfigList(configLevel.group, function(config) {
         if(!config._matchGroup || config._matchGroup(typeId))
@@ -448,12 +447,12 @@ define([
 
   // @private
   function invalidateContext(contextIds) {
-    var cache = this._definitionsByContext;
+    var cache = this._typesByContext;
     if(!cache) return;
 
     if(!contextIds) {
       // Affects every context
-      this._definitionsByContext = null;
+      this._typesByContext = null;
       return;
     }
 
@@ -461,8 +460,8 @@ define([
 
     function invalidateOne(c) {
       if(!c) c = "";
-      var contextDefinitions = O.getOwn(cache, c);
-      if(contextDefinitions) delete cache[c];
+      var contextTypes = O.getOwn(cache, c);
+      if(contextTypes) delete cache[c];
     }
 
     if(contextIds instanceof Array)
@@ -477,7 +476,7 @@ define([
           return;
 
       // No contexts left. Clear the field.
-      this._definitionsByContext = null;
+      this._typesByContext = null;
     }
   }
 });
