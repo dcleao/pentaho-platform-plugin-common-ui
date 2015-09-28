@@ -15,33 +15,33 @@
  */
 
 /**
- * @name pentaho.component.spec.ITypeConfigurationRule
+ * @name pentaho.component.spec.ITypeConfigRule
  *
  * @interface
  *
- * @description The `spec.ITypeConfigurationRule` interface represents a
+ * @description The `spec.ITypeConfigRule` interface represents a
  * configuration rule that controls the scope of application of a given type configuration.
  *
- * The properties {@link pentaho.component.spec.ITypeConfigurationRule#id}
- * and {@link pentaho.component.spec.ITypeConfigurationRule#context}
+ * The properties {@link pentaho.component.spec.ITypeConfigRule#id}
+ * and {@link pentaho.component.spec.ITypeConfigRule#context}
  * determine the &lt;component type, context&gt; pairs that a
  * configuration applies to.
  *
- * The property {@link pentaho.component.spec.ITypeConfigurationRule#priority}
+ * The property {@link pentaho.component.spec.ITypeConfigRule#priority}
  * affects the order of application of rules.
  *
- * The property {@link pentaho.component.spec.ITypeConfigurationRule#config}
+ * The property {@link pentaho.component.spec.ITypeConfigRule#config}
  * contains the rule's actual component type configuration.
  * This type can be used _generically_, having as argument the type of configuration it can have.
- * For example: {@link pentaho.component.spec.ITypeConfigurationRule.<pentaho.component.spec.ITypeConfiguration>}.
+ * For example: {@link pentaho.component.spec.ITypeConfigRule.<pentaho.component.spec.ITypeConfig>}.
  *
  * ### Configuration Rules Precedence
  *
  * When more than one configuration rules applies to a component type,
  * these are applied in reverse order (last wins) of the following precedence rules:
  *
- * 1. {@link pentaho.component.spec.ITypeConfiguration#priority} property, from greater to lower values.
- * 2. First _Individual_ then _Group_ configurations — see {@link pentaho.component.spec.ITypeConfiguration#id}.
+ * 1. {@link pentaho.component.spec.ITypeConfig#priority} property, from greater to lower values.
+ * 2. First _Individual_ then _Group_ configurations — see {@link pentaho.component.spec.ITypeConfig#id}.
  * 3. Configuration rules applicable to the component type,
  *    and all applicable to each of its base component types,
  *    from more specific to more abstract.
@@ -50,7 +50,7 @@
  * Note that for the configuration rules that are automatically loaded by the {@link pentaho.component.registry},
  * by using the {@link pentaho.service} AMD plugin, their relative order is actually undefined.
  *
- * @see pentaho.component.spec.TypeConfigurationRule
+ * @see pentaho.component.spec.TypeConfigRule
  * @see pentaho.component.spec.ITypeInfoExtend
  */
 
@@ -89,7 +89,7 @@
  * // CDF's input and select components
  * ["cdf/component/input", "cdf/component/select"]
  *
- * @name pentaho.component.spec.ITypeConfigurationRule#id
+ * @name pentaho.component.spec.ITypeConfigRule#id
  * @type string | RegExp | Array.<(string|RegExp)>
  */
 
@@ -107,7 +107,7 @@
  * // Analyzer and CDF
  * ["analyzer", "cdf"]
  *
- * @name pentaho.component.spec.ITypeConfigurationRule#context
+ * @name pentaho.component.spec.ITypeConfigRule#context
  * @type string|string[]
  */
 
@@ -125,7 +125,7 @@
  * one that is used unless another configuration intendedly overrides it,
  * with a greater priority value.
  *
- * @name pentaho.component.spec.ITypeConfigurationRule#priority
+ * @name pentaho.component.spec.ITypeConfigRule#priority
  * @type number
  * @default 0
  */
@@ -133,40 +133,6 @@
 /**
  * The component type configuration of the rule.
  *
- * @name pentaho.component.spec.ITypeConfigurationRule#config
- * @type !pentaho.component.spec.ITypeConfiguration
- */
-
-/**
- * Indicates if a component type is enabled.
- *
- * The default value is `true`.
- *
- * @name pentaho.component.spec.ITypeConfiguration#enabled
- * @type boolean|undefined|null
- * @default true
- */
-
-/**
- * A human-readable, localized and short description of the component type.
- *
- * @name pentaho.component.spec.ITypeConfiguration#label
- * @type string
- * @see pentaho.component.spec.ITypeInfoExtend#label
- */
-
-/**
- * A human-readable, localized description of the component type.
- *
- * @name pentaho.component.spec.ITypeConfiguration#description
- * @type string
- * @see pentaho.component.spec.ITypeInfoExtend#description
- */
-
-/**
- * The default property values to use when designing new component instances.
- *
- * @name pentaho.component.spec.ITypeConfiguration#defaults
- * @type Object.<string, pentaho.common.Value>
- * @see pentaho.component.spec.ITypeInfoExtend#defaults
+ * @name pentaho.component.spec.ITypeConfigRule#config
+ * @type !pentaho.component.spec.ITypeConfig
  */

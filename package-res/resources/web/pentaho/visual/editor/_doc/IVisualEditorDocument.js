@@ -22,7 +22,7 @@
  * A minimal interface for accessing a visualization editor document counterpart and
  * also for providing a way to generically read the properties it exposes.
  *
- * Used by {{#crossLink "IVisualTypeConfiguration/getEditorProperties:property"}}{{/crossLink}}.
+ * Used by {{#crossLink "IVisualTypeConfig/getEditorProperties:property"}}{{/crossLink}}.
  *
  * @class IVisualEditorDocument
  * @constructor

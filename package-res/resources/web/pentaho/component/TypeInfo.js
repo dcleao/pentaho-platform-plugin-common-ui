@@ -71,7 +71,7 @@ define([
     /**
      * Applies one or more configurations to the component type info.
      *
-     * @param {pentaho.component.spec.TypeConfiguration} config A component type info configuration specification.
+     * @param {pentaho.component.spec.TypeConfig} config A component type info configuration specification.
      */
     configure: function(config) {
       if(!config) throw error.argRequired("config");
@@ -85,7 +85,7 @@ define([
     /**
      * Applies a single configuration to the component type info.
      *
-     * @param {pentaho.component.spec.ITypeConfiguration} config A component type info configuration specification.
+     * @param {pentaho.component.spec.ITypeConfig} config A component type info configuration specification.
      * @protected
      * @virtual
      */
@@ -193,7 +193,7 @@ define([
     /**
      * Gets or sets the label of the component type.
      *
-     * The label is a human-readable, localized and short description of the component type.
+     * The label is a localized, short description of the component type.
      *
      * The label should be suitable for _identifying_ it in a menu, amongst others.
      *
@@ -219,8 +219,7 @@ define([
     /**
      * Gets or sets the description of the component type.
      *
-     * The description is a human-readable, localized description of the component type.
-     * It should be suitable for display in a tooltip.
+     * The _description_ is localized. It should be suitable for display in a tooltip.
      *
      * _Nully_ or empty values are converted to `undefined`.
      *
@@ -242,8 +241,8 @@ define([
     /**
      * Gets or sets the category of the component type.
      *
-     * A human-readable, localized short description
-     * that is used to group component types in a designer user interface.
+     * A localized, short description of the category,
+     * used to group component types in a designer user interface.
      *
      * This property is inherited from the info of the base component type.
      * The root component type has the category `"Miscellaneous"`.

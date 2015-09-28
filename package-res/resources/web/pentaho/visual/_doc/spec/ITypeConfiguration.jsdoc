@@ -15,11 +15,11 @@
  */
 
 /**
- * @name pentaho.visual.spec.ITypeConfiguration
+ * @name pentaho.visual.spec.ITypeConfig
  * @interface
- * @extends pentaho.component.spec.ITypeConfiguration
+ * @extends pentaho.component.spec.ITypeConfig
  *
- * @classdesc The `spec.ITypeConfiguration` interface represents a
+ * @classdesc The `spec.ITypeConfig` interface represents a
  * configuration that is applied to
  * certain visualization types, when under certain _usage contexts_.
  *
@@ -29,14 +29,14 @@
 /**
  * Overrides {{#crossLink "IVisualType/args:menuOrdinal"}}{{/crossLink}}.
  *
- * @name pentaho.visual.spec.ITypeConfiguration#menuOrdinal
+ * @name pentaho.visual.spec.ITypeConfig#menuOrdinal
  * @type number
  */
 
 /**
  * Overrides {{#crossLink "IVisualType/args:menuSeparator"}}{{/crossLink}}.
  *
- * @name pentaho.visual.spec.ITypeConfiguration#menuSeparator
+ * @name pentaho.visual.spec.ITypeConfig#menuSeparator
  * @type boolean
  */
 

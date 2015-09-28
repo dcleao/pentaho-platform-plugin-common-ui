@@ -172,7 +172,7 @@ define([
     /**
      * Gets or sets the label of the properties of this type.
      *
-     * The label is a human-readable, localized, short description of the property type.
+     * The label is a localized, short description of the property type.
      * It should be suitable for display as a _label_, beside the property value.
      *
      * The default value is that specified when defining the property model class,
@@ -213,7 +213,7 @@ define([
     /**
      * Gets or sets the description of the properties of this type.
      *
-     * The description is a human-readable, localized _description_ of the property type.
+     * The description is localized.
      * It should be suitable for display in a tooltip.
      *
      * The default value is that specified when defining the property model class,
@@ -252,8 +252,8 @@ define([
     /**
      * Gets or sets the category of the properties of this type.
      *
-     * The category is a human-readable, localized, short description of the _category_ of the property type.
-     * It should be suitable for display as the title for a group of properties.
+     * A localized, short description of the category,
+     * used to group properties in a designer user interface.
      *
      * The default value is that specified when defining the property model class,
      * through {@link pentaho.component.properties.spec.IAnyModelExtend#category},

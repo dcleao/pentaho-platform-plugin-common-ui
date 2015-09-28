@@ -37,7 +37,7 @@ define([
     /**
      * Applies a configuration to the visualization type.
      * @name pentaho.visual.Type#configure
-     * @param {!pentaho.visual.spec.ITypeConfiguration|Array.<pentaho.visual.spec.ITypeConfiguration>} config A visualization type configuration.
+     * @param {!pentaho.visual.spec.ITypeConfig|Array.<pentaho.visual.spec.ITypeConfig>} config A visualization type configuration.
      */
 
     // @override

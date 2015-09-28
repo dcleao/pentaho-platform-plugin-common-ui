@@ -15,11 +15,7 @@
  */
 
 /**
- * The `spec.TypeConfigurationRuleSet` type is an array of component type configuration rules.
+ * The `spec.TypeConfigRules` type is an array of component type configuration rules.
  *
- * This type can be used generically, having as argument the type of configurations
- * that its rules contain.
- * For example: {@link pentaho.component.spec.TypeConfigurationRuleSet.<pentaho.component.spec.ITypeConfiguration>}.
- *
- * @typedef {Array.pentaho.component.spec.ITypeConfigurationRule[]} pentaho.component.spec.TypeConfigurationRuleSet
+ * @typedef {Array.<pentaho.component.spec.ITypeConfigRule>} pentaho.component.spec.TypeConfigRules
  */

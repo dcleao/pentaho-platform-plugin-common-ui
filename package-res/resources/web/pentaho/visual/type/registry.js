@@ -109,11 +109,11 @@ define([
        * {
        *   // Individual VisualType configs
        *   //  (known to apply to a single visual type; their `id` is a string).
-       *   // @type Object.<string, Array.<IVisualTypeConfiguration>>
+       *   // @type Object.<string, Array.<IVisualTypeConfig>>
        *   indiv: {},
        *
        *   // Group VisualType configs (apply to more than one visual type)
-       *   // @type Array.<IVisualTypeConfiguration>
+       *   // @type Array.<IVisualTypeConfig>
        *   group: []
        * }
        */
@@ -214,7 +214,7 @@ define([
      * Adds a visual type configuration.
      *
      * @method addConfig
-     * @param {IVisualTypeConfiguration} config The visual type configuration.
+     * @param {IVisualTypeConfig} config The visual type configuration.
      * @chainable
      */
     addConfig: function(config) {

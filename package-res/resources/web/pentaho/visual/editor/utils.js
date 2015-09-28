@@ -46,7 +46,7 @@ define([
    * Gets the visualization properties exposed by a visualization editor's document.
    *
    * If the visual type has been configured with
-   * {{#crossLink "IVisualTypeConfiguration/getEditorProperties:method"}}{{/crossLink}},
+   * {{#crossLink "IVisualTypeConfig/getEditorProperties:method"}}{{/crossLink}},
    * it is called to perform the retrieval.
    *
    * When _filterPropsList_ is specified,

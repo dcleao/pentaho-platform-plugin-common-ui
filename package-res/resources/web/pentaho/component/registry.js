@@ -15,18 +15,21 @@
  */
 define([
   "./TypeRegistry",
-  "service!pentaho/component/Type",
-  "service!pentaho/component/ITypeConfiguration"
-], function(TypeRegistry, Types, typeConfigs) {
+  // TODO: need to review the registry workings so that config is split between info and model classes...
+  "service!pentaho/component/info",
+  "service!pentaho/component/model",
+  "service!pentaho/component/config"
+], function(TypeRegistry, TypeInfoClasses, ModelClasses, typeConfigs) {
 
   /*global Promise:true*/
 
   /**
    * The singleton instance where component types and their configurations are registered.
    *
-   * The component type registry comes pre-loaded with the AMD _services_:
-   * 1. {@link pentaho.component.spec.TypeConfiguration}
-   * 2. {@link pentaho.component.Model}
+   * The registry is pre-loaded with the following AMD _services_:
+   * 1. `"pentaho/component/info"` - {@link pentaho.component.spec.TypeInfo}
+   * 2. `"pentaho/component/model"` - {@link pentaho.component.spec.Model}
+   * 3. `"pentaho/component/config"` - {@link pentaho.component.spec.TypeConfigRules}
    *
    * Additional component types and configurations may be loaded dynamically by using the methods
    * {@link pentaho.component.TypeRegistry#add} and {@link pentaho.component.TypeRegistry#addConfig},
@@ -43,7 +46,7 @@ define([
    */
   var typeRegistry = new TypeRegistry();
 
-  // Auto-load the registry with ITypeConfiguration instances
+  // Auto-load the registry with ITypeConfig instances
   if(typeConfigs) typeConfigs.forEach(function(typeConfig) {
     if(typeConfig && typeConfig.types)
       typeConfig.types.forEach(function(typeConfig) {
@@ -53,7 +56,7 @@ define([
   });
 
   // Auto-load the registry with Type classes.
-  Types.forEach(function(Type) {
+  TypeInfoClasses.forEach(function(Type) {
     typeRegistry.add(Type);
   });
 

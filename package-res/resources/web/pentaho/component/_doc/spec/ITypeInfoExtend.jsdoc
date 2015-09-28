@@ -19,22 +19,19 @@
  * create a component type info sub-class.
  *
  * @name pentaho.component.spec.ITypeInfoExtend
+ *
  * @interface
+ *
+ * @extend pentaho.component.spec.IItemInfoConfig
  *
  * @property {string} id The id of the component type.
  *
- * If a specified id ends with the string `"/definition"`, that part is removed.
- *
- * @property {string} label The human-readable, localized and short description of the component type.
- *
- * @property {string} [description=undefined] The human-readable, localized description of the component type.
- *
- * @property {string} [className=undefined] The _CSS_ class name used to style components of this type.
+ * If a specified id ends with the string `"/info"`, that part is removed.
  *
  * @property {boolean} [abstract=false] Indicates if the component type is abstract.
  *
- * @property {pentaho.component.IPropertyTypeUsage[]} [properties] An array of property type usages.
+ * @property {?string} [className] The _CSS_ class name used to style components of this type.
  *
- * @property {Object.<string, pentaho.component.Value>} [defaults] The default property values to use
- *    when designing new component instances.
+ * @property {Array.<pentaho.component.IconType>} [icons] The array of icon types supported by
+ *     the own _CSS_ class of the component type.
  */

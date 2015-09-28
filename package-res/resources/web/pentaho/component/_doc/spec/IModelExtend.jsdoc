@@ -15,9 +15,10 @@
  */
 
 /**
- * The `spec.IModel` interface represents the information used to create a component model sub-class.
+ * The `spec.IModelExtend` interface represents the information used to
+ * create a component model sub-class.
  *
- * @name pentaho.component.spec.IModel
+ * @name pentaho.component.spec.IModelExtend
  * @interface
  */
 
@@ -25,6 +26,6 @@
  * An array of property usages.
  *
  * @name properties
- * @memberOf pentaho.component.spec.IModel#
- * @type Array.<pentaho.component.spec.IPropertyUsage>
+ * @memberOf pentaho.component.spec.IModelExtend#
+ * @type Array.<pentaho.component.spec.IModelPropertyUsage>
  */

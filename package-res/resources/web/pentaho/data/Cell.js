@@ -64,7 +64,7 @@ define([
      * {@link pentaho.data.Cell#value}.
      *
      * Besides holding the value of an attribute,
-     * a cell can also hold a _context specific_, human-readable
+     * a cell can also hold a _context specific_, human readable
      * label of that value. See {@link pentaho.data.Cell#label}.
      *
      * Also, because a cell is an {@link pentaho.lang.IAnnotatable},
@@ -228,8 +228,7 @@ define([
     /**
      * Gets or sets the label of the cell.
      *
-     * The label of a cell is a _context specific_, human-readable
-     * short description of its value.
+     * The label of a cell is a _context specific_, short description of its value.
      *
      * Setting the label of a cell to either `null` or `undefined`
      * always sets it to `undefined`, which is considered **unspecified**.

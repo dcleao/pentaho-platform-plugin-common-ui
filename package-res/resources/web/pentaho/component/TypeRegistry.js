@@ -110,11 +110,11 @@ define([
        * {
        *   // Individual component configs
        *   //  (known to apply to a single visual type; their `id` is a string).
-       *   // @type Object.<string, Array.<ITypeConfiguration>>
+       *   // @type Object.<string, Array.<ITypeConfig>>
        *   indiv: {},
        *
        *   // Group component configs (apply to more than one component type)
-       *   // @type Array.<ITypeConfiguration>
+       *   // @type Array.<ITypeConfig>
        *   group: []
        * }
        */
@@ -203,7 +203,7 @@ define([
     /**
      * Adds a component type configuration.
      *
-     * @param {pentaho.component.ITypeConfiguration} config The component type configuration.
+     * @param {pentaho.component.ITypeConfig} config The component type configuration.
      * @return {pentaho.component.TypeRegistry} The component registry.
      */
     addConfig: function(config) {
@@ -352,7 +352,7 @@ define([
    * and for the given context id.
    *
    * @param {Class.<pentaho.component.Model>} Type A non-abstract component type class.
-   * @param {function(pentaho.component.spec.ITypeConfiguration)} fun The mapping function.
+   * @param {function(pentaho.component.spec.ITypeConfig)} fun The mapping function.
    * @return {pentaho.component.Model} A new, configured component type.
    * @ignore
    */
@@ -373,7 +373,7 @@ define([
    * from lowest to highest precedence.
    *
    * @param {Class.<pentaho.component.Model>} Type The component type class.
-   * @param {function(pentaho.component.spec.ITypeConfiguration)} fun The mapping function.
+   * @param {function(pentaho.component.spec.ITypeConfig)} fun The mapping function.
    * @ignore
    */
   function mapConfigs(Type, fun) {
@@ -390,7 +390,7 @@ define([
    *
    * @param {pentaho.component.IComponentConfigLevel} configLevel The configuration level.
    * @param {Class.<pentaho.component.Model>} Type The component type class.
-   * @param {function(pentaho.component.spec.ITypeConfiguration)} fun The mapping function.
+   * @param {function(pentaho.component.spec.ITypeConfig)} fun The mapping function.
    * @ignore
    */
   function mapConfigsOfLevel(configLevel, Type, fun) {

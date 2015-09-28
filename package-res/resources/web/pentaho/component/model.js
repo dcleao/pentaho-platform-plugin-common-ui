@@ -69,7 +69,7 @@ define([
     /**
      * Applies a single configuration to the component type.
      *
-     * @param {pentaho.component.spec.ITypeConfiguration} config A component type configuration specification.
+     * @param {pentaho.component.spec.ITypeConfig} config A component type configuration specification.
      * @protected
      * @virtual
      */
@@ -118,7 +118,7 @@ define([
     /**
      * Creates a component model sub-class of this one.
      *
-     * @param {pentaho.component.spec.IModel} instSpec The component model specification.
+     * @param {pentaho.component.spec.IModelExtend} instSpec The component model extend specification.
      * @param {Object} [classSpec] Class-level members of the component model class.
      * @return {Class.<pentaho.component.Model>} The created component model sub-class.
      */

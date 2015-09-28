@@ -18,19 +18,13 @@
  * The `spec.IAnyModelConfig` interface is the base interface of the information
  * that is used to _configure_ a component property.
  *
+ * This interface is used as part of the {@link pentaho.component.spec.ITypeConfig} interface.
+ *
  * @name pentaho.component.properties.spec.IAnyModelConfig
  *
  * @interface
  *
- * @see pentaho.component.properties.AnyModel#configure
+ * @extend pentaho.component.spec.IItemInfoConfig
  *
- * @property {string} [label] The human-readable, localized and short description of properties of this type.
- *
- * @property {?string} [description] The human-readable, localized _description_ of properties of this type.
- *
- * @property {string} [category] The human-readable, localized, short description of the _category_ of properties of this type.
- *
- * @property {?string} [helpUrl] The help url of the properties of this type.
- *
- * @property {?pentaho.component.Value} [defaultValue] The default default-value of properties of this type.
+ * @property {?pentaho.component.Value} [defaultValue] The default-value of properties of this type.
  */

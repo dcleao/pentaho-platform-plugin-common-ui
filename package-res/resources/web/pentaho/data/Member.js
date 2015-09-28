@@ -51,7 +51,7 @@ define([
      * The value of a member defines it — it is unique amongst its attribute's members.
      * See property {@link pentaho.data.Member#value}.
      *
-     * A member can also hold a _context agnostic_, human-readable
+     * A member can also hold a _context agnostic_, human readable
      * label of its value. See property {@link pentaho.data.Member#label}.
      *
      * A member is an {@link pentaho.lang.IAnnotatable}.

@@ -15,11 +15,14 @@
  */
 
 /**
- * The `spec.IPropertyUsage` interface represents the information
+ * The `spec.IModelPropertyUsage` interface represents the information
  * used to define the usage of a property of a certain type by a component model.
  *
- * @name pentaho.component.spec.IPropertyUsage
+ * @name pentaho.component.spec.IModelPropertyUsage
+ *
  * @interface
+ *
+ * @extends pentaho.component.properties.spec.IAnyModel
  */
 
 // TODO: ./properties/StandardNames enum
@@ -47,14 +50,6 @@
  * it can have been defined in module of the component model class.
  *
  * @name type
- * @memberOf pentaho.component.spec.IPropertyUsage#
+ * @memberOf pentaho.component.spec.IModelPropertyUsage#
  * @type string|Class.<pentaho.component.properties.AnyModel>
- */
-
-/**
- * An array of property usages.
- *
- * @name properties
- * @memberOf pentaho.component.spec.IPropertyUsage#
- * @type Array.<pentaho.component.spec.IPropertyUsage>
  */

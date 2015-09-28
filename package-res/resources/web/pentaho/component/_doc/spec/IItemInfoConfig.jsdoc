@@ -1,0 +1,36 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IItemInfoConfig` interface represents the information
+ * about a model item type, component or property, that can be configured.
+ *
+ * It contains informational, categorical and assistance-like information.
+ *
+ * @name pentaho.component.spec.IItemInfoConfig
+ *
+ * @interface
+ *
+ * @property {string} [label] The localized, short description of items of this type.
+ *
+ * The label is required for component types, because they do not inherit that of their base type.
+ *
+ * @property {?string} [description] The localized description of items of this type.
+ *
+ * @property {string} [category] The localized, short description of the category of items of this type.
+ *
+ * @property {?string} [helpUrl] The help url of items of this type.
+ */
