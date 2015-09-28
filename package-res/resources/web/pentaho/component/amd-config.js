@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-/* AMD/RequireJS configuration
+/* AMD/requireJS configuration
  *
  * This file is loaded by the special "webcontext.js" resource,
  * which establishes the pentaho platform's context.
  */
 
-/*global CONTEXT_PATH:true */
-
-(function() {
+define(function() {
   "use strict";
 
-  var mid = "pentaho/component/samples/textBox",
-      basePath = CONTEXT_PATH + "content/<myplugin>/resources/web/path/to/myComponent";
+  require({
+    paths: {
+      // ...
+    }
+  });
 
-  requireCfg.paths[mid] = basePath;
-
-  // Lib modules
-  // ...
-
-}());
+});

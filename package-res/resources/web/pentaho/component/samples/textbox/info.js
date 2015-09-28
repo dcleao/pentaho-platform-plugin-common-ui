@@ -15,26 +15,28 @@
  */
 define([
   "module",
-  "pentaho/component/Info",
+  "cdf/component/input/info",
   "pentaho/messages!info",
   "pentaho/theme!info"
-], function(module, Info, messages) {
-
-  // Alternative name: index, Index
+], function(module, InputInfo, messages) {
 
   /**
-   * @name pentaho.component.samples.textBox.info
-   * @type pentaho.component.Info
+   * @name pentaho.component.samples.TextBoxInfo
+   * @class
+   * @extends cdf.component.InputInfo
+   *
    * @amd pentaho/component/samples/textBox/info
    */
-  return new Info({
+  return InputInfo.extend(/** @lends pentaho.component.samples.TextBoxInfo# */{
     id: module.id,
     className: "pentaho-component-samples-textBox",
+    // icons:
 
     // configurable info
-    enabled:    true,
+    enabled:     true,
     label:       messages.get("label"),
     description: messages.get("description"),
-    category:    messages.get("category")
+    category:    messages.get("category"),
+    helpUrl:     "http://pentaho.com/components/samples/textBox"
   });
 });

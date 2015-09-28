@@ -16,41 +16,22 @@
 define([
   "module",
   "cdf/component/input/model",
-  "pentaho/messages!model",
-  "pentaho/theme!model"
+  "pentaho/messages!model"
 ], function(module, InputModel, messages) {
 
   /**
    * @name pentaho.component.samples.TextBoxModel
    * @class
    * @extends cdf.component.InputModel
+   *
+   * @amd pentaho/component/samples/textBox/model
    */
   return InputModel.extend(/** @lends pentaho.component.samples.TextBoxModel# */{
     properties: {
-      // Property Usage
+
+      // Property Usages
       "placeholderText" : {
-
-        // pentaho/component/properties/any : AnyModel
-        type: "pentaho/component/properties/string", // StringModel
-
-        // Displayed in the property editor?
-        // Can not change after being included/excluded from the editor...
-        browsable:  true,
-
-        // Is _currently_ applicable?
-        applicable: true,
-
-        // Is _currently_ editable?
-        editable: true,
-
-        required: false,
-        allowMultiple: false,
-
-        // countMin, countMax
-        // min, max
-        // values
-
-        //valueType: "string", // number, date, boolean
+        type: "string", // ~~> pentaho/component/properties/string
 
         // Override default label, description
         label: messages.get("placeholderText_label"),

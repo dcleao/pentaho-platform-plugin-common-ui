@@ -21,24 +21,13 @@ define({
     "default": {
 
       // theme part
-      "definition": [
-        "./definition.css"
+      "info": [
+        "./info.css"
       ],
 
-      "implementation": [
-        "../base/implementation.css",
-        "./implementation.css"
-      ]
-    },
-
-    // theme name
-    "crystal": {
-
-      // theme part
-      "definition": [
-        "./definition1.css",
-        "./definition2.css",
-        "./definition4.css"
+      "view": [
+        "../base/view.css",
+        "./view.css"
       ]
     }
   }
