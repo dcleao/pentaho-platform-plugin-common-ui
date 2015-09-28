@@ -396,7 +396,7 @@ define([
      *
      * A number greater than or equal to `0`.
      *
-     * ### Default value
+     * #### Default value
      *
      * The default value depends on the default value of
      * {@link pentaho.component.properties.AnyModel#required}.
@@ -441,7 +441,7 @@ define([
      *
      * A number greater than or equal to `1`, possibly, `Infinity`.
      *
-     * ### Default value
+     * #### Default value
      *
      * The default value depends on the specified value of
      * {@link pentaho.component.properties.AnyModel#multiple}.
@@ -662,7 +662,7 @@ define([
      * The default default-value is:
      * 1. that specified at an ancestor property model class,
      * 2. that determined based on other local attributes (see below), when possible, or
-     * 3. ultimately, `null`.
+     * 3. `null`.
      *
      * A sensible default default-value can be determined from the
      * {@link pentaho.component.properties.AnyModel#values} property, when not `null`,

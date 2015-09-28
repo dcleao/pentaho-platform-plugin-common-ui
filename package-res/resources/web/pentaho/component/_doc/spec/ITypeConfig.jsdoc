@@ -21,16 +21,16 @@
  *
  * @interface
  *
- * @extend pentaho.component.spec.IItemInfoConfig
+ * @extends pentaho.component.spec.IItemInfoConfig
  *
  * @description The `spec.ITypeConfig` interface represents
- * the information that can be used to configure to a component type.
+ * the information that can be used to configure a component type.
  *
- * Most top-level configuration properties configure
- * the component type's `TypeInfo` class.
+ * Most of the top-level configuration properties are used to configure
+ * the component's `TypeInfo` class.
  *
  * The {@link pentaho.component.spec.ITypeConfig#properties} property
- * configures the component type's `Model` class.
+ * configures the component's `Model` class.
  *
  * Editors and viewer applications may define extensions to this interface,
  * consisting of additional properties that they give meaning to.
@@ -43,6 +43,6 @@
  *
  * When unspecified, the property keeps its current value.
  *
- * @property {Object.<string, pentaho.component.spec.IAnyModelConfig>} [properties] The component type's
+ * @property {Object.<string, pentaho.component.properties.spec.IAnyModelConfig>} [properties] The component type's
  *    property configurations, by property name.
  */

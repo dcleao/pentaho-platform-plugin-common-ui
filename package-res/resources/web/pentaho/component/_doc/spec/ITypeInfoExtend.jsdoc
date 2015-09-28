@@ -22,7 +22,7 @@
  *
  * @interface
  *
- * @extend pentaho.component.spec.IItemInfoConfig
+ * @extends pentaho.component.spec.IItemInfoConfig
  *
  * @property {string} id The id of the component type.
  *

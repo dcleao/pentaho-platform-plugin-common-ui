@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
- * The `spec.IAnyModelConfig` interface is the base interface of the information
- * that is used to _configure_ a component property.
+ * The `pentaho.component.properties` namespace
+ * contains the standard property type classes,
+ * and some support specification interfaces.
  *
- * This interface is used as part of the {@link pentaho.component.spec.ITypeConfig} interface.
- *
- * @name pentaho.component.properties.spec.IAnyModelConfig
- *
- * @interface
- *
- * @extends pentaho.component.spec.IItemInfoConfig
- *
- * @property {?pentaho.component.Value} [defaultValue] The default-value of properties of this type.
+ * @name pentaho.component.properties
+ * @namespace
  */

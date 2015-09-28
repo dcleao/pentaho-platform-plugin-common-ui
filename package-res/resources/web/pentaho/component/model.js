@@ -34,18 +34,46 @@ define([
      * A component `Model` plays the following main roles:
      * * contains general metadata about each property supported by a component, like label, description and category
      * * contains logic for property update and validation
-     * * provides a uniform view of components for designers, standing for the real component
+     * * provides a uniform view of components for editors, standing for the real component
      * * provides a way to design a component without having to instantiate the real component
-     * * _can_ be used as the properties model object by the real component.
+     * * _can_ also be used as the properties model object by the real component.
      *
-     * Every component type defines its own component model class,
-     * by sub-classing from its base component type model class.
+     * Every component type creates a `Model` sub-class,
+     * by using the {@link pentaho.component.Model.extend} method,
+     * and publishes it in the sub-module named **model**.
      *
-     * A component model sub-class can define additional properties,
-     * change existing ones, or just change validation and update behavior.
+     * This sub-class can define additional _component properties_ or change the existing, inherited ones.
      *
+     * The following example shows the contents of a module with the id `"my/components/textBox/model"`,
+     * and how a new component model class could be defined:
+     *
+     * ```javascript
+     * define([
+     *   "pentaho/component/model,
+     *   "cdf/component/properties/parameter"
+     * ], function(Model) {
+     *
+     *   return Model.extend({
+     *      properties: [
+     *        {
+     *          type: "string",
+     *          name: "placeholderText",
+     *          label: "Placeholder text",
+     *          description: "The text to show when the control is empty.",
+     *          defaultValue: "Write here",
+     *          category: "Style",
+     *          helpUrl: "http://my.components.example.com/textBox.html#placeholderText"
+     *        },
+     *        {
+     *          type: "cdf/component/properties/parameter",
+     *        }
+     *      ]
+     *   });
+     *
+     * });
+     * ```
      * @description Creates a component model with a given configuration.
-     * @param {pentaho.component.spec.IModelConfig} [config] A component model configuration specification.
+     * @param {pentaho.component.spec.ITypeConfig} [config] A component type configuration.
      */
     constructor: function(config) {
       if(config) this.configure(config);
@@ -53,27 +81,11 @@ define([
 
     //region IConfigurable implementation
     /**
-     * Applies one or more configurations to the component type.
+     * Applies a configuration to the model.
      *
-     * @param {pentaho.component.spec.IModelConfig} config A component model configuration specification.
+     * @param {!pentaho.component.spec.ITypeConfig} config A component type configuration.
      */
     configure: function(config) {
-      if(!config) throw error.argRequired("config");
-
-      if(config instanceof Array)
-        config.forEach(this._configureOne, this);
-      else
-        this._configureOne(config);
-    },
-
-    /**
-     * Applies a single configuration to the component type.
-     *
-     * @param {pentaho.component.spec.ITypeConfig} config A component type configuration specification.
-     * @protected
-     * @virtual
-     */
-    _configureOne: function(config) {
       if(!config) throw error.argRequired("config");
 
       if(config.enabled !== undefined) this.enabled = config.enabled;

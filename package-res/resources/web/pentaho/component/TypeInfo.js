@@ -43,13 +43,37 @@ define([
      *
      * @classdesc The `TypeInfo` class contains general metadata information about a component type.
      *
-     * An `TypeInfo` contains information like: id, name, description, category, CSS-class and icons.
+     * Information like its id, name, description, category, help URL, CSS-class and supported icon types.
      *
-     * Specific component frameworks define sub-classes of `TypeInfo`
-     * to account for additional metadata or specialize existing metadata.
+     * Specific component frameworks may define sub-classes of `TypeInfo`
+     * to account for additional metadata or specialize existing one.
+     *
+     * Also, container-specific metadata can be specified as annotations.
+     *
+     * Every component type creates a `TypeInfo` sub-class,
+     * by using the {@link pentaho.component.TypeInfo.extend} method,
+     * and publishes it in the sub-module named **info**.
+     *
+     * The following example shows the contents of a module with the id `"my/components/textBox/info"`,
+     * and how a new component type info class could be defined:
+     *
+     * ```javascript
+     * define(["module", "pentaho/component/info"], function(module, TypeInfo) {
+     *
+     *   return TypeInfo.extend({
+     *      id: module.id,
+     *      label: "My TextBox",
+     *      description: "A super-cool TextBox by My.",
+     *      category: "Input",
+     *      helpUrl: "http://my.components.example.com/textBox.html"
+     *      className: "my-components-textBox"
+     *   });
+     *
+     * });
+     * ```
      *
      * @description Creates a component type info, optionally given a configuration.
-     * @spec.param {pentaho.component.ITypeInfoConfig} config A component type info configuration specification.
+     * @param {pentaho.component.spec.ITypeConfig} config A component type configuration.
      */
     constructor: function(config) {
       if(config) this.configure(config);
@@ -69,27 +93,11 @@ define([
 
     //region IConfigurable implementation
     /**
-     * Applies one or more configurations to the component type info.
+     * Applies a configuration to the component type info.
      *
-     * @param {pentaho.component.spec.TypeConfig} config A component type info configuration specification.
+     * @param {!pentaho.component.spec.ITypeConfig} config A component type info configuration.
      */
     configure: function(config) {
-      if(!config) throw error.argRequired("config");
-
-      if(config instanceof Array)
-        config.forEach(this._configureOne, this);
-      else
-        this._configureOne(config);
-    },
-
-    /**
-     * Applies a single configuration to the component type info.
-     *
-     * @param {pentaho.component.spec.ITypeConfig} config A component type info configuration specification.
-     * @protected
-     * @virtual
-     */
-    _configureOne: function(config) {
       if(!config) throw error.argRequired("config");
 
       if(config.enabled     !== undefined) this.enabled     = config.enabled;

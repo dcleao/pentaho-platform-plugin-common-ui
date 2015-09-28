@@ -15,20 +15,20 @@
  */
 define([
   "module",
-  "../component/model",
-  "../messages!definition"
-], function(module, ComponentModel, messages) {
+  "../component/info",
+  "../messages!info"
+], function(module, TypeInfo, messages) {
 
   /**
-   * @name pentaho.visual.Model
+   * @name pentaho.visual.TypeInfo
    *
    * @class
-   * @extends pentaho.component.Model
+   * @extends pentaho.component.TypeInfo
    *
-   * @classdesc The `pentaho.visual.Model` is the abstract base class of
-   *    the models of Visualization API components.
+   * @classdesc The `pentaho.visual.Info` is the abstract base class of
+   *    the _info_ classes of Visualization API components.
    */
-  return ComponentModel.extend("pentaho.visual.Model", /** @lends pentaho.visual.Model# */{
+  return TypeInfo.extend("pentaho.visual.Info", /** @lends pentaho.visual.Info# */{
     id: module.id,
     name: messages.get("name"),
     description: messages.get("description"),
@@ -36,13 +36,10 @@ define([
 
     /**
      * Applies a configuration to the visualization type.
-     * @name pentaho.visual.Type#configure
-     * @param {!pentaho.visual.spec.ITypeConfig|Array.<pentaho.visual.spec.ITypeConfig>} config A visualization type configuration.
+     *
+     * @param {!pentaho.visual.spec.ITypeConfig} config A visualization type configuration.
      */
-
-    // @override
-    _configureOne: function(config) {
-      this.base(config);
+    configure: function(config) {
 
       // TODO...
     }
