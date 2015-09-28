@@ -110,7 +110,7 @@
  * @method draw
  *
  * @param {DataTable} dataTable The data to encode visually.
- * @param {IVisualDrawSpec} drawSpec The visual _draw_ specification.
+ * @param {spec.IVisualDraw} drawSpec The visual _draw_ specification.
  *
  * @return {Promise} A promise that is resolved when the operation completes, or _nully_.
  */
@@ -150,12 +150,12 @@
  * with a call to {{#crossLink "IVisual/draw:method"}}{{/crossLink}}.
  *
  * Note that state information should not include properties
- * that are otherwise present in a {{#crossLink "IVisualSpec"}}visual specification{{/crossLink}}.
+ * that are otherwise present in a {{#crossLink "spec.IVisual"}}visual specification{{/crossLink}}.
  *
  * In general, state information _can_ be related to the current dataset.
  * However, there are no guarantees that the returned state object will only be
  * specified in a subsequent {{#crossLink "IVisual/draw:method"}}{{/crossLink}} call,
- * in {{#crossLink "IVisualSpec/state:property"}}visualSpec.state{{/crossLink}},
+ * in {{#crossLink "spec.IVisual/state:property"}}visualSpec.state{{/crossLink}},
  * along with the current dataset, or even with a different one but having the _same structure_.
  *
  * State information must be JSON-serializable.
@@ -192,7 +192,7 @@
  *
  * Initial highlights must be given in calls to
  * the {{#crossLink "IVisual/draw:method"}}{{/crossLink}} method,
- * in argument {{#crossLink "IVisualSpec/highlights:property"}}visualSpec.highlights{{/crossLink}},
+ * in argument {{#crossLink "spec.IVisual/highlights:property"}}visualSpec.highlights{{/crossLink}},
  * and not in a immediately following call to this method.
  *
  * @method setHighlights

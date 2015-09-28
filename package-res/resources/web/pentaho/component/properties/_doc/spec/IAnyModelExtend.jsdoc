@@ -1,0 +1,46 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IAnyModelExtend` interface is the base information
+ * that is used to create a new component property sub-class.
+ *
+ * Except for the {@link pentaho.component.properties.spec.IAnyModelExtend#id} property,
+ * which can only be set at the class level,
+ * all of values of the other properties specify the default values
+ * of instances of the created class.
+ *
+ * Then, upon construction,
+ * instances can override the class defaults through
+ * the {@link pentaho.component.properties.spec.IAnyModel} specification argument,
+ * matching the particular use of the type of property in each class.
+ *
+ * Also, upon configuration,
+ * some of the properties of instances can be further fine-tuned through the
+ * the {@link pentaho.component.properties.spec.IAnyModelConfig} specification.
+ *
+ * @name pentaho.component.properties.spec.IAnyModelExtend
+ *
+ * @interface
+ *
+ * @extends pentaho.component.properties.spec.IAnyModel
+ *
+ * @see pentaho.component.properties.AnyModel#extend
+ *
+ * @property {?string} [id=null] The id of the property type.
+ *
+ * The id of the AMD/RequireJS module where the property is defined, if any.
+ */

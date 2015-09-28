@@ -100,7 +100,7 @@
  *
  * This property always returns an array, possibly empty.
  *
- * NOTE: The visual role value in a {{#crossLink "IVisualSpec"}}visual specification{{/crossLink}}
+ * NOTE: The visual role value in a {{#crossLink "spec.IVisual"}}visual specification{{/crossLink}}
  * is not an array of data attribute objects, but one of their names only.
  * So, for example, in a visual specification,
  * the value of a requirement with id `"colors"` could be:

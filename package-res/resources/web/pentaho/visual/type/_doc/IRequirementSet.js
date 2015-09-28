@@ -29,13 +29,13 @@
  * Visual-containers, like Pentaho Analyzer, present a user interface that
  * allows end users to specify values for each of the visual's requirements.
  *
- * {{#crossLink "IVisualSpec"}}Visual specifications{{/crossLink}},
+ * {{#crossLink "spec.IVisual"}}Visual specifications{{/crossLink}},
  * contain the values of requirements as same name properties.
  *
  * Visuals receive specifications to be
  * {{#crossLink "IVisual/draw:method"}}drawn{{/crossLink}} as an object,
- * of type {{#crossLink "IVisualDrawSpec"}}{{/crossLink}} —
- * a sub-type of {{#crossLink "IVisualSpec"}}{{/crossLink}}.
+ * of type {{#crossLink "spec.IVisualDraw"}}{{/crossLink}} —
+ * a sub-type of {{#crossLink "spec.IVisual"}}{{/crossLink}}.
  *
  * Note that, of the following properties, those not having a default value are **required**.
  *

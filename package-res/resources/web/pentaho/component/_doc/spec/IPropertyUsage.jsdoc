@@ -1,0 +1,60 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IPropertyUsage` interface represents the information
+ * used to define the usage of a property of a certain type by a component model.
+ *
+ * @name pentaho.component.spec.IPropertyUsage
+ * @interface
+ */
+
+// TODO: ./properties/StandardNames enum
+/**
+ * The type of property model to use.
+ *
+ * When a string is specified, it can be a name with or without `"/"` characters.
+ * If it contains no `"/"` characters,
+ * then it must be the name of the module of a standard property type.
+ * Modules of standard property types are children of `"pentaho/component/properties"`.
+ *
+ * The following are some of the standard property type names:
+ * `"any"`, `"string"`, `"number"`, `"integer"`, `"positiveInteger"`, `"nonNegativeInteger"`,
+ * `"boolean"`, `"date"`.
+ *
+ * Otherwise,
+ * if it contains one or more `"/"` characters,
+ * then it must be the AMD/RequireJS module _id_ of an existing property model class.
+ * The module _must_ have already been loaded by the module system and
+ * thus be obtainable through a synchronous `require` call: `require("my/properties/model")`.
+ *
+ * When a function is directly specified,
+ * it must be a sub-class of {@link pentaho.component.properties.AnyModel}.
+ * In this case, the model class may or may not have been defined in a separate module —
+ * it can have been defined in module of the component model class.
+ *
+ * @name type
+ * @memberOf pentaho.component.spec.IPropertyUsage#
+ * @type string|Class.<pentaho.component.properties.AnyModel>
+ */
+
+/**
+ * An array of property usages.
+ *
+ * @name properties
+ * @memberOf pentaho.component.spec.IPropertyUsage#
+ * @type Array.<pentaho.component.spec.IPropertyUsage>
+ */

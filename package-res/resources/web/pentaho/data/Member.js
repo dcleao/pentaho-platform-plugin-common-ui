@@ -69,7 +69,7 @@ define([
      * they should be created by using its attribute's
      * {@link pentaho.data.Attribute#toMemberOf} method.
      *
-     * @param {pentaho.data.IMemberSpec} spec A member specification.
+     * @param {pentaho.data.spec.IMember} spec A member specification.
      * @param {!Object} keyArgs The keyword arguments.
      * @oaram {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
      */
@@ -192,7 +192,7 @@ define([
     /**
      * Creates a specification of the member.
      *
-     * @return {!pentaho.data.IMemberSpec} A new specification of the member.
+     * @return {!pentaho.data.spec.IMember} A new specification of the member.
      */
     toSpec: function() {
       var memberSpec = {v: this.v};

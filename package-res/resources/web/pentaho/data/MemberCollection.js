@@ -97,7 +97,7 @@ define([
      *
      * @name pentaho.data.MemberCollection#toSpec
      * @method
-     * @return {Array.<pentaho.data.IMemberSpec>} A specification of the members collection.
+     * @return {Array.<pentaho.data.spec.IMember>} A specification of the members collection.
      */
   });
 });

@@ -105,7 +105,7 @@ define([
      * but in a _plain_ format,
      * by using the {@link pentaho.data.Table#toPlainTable} method.
      *
-     * @param {string|pentaho.data.ITableSpec|pentaho.data.AbstractTable} [table]
+     * @param {string|pentaho.data.spec.ITable|pentaho.data.AbstractTable} [table]
      *    An instance of {@link pentaho.data.AbstractTable},
      *    a table specification, or
      *    a JSON specification string.
@@ -254,7 +254,7 @@ define([
      * @param {boolean} [keyArgs.shareModel=false] Indicates that
      *    the model of the resulting specification will be
      *    the model object itself and not its specification.
-     * @return {pentaho.data.IPlainTableSpec} A plain-structure specification of the table.
+     * @return {pentaho.data.spec.IPlainTable} A plain-structure specification of the table.
      * @see pentaho.data.Table#toPlainTable
      */
     toSpecPlain: function(keyArgs) {
@@ -270,7 +270,7 @@ define([
      *    the model of the resulting specification will be
      *    the model object itself and not its specification.
      *
-     * @return {pentaho.data.ITableSpec} A specification of the table.
+     * @return {pentaho.data.spec.ITable} A specification of the table.
      */
     toSpec: function(keyArgs) {
       return this._toSpec(keyArgs, false);

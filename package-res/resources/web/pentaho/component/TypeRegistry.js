@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "./definition",
+  "./model",
   "../lang/Base",
   "../lang/Collection",
   "../util/error",
@@ -132,7 +132,7 @@ define([
      * An error is thrown if a component type having
      * the same _id_ is already registered.
      *
-     * @param {Class.<pentaho.component.Type>} Type The component type class.
+     * @param {Class.<pentaho.component.Model>} Type The component type class.
      * @return {pentaho.component.TypeRegistry} The component registry.
      */
     add: function(Type) {
@@ -166,7 +166,7 @@ define([
      * Do **not** modify the returned array or any of its elements.
      *
      * @param {string} [contextId] The context id.
-     * @return {pentaho.lang.Collection.<pentaho.component.Type>} A collection of component types.
+     * @return {pentaho.lang.Collection.<pentaho.component.Model>} A collection of component types.
      */
     getAll: function(contextId) {
       return getContextTypes.call(this, contextId);
@@ -185,7 +185,7 @@ define([
      * @param {string} [contextId] The context id.
      * @param {boolean} [assertAvailable=false] Indicates if an error should be thrown
      *    if the specified component type is not registered or is disabled.
-     * @return {?pentaho.component.Type} A component type or `null`.
+     * @return {?pentaho.component.Model} A component type or `null`.
      */
     get: function(typeId, contextId, assertAvailable) {
       if(!typeId) throw error.argRequired("typeId");
@@ -351,9 +351,9 @@ define([
    * Creates a component type of the given class,
    * and for the given context id.
    *
-   * @param {Class.<pentaho.component.Type>} Type A non-abstract component type class.
-   * @param {function(pentaho.component.ITypeConfigurationSpec)} fun The mapping function.
-   * @return {pentaho.component.Type} A new, configured component type.
+   * @param {Class.<pentaho.component.Model>} Type A non-abstract component type class.
+   * @param {function(pentaho.component.spec.ITypeConfiguration)} fun The mapping function.
+   * @return {pentaho.component.Model} A new, configured component type.
    * @ignore
    */
   function createTypeForContext(Type, contextId) {
@@ -372,8 +372,8 @@ define([
    * Maps the configurations applicable to a given component type,
    * from lowest to highest precedence.
    *
-   * @param {Class.<pentaho.component.Type>} Type The component type class.
-   * @param {function(pentaho.component.ITypeConfigurationSpec)} fun The mapping function.
+   * @param {Class.<pentaho.component.Model>} Type The component type class.
+   * @param {function(pentaho.component.spec.ITypeConfiguration)} fun The mapping function.
    * @ignore
    */
   function mapConfigs(Type, fun) {
@@ -389,8 +389,8 @@ define([
    * from lowest to highest precedence.
    *
    * @param {pentaho.component.IComponentConfigLevel} configLevel The configuration level.
-   * @param {Class.<pentaho.component.Type>} Type The component type class.
-   * @param {function(pentaho.component.ITypeConfigurationSpec)} fun The mapping function.
+   * @param {Class.<pentaho.component.Model>} Type The component type class.
+   * @param {function(pentaho.component.spec.ITypeConfiguration)} fun The mapping function.
    * @ignore
    */
   function mapConfigsOfLevel(configLevel, Type, fun) {

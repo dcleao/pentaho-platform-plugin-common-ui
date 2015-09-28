@@ -60,7 +60,7 @@ define([
      *
      * @description Creates an attribute.
      *
-     * @param {pentaho.data.IAttributeSpec} spec The specification of the attribute.
+     * @param {pentaho.data.spec.IAttribute} spec The specification of the attribute.
      * @param {!Object} keyArgs The keyword arguments.
      * @param {number} keyArgs.ordinal The ordinal of the attribute in its model's attribute collection.
      */
@@ -94,7 +94,7 @@ define([
       /**
        * Gets the format provider of the attribute, if it has one, or `null`, otherwise.
 
-       * @type ?pentaho.data.IFormatProviderSpec
+       * @type ?pentaho.data.spec.IFormatProvider
        */
       this.format = spec.format || null;
 
@@ -219,7 +219,7 @@ define([
     /**
      * Converts a member specification to a member of this attribute.
      *
-     * @param {!(pentaho.data.IMemberSpec|pentaho.data.Atomic)} memberSpec A member specification
+     * @param {!(pentaho.data.spec.IMember|pentaho.data.Atomic)} memberSpec A member specification
      *     or, directly, a member's atomic value.
      * @oaram {!Object} keyArgs The keyword arguments.
      * @oaram {number} keyArgs.ordinal The ordinal of the member in the attribute's member collection.
@@ -237,7 +237,7 @@ define([
     /**
      * Converts a cell specification to a cell of this attribute.
      *
-     * @param {pentaho.data.ICellSpec|pentaho.data.Atomic} cellSpec A cell specification
+     * @param {pentaho.data.spec.ICell|pentaho.data.Atomic} cellSpec A cell specification
      *     or, directly, a cell's value, possibly _nully_.
      * @return {pentaho.data.Cell} A cell of this attribute.
      */
@@ -273,7 +273,7 @@ define([
     /**
      * Creates a specification of the attribute.
      *
-     * @return {pentaho.data.IAttributeSpec} A new specification of the attribute.
+     * @return {pentaho.data.spec.IAttribute} A new specification of the attribute.
      */
     toSpec: function() {
       var attrSpec = {

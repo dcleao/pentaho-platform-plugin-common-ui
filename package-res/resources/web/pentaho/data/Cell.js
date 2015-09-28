@@ -83,7 +83,7 @@ define([
      * they should be created by using their attribute's
      * {@link pentaho.data.Attribute#toCellOf} method.
      *
-     * @param {pentaho.data.ICellSpec|pentaho.data.Atomic} cell A cell specification
+     * @param {pentaho.data.spec.ICell|pentaho.data.Atomic} cell A cell specification
      *     or, directly, a cell's value, possibly _nully_.
      */
     constructor: function(spec) {

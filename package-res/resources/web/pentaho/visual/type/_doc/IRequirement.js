@@ -45,9 +45,9 @@
  * The id of the requirement.
  *
  * A requirement defines a property with the name of its _id_
- * in a visual specification, {{#crossLink "IVisualSpec"}}{{/crossLink}}.
+ * in a visual specification, {{#crossLink "spec.IVisual"}}{{/crossLink}}.
  * Because of the namespace sharing, the id of a requirement
- * cannot be the name of a standard property of {{#crossLink "IVisualSpec"}}{{/crossLink}}.
+ * cannot be the name of a standard property of {{#crossLink "spec.IVisual"}}{{/crossLink}}.
  *
  * @property id
  * @type string

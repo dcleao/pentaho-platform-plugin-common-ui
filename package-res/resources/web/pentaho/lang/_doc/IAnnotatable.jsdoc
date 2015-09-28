@@ -28,10 +28,10 @@
  *
  * By convention, the specification of an annotatable object
  * uses a property named `p` to contain a plain object,
- * a dictionary of annotations' names and values (see {@link pentaho.lang.IAnnotatableSpec}).
+ * a dictionary of annotations' names and values (see {@link pentaho.lang.spec.IAnnotatable}).
  *
  * @see pentaho.lang.ISpecifiable
- * @see pentaho.lang.IAnnotatableSpec
+ * @see pentaho.lang.spec.IAnnotatable
  *
  * @example
  *    // Obtain an annotatable object

@@ -1,0 +1,48 @@
+/*!
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `spec.IAnyModel` interface is the base interface of the information
+ * that is used to _construct_ a component property instance.
+ *
+ * Unspecified properties get the class' default value,
+ * as defined in {@link pentaho.component.properties.spec.IAnyModelExtend}.
+ *
+ * @name pentaho.component.properties.spec.IAnyModel
+ *
+ * @interface
+ *
+ * @extends pentaho.component.properties.spec.IAnyModelConfig
+ *
+ * @see pentaho.component.properties.AnyModel
+ *
+ * @property {string} [name] The name of properties of this type when used in a component.
+ *
+ * @property {boolean} [required=false] Indicates if properties of this type must be specified.
+ *
+ * @property {boolean} [allowMultiple=false] Indicates if properties of this type can have more than one value.
+ *
+ * @property {number} [countMin=0] The minimum number of values that properties of this type must have.
+ *
+ * @property {number} [countMax=1] The maximum number of values that properties of this type can have.
+ *
+ * @property {Array.<pentaho.component.spec.SingleValueLabel>} [values] The list of possible values that properties
+ *    of this type can have.
+ *
+ * @property {pentaho.component.SingleValue} [min] The minimum value that properties of this type can have.
+ *
+ * @property {pentaho.component.SingleValue} [max] The maximum value that properties of this type can have.
+ */

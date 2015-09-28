@@ -322,7 +322,7 @@ define([
      *
      * The resulting model will have one attribute per distinct view column.
      *
-     * @return {pentaho.data.IPlainTableSpec} A specification of the view.
+     * @return {pentaho.data.spec.IPlainTable} A specification of the view.
      */
     toSpec: function() {
       // For a cross-table, defines as many model attributes as there are distinct col groups...

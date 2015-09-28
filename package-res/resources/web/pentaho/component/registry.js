@@ -25,8 +25,8 @@ define([
    * The singleton instance where component types and their configurations are registered.
    *
    * The component type registry comes pre-loaded with the AMD _services_:
-   * 1. {@link pentaho.component.TypeConfigurationSpec}
-   * 2. {@link pentaho.component.Type}
+   * 1. {@link pentaho.component.spec.TypeConfiguration}
+   * 2. {@link pentaho.component.Model}
    *
    * Additional component types and configurations may be loaded dynamically by using the methods
    * {@link pentaho.component.TypeRegistry#add} and {@link pentaho.component.TypeRegistry#addConfig},

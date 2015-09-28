@@ -65,7 +65,7 @@ define([
      *
      * @name pentaho.data.AttributeCollection#toSpec
      * @method
-     * @return {Array.<pentaho.data.IAttributeSpec>} A specification of the attributes collection.
+     * @return {Array.<pentaho.data.spec.IAttribute>} A specification of the attributes collection.
      */
   });
 });

@@ -59,8 +59,8 @@ define([
    * Indicates if a name is that of a standard property name.
    *
    * Standard specification properties are those defined
-   * by the {{#crossLink "IVisualSpec"}}{{/crossLink}} and
-   * {{#crossLink "IVisualDrawSpec"}}{{/crossLink}} interfaces:
+   * by the {{#crossLink "spec.IVisual"}}{{/crossLink}} and
+   * {{#crossLink "spec.IVisualDraw"}}{{/crossLink}} interfaces:
    *
    * * `type`
    * * `state`
@@ -91,7 +91,7 @@ define([
    * @param {IVisualType} type The visual type.
    * @param {Object} [properties] Visual properties to initialize the specification.
    *
-   * @return {IVisualSpec} The created visual specification.
+   * @return {spec.IVisual} The created visual specification.
    */
   function create(type, properties) {
     if(!type) throw error.argRequired("type");
@@ -119,9 +119,9 @@ define([
    *
    * @method clone
    *
-   * @param {IVisualSpec} spec The specification to clone.
+   * @param {spec.IVisual} spec The specification to clone.
    *
-   * @return {IVisualSpec} The cloned specification.
+   * @return {spec.IVisual} The cloned specification.
    */
   function clone(spec) {
     var clone = {},
@@ -140,7 +140,7 @@ define([
    *
    * @method eachProperties
    *
-   * @param {IVisualSpec} spec The specification whose properties to map.
+   * @param {spec.IVisual} spec The specification whose properties to map.
    * @param {function} fun The mapping function.
    *   Called with each property's value and name as arguments.
    *   Iteration is cancelled if the function returns the value `false`.
@@ -167,7 +167,7 @@ define([
    *
    * @method setProperties
    *
-   * @param {IVisualSpec} spec The specification to set properties in.
+   * @param {spec.IVisual} spec The specification to set properties in.
    * @param {object} props A map of properties.
    * @param {boolean} [defaultsOnly=false] Indicates if only the properties
    * of the specification that have no value should be set.

@@ -110,7 +110,7 @@ define([
    * @method processEditModelChange
    *
    * @param {IVisualType} type The visual type.
-   * @param {IVisualSpec} spec The visual specification.
+   * @param {spec.IVisual} spec The visual specification.
    * @param {IVisualEditModel} editModel The visual edit model.
    * @param {string} [changedProp] The name of the property that has changed.
    *   When unspecified, it is assumed that all properties have changed.

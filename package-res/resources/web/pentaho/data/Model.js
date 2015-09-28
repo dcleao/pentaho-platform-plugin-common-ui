@@ -46,8 +46,8 @@ define([
      *
      * @description Creates a model given a specification.
      *
-     * @param {pentaho.data.IModelSpec |
-     *     Array.<pentaho.data.IAttributeSpec |
+     * @param {pentaho.data.spec.IModel |
+     *     Array.<pentaho.data.spec.IAttribute |
      *     pentaho.data.Attribute>} [spec] The model specification.
      *
      * An array of attribute specifications or instances can also be specified.
@@ -76,7 +76,7 @@ define([
        * This format provider provides defaults to the format providers
        * of every attribute of the model.
        *
-       * @type ?pentaho.data.IFormatProviderSpec
+       * @type ?pentaho.data.spec.IFormatProvider
        * @see pentaho.data.Attribute#format
        */
       this.format = (spec && spec.format) || null;
@@ -88,7 +88,7 @@ define([
     /**
      * Creates a specification of the model.
      *
-     * @return {pentaho.data.IModelSpec}
+     * @return {pentaho.data.spec.IModel}
      *    A specification of the model.
      */
     toSpec: function() {

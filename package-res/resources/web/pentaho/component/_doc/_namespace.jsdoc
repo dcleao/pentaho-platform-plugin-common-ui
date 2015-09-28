@@ -66,7 +66,7 @@
  * ### Definition
  *
  * The other main constituent of a web component is that which describes
- * the component type — a JavaScript sub-class of `pentaho.component.Type`.
+ * the component type — a JavaScript sub-class of `pentaho.component.Model`.
  * By convention, this class is the value of the sub-module name _definition_.
  *
  * Note that the _definition_ sub-module is only strictly required by editor applications

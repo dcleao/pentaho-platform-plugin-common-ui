@@ -184,7 +184,7 @@ define([
      *
      * @property visualSpec
      *
-     * @type IVisualSpec
+     * @type spec.IVisual
      */
     get visualSpec() {
       return this._visualSpec;
@@ -296,7 +296,7 @@ define([
      *   Its properties are used to set any `undefined` properties of the visual specification.
      *   Its properties are _not_ saved along with the visual specification.
      * @param {string} [drawOptions.action] The action that triggered the update call and
-     *   feeds {{#crossLink "IVisualDrawSpec/action:property"}}{{/crossLink}}.
+     *   feeds {{#crossLink "spec.IVisualDraw/action:property"}}{{/crossLink}}.
      *
      *   When unspecified and a single operation was performed on the wrapper since
      *   the last update call, the action passed to the _visual_ is
@@ -535,7 +535,7 @@ define([
      * @param {boolean} [options.saveData=false] Indicates if the current visual
      *    data should be included.
      *
-     * @return {IVisualSpec} The current visual specification.
+     * @return {spec.IVisual} The current visual specification.
      */
     save: function(options) {
       this._checkVisualState();

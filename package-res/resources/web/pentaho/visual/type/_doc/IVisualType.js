@@ -138,10 +138,10 @@
 
 /**
  * An object containing static properties which are
- * merged into {{#crossLink "IVisualSpec"}}{{/crossLink}}.
+ * merged into {{#crossLink "spec.IVisual"}}{{/crossLink}}.
  *
  * Properties having the name of a standard property of
- * {{#crossLink "IVisualSpec"}}{{/crossLink}} are **ignored**.
+ * {{#crossLink "spec.IVisual"}}{{/crossLink}} are **ignored**.
  *
  * Use this property for specifying default values for
  * a visual's requirements.

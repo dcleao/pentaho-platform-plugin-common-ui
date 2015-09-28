@@ -15,28 +15,20 @@
  */
 define([
   "module",
-  "../component/definition",
-  "../messages!definition",
-  "../util/arg",
-  "../util/error",
-  "../util/object"
-], function(module, ComponentType, messages, arg, error, O) {
+  "../component/model",
+  "../messages!definition"
+], function(module, ComponentModel, messages) {
 
   /**
-   * @name Type
-   * @memberOf pentaho.visual
+   * @name pentaho.visual.Model
    *
    * @class
-   * @extends pentaho.component.Type
+   * @extends pentaho.component.Model
    *
-   * @classdesc The `pentaho.visual.Type` is the base abstract class of
-   *     the Visualization API component types.
-   *
-   * A visualization component type can also be called, simply, a **visualization type**.
-   *
-   * Visualization types are defined by creating a class that directly or indirectly inherits from this one.
+   * @classdesc The `pentaho.visual.Model` is the abstract base class of
+   *    the models of Visualization API components.
    */
-  return ComponentType.extend("pentaho.visual.Type", /** @lends pentaho.visual.Type# */{
+  return ComponentModel.extend("pentaho.visual.Model", /** @lends pentaho.visual.Model# */{
     id: module.id,
     name: messages.get("name"),
     description: messages.get("description"),
@@ -45,7 +37,7 @@ define([
     /**
      * Applies a configuration to the visualization type.
      * @name pentaho.visual.Type#configure
-     * @param {!pentaho.visual.ITypeConfigurationSpec|Array.<pentaho.visual.ITypeConfigurationSpec>} config A visualization type configuration.
+     * @param {!pentaho.visual.spec.ITypeConfiguration|Array.<pentaho.visual.spec.ITypeConfiguration>} config A visualization type configuration.
      */
 
     // @override
