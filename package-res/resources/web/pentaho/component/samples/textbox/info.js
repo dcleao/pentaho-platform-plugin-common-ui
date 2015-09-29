@@ -30,7 +30,6 @@ define([
   return InputInfo.extend(/** @lends pentaho.component.samples.TextBoxInfo# */{
     id: module.id,
     className: "pentaho-component-samples-textBox",
-    // icons:
 
     // configurable info
     enabled:     true,

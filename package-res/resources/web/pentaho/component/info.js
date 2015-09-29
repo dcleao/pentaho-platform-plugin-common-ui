@@ -16,10 +16,9 @@
 define([
   "module",
   "./TypeInfo",
-  "./IconType",
   "../messages!info",
   "../theme!info"
-], function(module, TypeInfo, IconType, messages) {
+], function(module, TypeInfo, messages) {
 
   // Actual root component type metadata/information.
 
@@ -29,7 +28,6 @@ define([
     label:       messages.get("label"),
     description: messages.get("description"),
     category:    messages.get("category"),
-    className:   "pentaho-component",
-    icons:       IconType.wellKnown.slice()
+    className:   "pentaho-component"
   });
 });

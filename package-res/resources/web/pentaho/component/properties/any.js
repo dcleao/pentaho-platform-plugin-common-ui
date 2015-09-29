@@ -54,7 +54,6 @@ define([
       return this === this.constructor.prototype;
     },
 
-
     //region Identification and Informational properties
 
     //region id property

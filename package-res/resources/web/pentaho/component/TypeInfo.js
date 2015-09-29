@@ -19,19 +19,8 @@ define([
   "../util/Base",
   "../util/Collection",
   "../util/error",
-  "../util/object",
-  "./IconType"
-], function(ItemInfo, Annotatable, Base, Collection, error, O, IconType) {
-
-  var IconTypeCollection = Collection.extend({
-    //region List implementation
-    elemClass: IconType,
-    //endregion
-
-    _sortIcons: function() {
-      this.sort(IconType.areaComparer);
-    }
-  });
+  "../util/object"
+], function(ItemInfo, Annotatable, Base, Collection, error, O) {
 
   var TypeInfo = ItemInfo.extend("pentaho.component.TypeInfo", /** @lends pentaho.component.TypeInfo# */{
     /**
@@ -45,7 +34,7 @@ define([
      *
      * @classdesc The `TypeInfo` class contains general metadata information about a component type.
      *
-     * Information like its id, name, description, category, help URL, CSS-class and supported icon types.
+     * Information like its id, name, description, category, help URL and CSS-class.
      *
      * Specific component frameworks may define sub-classes of `TypeInfo`
      * to account for additional metadata or specialize existing one.
@@ -358,47 +347,6 @@ define([
       } while((proto !== rootProto) && (proto = Object.getPrototypeOf(proto)));
 
       return classNames;
-    },
-    //endregion
-
-    //region icons property
-
-    // TODO: Need to review the whole icons thing
-    // * If CSS scheme of placing all classNames works as thought
-    // * How inheritance of icon types should actually work to make it useful to smart containers
-    // * Is it worth the complexity?
-
-    _icons: IconTypeCollection.to([]),
-
-    /**
-     * The array of icon types supported by the own _CSS_ class of the component type,
-     * ordered by area.
-     *
-     * Declared icon types _should_ be supported by all of the component type's themes.
-     *
-     * By default, a component type has no icons.
-     *
-     * This option is only applicable if the component type has a defined own `className`.
-     *
-     * @type !pentaho.lang.Collection.<!pentaho.component.IconType>
-     * @see pentaho.component.Model#className
-     */
-    get icons() {
-      // Inherit base icons at first access.
-      // Setting icons to null will reset.
-      return O.getOwn(this, "_icons") ||
-          (this._icons = IconTypeCollection.to(this._icons.slice()));
-    },
-
-    set icons(value) {
-      var icons = this.icons;
-      if(value == null) {
-        // Reset
-        icons.length = 0;
-      } else {
-        icons.addMany(value);
-        icons._sortIcons();
-      }
     }
     //endregion
   }, /** @lends pentaho.component.TypeInfo */{
