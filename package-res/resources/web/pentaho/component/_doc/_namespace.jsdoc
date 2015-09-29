@@ -101,7 +101,12 @@
  * in that a _view_ is an expression or representation of a _model_.
  *
  * Every component type publishes its view class in the sub-module named **view**.
- * The actual interface of a view class is **not** specified.
+ *
+ * There is no requirement whatsoever on the view class.
+ * It can be a normal "constructor and prototype" JavaScript class,
+ * or its instances can be created using a factory function and return function instances,
+ * or anything else.
+ * Naturally, the _view_ sub-module must have as a value something that allows the creation of multiple instances...
  *
  * ### Identification
  *
@@ -127,6 +132,6 @@
  * });
  * ```
  *
- * Although, as said before, to use a component effectively,
- * it is necessary to know more about its specific component type.
+ * As said before, to use a component effectively, it is necessary to know the specifics of
+ * its component type's _view_ class.
  */

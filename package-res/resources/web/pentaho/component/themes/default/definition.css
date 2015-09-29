@@ -1,8 +1,30 @@
 
+.pentaho-component.component-icon-small, .pentaho-component.component-icon-medium {
+  background: no-repeat center;
+  background-size: 100%;
+  /*border: solid 1px red;*/
+}
+
 .pentaho-component.component-icon-small {
-  background-image: "./images/icon-small.png"
+  width:  16px;
+  height: 16px;
+  background-image: url("./images/icon-small.png");
 }
 
 .pentaho-component.component-icon-medium {
-  background-image: "./images/icon-medium.png"
+  width:  32px;
+  height: 32px;
+  background-image: url("./images/icon-medium.png");
+}
+
+.pentaho-component.component-icon-large {
+  width:  64px;
+  height: 64px;
+  background-image: url("./images/icon-large.png");
+}
+
+.pentaho-component.component-icon-landscape {
+  width:  196px;
+  height: 128px;
+  background-image: url("./images/icon-landscape.png");
 }

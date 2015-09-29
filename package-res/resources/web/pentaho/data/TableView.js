@@ -21,8 +21,6 @@ define([
   "../util/error"
 ], function(AbstractTable, Table, Annotatable, error) {
 
-  var annotProto = Annotatable.prototype;
-
   return AbstractTable.extend("pentaho.data.TableView", /** @lends pentaho.data.TableView# */{
     /**
      * @alias TableView
@@ -355,7 +353,7 @@ define([
       }
 
       // Reuse this model's metadata.
-      var modelSpec = annotProto.toSpec.call(this.model, {attrs: attrSpecs});
+      var modelSpec = Annotatable.toSpec(this.model, {attrs: attrSpecs});
 
       return {
           model: modelSpec,

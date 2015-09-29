@@ -36,12 +36,23 @@ define([
       if(!annots) this._annots = annots = {};
       annots[name] = value;
       return this;
+    }
+  }, {
+    configure: function(inst, config) {
+      var ps = config.p;
+      if(ps) {
+        var annots = inst._annots;
+        Object.keys(ps).forEach(function(name) {
+          if(!annots) inst._annots = annots = {};
+          annots[name] = ps[name];
+        });
+      }
     },
 
-    //region ISpecifiable implementation
-    toSpec: function(json) {
+    //region ISpecifiable implementation helper
+    toSpec: function(inst, json) {
       if(!json) json = {};
-      if(this._annots) json._annots = O.cloneShallow(this._annots);
+      if(inst._annots) json._annots = O.cloneShallow(inst._annots);
       return json;
     }
     //endregion

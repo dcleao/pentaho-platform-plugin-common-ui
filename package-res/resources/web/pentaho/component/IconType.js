@@ -148,7 +148,7 @@ define([
      * @type !pentaho.component.IconType
      * @readonly
      */
-    LANDSCAPE: new IconType({name: "landscape", width: 64, height: 64, className: "landscape"}),
+    LANDSCAPE: new IconType({name: "landscape", width: 192, height: 128, className: "landscape"}),
 
     /**
      * Converts a value to an icon type.

@@ -19,8 +19,6 @@ define([
   "../lang/_Annotatable"
 ], function(AttributeCollection, Base, Annotatable) {
 
-  var annotProto = Annotatable.prototype;
-
   return Base.extend("pentaho.data.Model", /** @lends pentaho.data.Model# */{
     /**
      * @alias Model
@@ -99,8 +97,8 @@ define([
         format: this.format
       };
 
-      return annotProto.toSpec(spec);
+      return Annotatable.toSpec(this, spec);
     }
     //endregion
-  });
+  }).implement(Annotatable);
 });

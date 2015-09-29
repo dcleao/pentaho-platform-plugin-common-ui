@@ -88,9 +88,7 @@ define([
     configure: function(config) {
       if(!config) throw error.argRequired("config");
 
-      if(config.enabled !== undefined) this.enabled = config.enabled;
-      if(config.label   !== undefined) this.label   = config.label;
-      if(config.description) this.description = config.description;
+
     },
     //endregion
 

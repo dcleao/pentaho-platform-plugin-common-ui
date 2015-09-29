@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 define([
+  "./ItemInfo",
+  "../lang/_Annotatable",
   "../util/Base",
   "../util/Collection",
   "../util/error",
   "../util/object",
   "./IconType"
-], function(Base, Collection, error, O, IconType) {
+], function(ItemInfo, Annotatable, Base, Collection, error, O, IconType) {
 
   var IconTypeCollection = Collection.extend({
     //region List implementation
@@ -31,7 +33,7 @@ define([
     }
   });
 
-  var TypeInfo = Base.extend("pentaho.component.TypeInfo", /** @lends pentaho.component.TypeInfo# */{
+  var TypeInfo = ItemInfo.extend("pentaho.component.TypeInfo", /** @lends pentaho.component.TypeInfo# */{
     /**
      * @name pentaho.component.TypeInfo
      *
@@ -79,6 +81,10 @@ define([
       if(config) this.configure(config);
     },
 
+    _isPrototype: function() {
+      return this === this.constructor.prototype;
+    },
+
     //region IListElement implementation
     elemName: "component type info",
     //endregion
@@ -104,77 +110,69 @@ define([
       if(config.label       !== undefined) this.label       = config.label;
       if(config.description !== undefined) this.description = config.description;
       if(config.category    !== undefined) this.category    = config.category;
+      if(config.helpUrl     !== undefined) this.helpUrl     = config.helpUrl;
+
+      Annotatable.configure(this, config);
     },
     //endregion
 
     // IMPLEMENTATION NOTE: All of the following setters are used both at instance and class/prototype level.
     // In TypeInfo.extend, the class' prototype is **assigned** with the values of the given instance specification!
 
-    //region enabled property
-    _enabled: true,
-
-    /**
-     * Gets or sets a value that indicates if the component type is enabled.
-     *
-     * Disabled component types should not be made available to users when creating new component instances.
-     *
-     * @type boolean
-     * @default true
-     */
-    get enabled() {
-      return this._enabled;
-    },
-
-    set enabled(value) {
-      if(value !== undefined) {
-        this._enabled = !!value;
-      }
-    },
-    //endregion
-
     //region id property
-    _id: undefined,
+
+    // -> nonEmptyString, Required, Shared, ReadOnly
+
+    _id: null,
 
     /**
-     * Gets the id of the component type.
+     * Gets or sets the id of the component type.
      *
-     * This property is shared by all instances of a component type
-     * and cannot be changed for specific instances.
+     * If a specified id ends with the string `"/info"`, that part is removed.
      *
-     * @type string
-     * @readonly
+     * Can only be specified when defining the component type info class,
+     * through {@link pentaho.component.spec.ITypeInfoExtend#id}.
+     *
+     * Once set, cannot be changed.
+     *
+     * This property is not inherited.
+     *
+     * @type ?nonEmptystring
      */
     get id() {
       return this._id;
     },
 
     set id(value) {
-      // Can only be called on the prototype of the class, once
-      if(this !== this.constructor.prototype) throw error.operInvalid("'id' can only be called on the prototype.");
+      // Can only be called once, and on the class prototype.
+      if(!this._isPrototype()) throw error.operInvalid("'id' can only be called on the prototype.");
       if(O.hasOwn(this, "_id")) throw error.operInvalid("'id' can only be set once.");
 
-      if(value !== undefined) {
-        value = value && value.replace(/\/info$/, "");
-        if(!value) throw error.argRequired("id");
+      value = value && value.replace(/\/info$/, "");
+      if(!value) throw error.argRequired("id");
 
-        this._id = value;
-      }
+      this._id = value;
     },
     //endregion
 
     //region "abstract" property
-    _abstract: true, // default root class value...
+
+    // -> boolean, Optional(false), Shared, ReadOnly
+
+    _abstract: false,
 
     /**
-     * Gets a value that indicates if the component type is abstract.
+     * Gets or sets a value that indicates if the component type is abstract.
      *
      * An abstract component type is meant to be inherited from.
      * A component of this exact type cannot be instantiated.
      *
-     * This property is shared by all instances of a component type
-     * and cannot be changed for specific instances.
+     * Can only be specified when defining the component type info class,
+     * through {@link pentaho.component.spec.ITypeInfoExtend#abstract}.
      *
-     * The default value is `false`.
+     * Once set, cannot be changed.
+     *
+     * This property is not inherited.
      *
      * @type boolean
      * @readonly
@@ -186,65 +184,83 @@ define([
 
     set "abstract"(value) {
       // Can only be called on the prototype of the class, once
-      if(this !== this.constructor.prototype) throw error.operInvalid("'abstract' can only be called on the prototype.");
-      if(O.hasOwn(this, "_id")) throw error.operInvalid("'abstract' can only be set once.");
+      if(!this._isPrototype()) throw error.operInvalid("'abstract' can only be called on the prototype.");
+      if(O.hasOwn(this, "_abstract")) throw error.operInvalid("'abstract' can only be set once.");
 
-      if(value !== undefined) {
-        this._abstract = !!value;
-      }
+      this._abstract = !!value;
     },
     //endregion
 
-    //region label property
-    _label: undefined,
+    //region enabled property
 
+    // -> boolean, Optional(true), Configurable, ReadOnlyAfterConfig, NoClassDefault
+
+    _enabled: true,
+
+    /**
+     * Gets or sets a value that indicates if the component type is enabled.
+     *
+     * Disabled component types are not made available to users for creating new component instances.
+     *
+     * This property is not inherited and must be set instance by instance.
+     * There's no way to set the default value, when defining the component type info class.
+     *
+     * Set to `undefined` to reset the value to its default.
+     * Any other value is converted to boolean using `Boolean` (`null` included).
+     *
+     * @type boolean
+     * @default true
+     */
+    get enabled() {
+      return this._enabled;
+    },
+
+    set enabled(value) {
+      this._enabled = (value === undefined) || !!value;
+    },
+    //endregion
+
+    //region ItemInfo properties
     /**
      * Gets or sets the label of the component type.
      *
-     * The label is a localized, short description of the component type.
+     * The _label_ is a localized, short description.
+     * It should be suitable for _identifying_ the component type in a menu,
+     * amongst others.
      *
-     * The label should be suitable for _identifying_ it in a menu, amongst others.
+     * Set to `undefined` to reset the value to its default.
      *
-     * The label cannot be null or empty.
+     * The default value is that specified when defining the component type info class,
+     * through {@link pentaho.component.spec.ITypeInfoExtend#label}.
      *
-     * @type string
+     * A component type must have a non-empty label.
+     *
+     * Can be configured through {@link pentaho.component.spec.ITypeConfig#label}.
+     *
+     * @name pentaho.component.TypeInfo#label
+     * @type nonEmptyString
      */
-    get label() {
-      return this._label;
-    },
-
-    set label(value) {
-      if(value !== undefined) {
-        if(!value) throw error.argRequired("label");
-        this._label = String(value);
-      }
-    },
-    //endregion
-
-    //region description property
-    _description: undefined,
 
     /**
      * Gets or sets the description of the component type.
      *
      * The _description_ is localized. It should be suitable for display in a tooltip.
      *
-     * _Nully_ or empty values are converted to `undefined`.
+     * Set `null` or `""` to clear the description and force it to be `null`.
      *
-     * @type string|undefined
-     * @default undefined
+     * Set to `undefined` to reset the value to its default.
+     *
+     * The default value is that specified when defining the component type info class,
+     * through {@link pentaho.component.spec.ITypeInfoExtend#description}, or `null`.
+     *
+     * This property is not inherited.
+     *
+     * Can be configured through {@link pentaho.component.spec.ITypeConfig#description}.
+     *
+     * @name pentaho.component.TypeInfo#description
+     * @type ?nonEmptyString
+     * @default null
      */
-    get description() {
-      return this._description;
-    },
-
-    set description(value) {
-      this._description = value != null && value !== "" ? String(value) : undefined;
-    },
-    //endregion
-
-    //region category property
-    _category: undefined,
 
     /**
      * Gets or sets the category of the component type.
@@ -252,40 +268,66 @@ define([
      * A localized, short description of the category,
      * used to group component types in a designer user interface.
      *
-     * This property is inherited from the info of the base component type.
-     * The root component type has the category `"Miscellaneous"`.
+     * A component type must have a non-empty category, own or inherited.
      *
-     * @type string
+     * Set to `undefined` to reset the value to its default.
+     *
+     * The default value is that specified when defining the component type info class,
+     * through {@link pentaho.component.spec.ITypeInfoExtend#category},
+     * or is inherited from the base component type info class.
+     * The default value of the root component type info class is `"Miscellaneous"`.
+     *
+     * This property is not inherited.
+     *
+     * Can be configured through {@link pentaho.component.spec.ITypeConfig#category}.
+     *
+     * @name pentaho.component.TypeInfo#category
+     * @type nonEmptyString
      */
-    get category() {
-      return this._category;
-    },
 
-    set category(value) {
-      if(!value)
-        // Inherit from base component type info.
-        // TODO: validate not root...
-        delete this._category;
-      else
-        this._category = String(value);
-    },
+    /**
+     * Gets or sets the help url of the component type.
+     *
+     * Set to `null` or `""` to clear the help url and force it to be `null`,
+     * even if a non-empty help url would be inherited.
+     *
+     * Set to `undefined` to reset the value to its default.
+     *
+     * The default value is that specified when defining the component type info class,
+     * through {@link pentaho.component.spec.ITypeInfoExtend#helpUrl},
+     * or is inherited from the base component type info class.
+     * The default value of the root component type info class is `null`.
+     *
+     * Can be configured through {@link pentaho.component.spec.ITypeConfig#helpUrl}.
+     *
+     * @name pentaho.component.TypeInfo#helpUrl
+     * @type ?nonEmptyString
+     */
     //endregion
 
     //region className property
-    _className: undefined,
+
+    // -> nonEmptyString, Optional(null)
+
+    _className: null,
 
     /**
      * Gets or sets the _CSS_ class name used to style components of this type.
      *
      * CSS class names should be spinal-case strings (e.g.: `"pentaho-component"`).
      *
-     * A component inherits all of the defined _CSS_ classes in ancestor component types.
+     * Can only be specified when defining the component type info class,
+     * through {@link pentaho.component.spec.ITypeInfoExtend#className}.
      *
-     * _Nully_ or empty values are converted to `undefined`.
+     * This property is not inherited.
+     * However, in practice, all of the defined _CSS_ classes of ancestor component types
+     * are assigned to an HTML element that displays a component type icon.
+     * See {@link pentaho.component.Model#inheritedClassNames}.
      *
-     * @type string|undefined
-     * @default undefined
-     * @see pentaho.component.Model#inheritedClassNames
+     * Set to `undefined`, `null` or `""` to clear the value and force it to be `null`.
+     *
+     * @type ?nonEmptyString
+     * @default null
      */
     get className() {
       return this._className;
@@ -410,6 +452,8 @@ define([
       return SubClass;
     }
   });
+
+  TypeInfo.implement(Annotatable);
 
   return TypeInfo;
 });

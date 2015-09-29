@@ -33,8 +33,6 @@ define([
   // For all these to be practically possible, the cell needs to store (or inherit) a ref to the attribute that
   //  its values are based on for validating set values directly.
 
-  var annotProto = Annotatable.prototype;
-
   var Cell = Base.extend("pentaho.data.Cell", /** @lends pentaho.data.Cell# */ {
     /**
      * @alias Cell
@@ -294,7 +292,7 @@ define([
         result = {};
         if(v != null) result.v = v;
         if(f != null) result.f = f;
-        result = annotProto.toSpec.call(this, result);
+        result = Annotatable.toSpec(this, result);
       } else if(f != null) {
         result = {};
         if(v != null) result.v = v;
@@ -306,7 +304,8 @@ define([
       return result;
     }
     //endregion
-  });
+  })
+  .implement(Annotatable);
 
   // --------
 

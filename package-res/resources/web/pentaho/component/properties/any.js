@@ -15,13 +15,14 @@
  */
 define([
   "module",
+  "../ItemInfo",
   "../SingleValueLabel",
   "../../util/Base",
   "../../util/Collection",
   "../../util/arg",
   "../../util/error",
   "../../util/object"
-], function(module, SingleValueLabel, Base, Collection, arg, error, O) {
+], function(module, ItemInfo, SingleValueLabel, Base, Collection, arg, error, O) {
 
   var SingleValueLabelCollection = Collection.extend("pentaho.component.SingleValueLabelCollection", {
     //region List implementation
@@ -47,7 +48,7 @@ define([
    * @param {pentaho.component.properties.spec.IAnyModel} spec The property model specification.
    */
 
-  return Base.extend("pentaho.component.properties.AnyModel", /** @lends pentaho.component.properties.AnyModel# */{
+  return ItemInfo.extend("pentaho.component.properties.AnyModel", /** @lends pentaho.component.properties.AnyModel# */{
 
     _isPrototype: function() {
       return this === this.constructor.prototype;
@@ -98,16 +99,16 @@ define([
     /**
      * Gets or sets the name of properties of this type, when used in a component.
      *
+     * A property model must have a non-empty name, own or inherited.
+     *
+     * Set to `undefined` to reset the value to its default.
+     *
      * The default value is that specified when defining the property model class,
      * through {@link pentaho.component.properties.spec.IAnyModelExtend#name},
      * or is inherited from the base property model class.
      *
-     * Set to `undefined` to reset the value to its default.
-     *
      * Can only be set during construction of a property model instance
      * and becomes readonly afterwards.
-     *
-     * A property model must have a non-empty name, own or inherited.
      *
      * @type string
      */
@@ -137,16 +138,15 @@ define([
      * Gets or sets a value that indicates if properties of this type can be
      * displayed to the user in a component properties browser.
      *
-     * The default value is that specified when defining the property model class,
-     * through {@link pentaho.component.properties.spec.IAnyModelExtend#browsable},
-     * or is inherited from the base property model class.
-     *
      * Set to `undefined` to reset the value to its default.
      * Any other value is converted to boolean using `Boolean` (`null` included).
      *
+     * The default value is that specified when defining the property model class,
+     * through {@link pentaho.component.properties.spec.IAnyModelExtend#browsable},
+     * or is inherited from the base property model class.
      * The default value of the root property model class is `true`.
      *
-     * Can be configured through {@link pentaho.component.properties.spec.InyModelConfig#browsable}.
+     * Can be configured through {@link pentaho.component.properties.spec.IAnyModelConfig#browsable}.
      *
      * @type boolean
      */
@@ -163,11 +163,7 @@ define([
     },
     //endregion
 
-    //region label property
-
-    // -> nonEmptyString, Required, Inherited, Configurable, ReadOnlyAfterConfig, Localized
-
-    _label: undefined,
+    //region ItemInfo properties
 
     /**
      * Gets or sets the label of the properties of this type.
@@ -175,40 +171,19 @@ define([
      * The label is a localized, short description of the property type.
      * It should be suitable for display as a _label_, beside the property value.
      *
+     * A property model must have a non-empty label, own or inherited.
+     *
+     * Set to `undefined` to reset the value to its default.
+     *
      * The default value is that specified when defining the property model class,
      * through {@link pentaho.component.properties.spec.IAnyModelExtend#label},
      * or is inherited from the base property model class.
      *
-     * Set to `undefined` to reset the value to its default.
-     *
-     * A property model must have a non-empty label, own or inherited.
-     *
      * Can be configured through {@link pentaho.component.properties.spec.IAnyModelConfig#label}.
      *
-     * @type string
+     * @name pentaho.component.properties.AnyModel#label
+     * @type nonEmptyString
      */
-    get label() {
-      return this._label;
-    },
-
-    set label(value) {
-      if(value === undefined) {
-        delete this._label;
-        // Ensure there is an inherited value.
-        if(!this._label) throw error.argRequired("label");
-      } else {
-        // null || ""
-        if(!value) throw error.argRequired("label");
-        this._label = value;
-      }
-    },
-    //endregion
-
-    //region description property
-
-    // -> nonEmptyString, Optional, Inherited, Configurable, ReadOnlyAfterConfig, Localized
-
-    _description: null,
 
     /**
      * Gets or sets the description of the properties of this type.
@@ -216,38 +191,22 @@ define([
      * The description is localized.
      * It should be suitable for display in a tooltip.
      *
-     * The default value is that specified when defining the property model class,
-     * through {@link pentaho.component.properties.spec.IAnyModelExtend#description},
-     * or is inherited from the base property model class.
+     * Set to `null` or `""` to clear the description and force it to be `null`,
+     * even if a non-empty description would be inherited.
      *
      * Set to `undefined` to reset the value to its default.
      *
-     * Set to `null` or `""` to clear the description and force it to be `null`,
-     * even if a non-empty description would be inherited.
+     * The default value is that specified when defining the property model class,
+     * through {@link pentaho.component.properties.spec.IAnyModelExtend#description},
+     * or is inherited from the base property model class.
      *
      * The default value of the root property model class is `null`.
      *
      * Can be configured through {@link pentaho.component.properties.spec.IAnyModelConfig#description}.
      *
-     * @type null|nonEmptyString
+     * @name pentaho.component.properties.AnyModel#description
+     * @type ?nonEmptyString
      */
-    get description() {
-      return this._description;
-    },
-
-    set description(value) {
-      if(value === undefined) {
-        delete this._description;
-      } else {
-        this._description = value || null;
-      }
-    },
-    //endregion
-
-    //region category property
-
-    // -> nonEmptyString, Required, Inherited, Configurable, ReadOnlyAfterConfig, Localized
-    _category: null,
 
     /**
      * Gets or sets the category of the properties of this type.
@@ -255,73 +214,39 @@ define([
      * A localized, short description of the category,
      * used to group properties in a designer user interface.
      *
-     * The default value is that specified when defining the property model class,
-     * through {@link pentaho.component.properties.spec.IAnyModelExtend#category},
-     * or is inherited from the base property model class.
+     * A property model must have a non-empty category, own or inherited.
      *
      * Set to `undefined` to reset the value to its default.
      *
-     * A property model must have a non-empty category, own or inherited.
-     *
-     * The default value of the root property model class is `Miscellaneous`.
+     * The default value is that specified when defining the property model class,
+     * through {@link pentaho.component.properties.spec.IAnyModelExtend#category},
+     * or is inherited from the base property model class.
+     * The default value of the root property model class is `"Miscellaneous"`.
      *
      * Can be configured through {@link pentaho.component.properties.spec.IAnyModelConfig#category}.
      *
+     * @name pentaho.component.properties.AnyModel#category
      * @type nonEmptyString
      */
-    get category() {
-      return this._category;
-    },
-
-    set category(value) {
-      if(value === undefined) {
-        delete this._category;
-        // Ensure there is an inherited value.
-        if(!this._category) throw error.argRequired("category");
-      } else {
-        // null || ""
-        if(!value) throw error.argRequired("category");
-        this._category = value;
-      }
-    },
-    //endregion
-
-    //region helpUrl property
-
-    // -> nonEmptyString, Optional, Inherited, Configurable, ReadOnlyAfterConfig, Localized?
-
-    _helpUrl: null,
 
     /**
      * Gets or sets the help url of the properties of this type.
      *
-     * The default value is that specified when defining the property model class,
-     * through {@link pentaho.component.properties.spec.IAnyModelExtend#description},
-     * or is inherited from the base property model class.
-     *
-     * Set to `undefined` to reset the value to its default.
-     *
      * Set to `null` or `""` to clear the help url and force it to be `null`,
      * even if a non-empty help url would be inherited.
      *
+     * Set to `undefined` to reset the value to its default.
+     *
+     * The default value is that specified when defining the property model class,
+     * through {@link pentaho.component.properties.spec.IAnyModelExtend#description},
+     * or is inherited from the base property model class.
      * The default value of the root property model class is `null`.
      *
      * Can be configured through {@link pentaho.component.properties.spec.IAnyModelConfig#helpUrl}.
      *
-     * @type null|nonEmptyString
+     * @name pentaho.component.properties.AnyModel#helpUrl
+     * @type ?nonEmptyString
      */
-    get helpUrl() {
-      return this._helpUrl;
-    },
-
-    set helpUrl(value) {
-      if(value === undefined) {
-        delete this._helpUrl;
-      } else {
-        this._helpUrl = value || null;
-      }
-    },
-
     //endregion
 
     //endregion

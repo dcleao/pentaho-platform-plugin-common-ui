@@ -21,8 +21,6 @@ define([
   "../util/error"
 ], function(OfAttribute, Base, Annotatable, arg, error) {
 
-  var annotProto = Annotatable.prototype;
-
   var Member = Base.extend("pentaho.data.Member", /** @lends pentaho.data.Member# */{
     /**
      * @alias Member
@@ -199,7 +197,7 @@ define([
 
       if(this.f != null) memberSpec.f = this.f;
 
-      annotProto.toSpec.call(this, memberSpec);
+      Annotatable.toSpec(this, memberSpec);
 
       return memberSpec;
     }

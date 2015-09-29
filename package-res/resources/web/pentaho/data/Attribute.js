@@ -24,8 +24,6 @@ define([
   "../util/error"
 ], function(Cell, Member, StructurePosition, MemberCollection, Annotatable, Base, arg, error) {
 
-  var annotProto = Annotatable.prototype;
-
   var Attribute = Base.extend("pentaho.data.Attribute", /** @lends pentaho.data.Attribute# */{
     /**
      * @alias Attribute
@@ -288,7 +286,7 @@ define([
       else
         attrSpec.isPercent = this.isPercent;
 
-      annotProto.toSpec.call(this, attrSpec);
+      Annotatable.toSpec(this, attrSpec);
 
       return attrSpec;
     },
