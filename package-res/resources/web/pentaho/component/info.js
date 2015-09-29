@@ -20,7 +20,7 @@ define([
   "../theme!info"
 ], function(module, TypeInfo, messages) {
 
-  // Actual root component type metadata/information.
+  // Root component type metadata/information.
 
   return TypeInfo.implement({
     id:          module.id,

@@ -128,14 +128,30 @@ define([
     /**
      * Creates a component model sub-class of this one.
      *
+     * @name pentaho.component.Model.extend
+     *
+     * @param {string} [name] The name of the new class.
      * @param {pentaho.component.spec.IModelExtend} instSpec The component model extend specification.
      * @param {Object} [classSpec] Class-level members of the component model class.
+     *
      * @return {Class.<pentaho.component.Model>} The created component model sub-class.
      */
-    extend: function(instSpec, classSpec) {
+
+    _extend: function(name, instSpec, classSpec) {
       if(!instSpec) throw error.argRequired("instSpec");
 
-      return this.base(instSpec, classSpec);
+      var propUsages;
+      if("properties" in instSpec) {
+        propUsages = instSpec.properties;
+        // Don't let this be assigned to the "properties" property...
+        delete instSpec.properties;
+      }
+
+      var SubClass = this.base.apply(this, arguments);
+
+      if(propUsages) SubClass.addProperties(propUsages);
+
+      return SubClass;
     }
   });
 });

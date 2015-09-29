@@ -1,19 +1,4 @@
 /*!
- * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/*!
  * Based on Base.js 1.1a (c) 2006-2010, Dean Edwards
  * Updated to pass JSHint and converted into a module by Kenneth Powers
  * License: http://www.opensource.org/licenses/mit-license.php
@@ -103,6 +88,7 @@ define([
 
     // Static interface that is inherited by all Base classes.
     BaseBoot.extend    = class_extend;
+    BaseBoot._extend   = class_extend_core;
     BaseBoot.implement = class_implement;
     BaseBoot.toString  = properToString;
     BaseBoot.to        = class_to;
@@ -143,6 +129,11 @@ define([
       name = null;
     }
 
+    return this._extend(this, name, instSpec, classSpec);
+  }
+
+  function class_extend_core(name, instSpec, classSpec) {
+
     // Create PROTOTYPE and CONSTRUCTOR
     var proto = Object.create(this.prototype),
         Class = class_extend_createCtor(proto, instSpec);
@@ -165,6 +156,7 @@ define([
 
     // Inherit standard static interface.
     Class.extend    = this.extend;
+    Class._extend   = this._extend;
     Class.implement = this.implement;
     Class.toString  = this.toString;
     Class.to        = this.to;

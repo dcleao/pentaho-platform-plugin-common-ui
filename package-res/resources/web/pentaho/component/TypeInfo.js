@@ -54,7 +54,7 @@ define([
      *   return TypeInfo.extend({
      *      id: module.id,
      *      label: "My TextBox",
-     *      description: "A super-cool TextBox by My.",
+     *      description: "A super-cool TextBox by My Company",
      *      category: "Input",
      *      helpUrl: "http://my.components.example.com/textBox.html"
      *      className: "my-components-textBox"
@@ -366,11 +366,16 @@ define([
     /**
      * Creates a component type info class by sub-classing its base component type info class.
      *
+     * @name pentaho.component.TypeInfo.extend
+     *
+     * @param {string} [name] The name of the new class.
      * @param {pentaho.component.spec.ITypeInfoExtend} instSpec The component type info specification.
      * @param {Object} [classSpec] Class-level members of the component type info class.
+     *
      * @return {Class.<pentaho.component.TypeInfo>} The created model sub-class.
      */
-    extend: function(instSpec, classSpec) {
+
+    _extend: function(name, instSpec, classSpec) {
       if(!instSpec) throw error.argRequired("instSpec");
 
       // Not inherited
@@ -383,7 +388,7 @@ define([
       // Not supported on spec, only on config.
       if("enabled" in instSpec) delete instSpec.enabled;
 
-      var SubClass = this.base(instSpec, classSpec);
+      var SubClass = this.base.apply(this, arguments);
 
       /**
        * Gets the instance specification used in the declaration of the component type info.

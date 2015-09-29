@@ -48,7 +48,7 @@ define([
    * @param {pentaho.component.properties.spec.IAnyModel} spec The property model specification.
    */
 
-  return ItemInfo.extend("pentaho.component.properties.AnyModel", /** @lends pentaho.component.properties.AnyModel# */{
+  var AnyModel = ItemInfo.extend("pentaho.component.properties.AnyModel", /** @lends pentaho.component.properties.AnyModel# */{
 
     _isPrototype: function() {
       return this === this.constructor.prototype;
@@ -669,14 +669,20 @@ define([
 
     }
   }, /** @lends pentaho.component.properties.AnyModel */{
+
     /**
      * Creates a property model sub-class given a specification.
      *
+     * @name pentaho.component.properties.AnyModel.extend
+     *
+     * @param {string} [name] The name of the new class.
      * @param {!pentaho.component.properties.spec.IAnyModelExtend} instSpec The property model _instance_ specification.
      * @param {Object} [classSpec] The property type _class_ specification.
+     *
      * @return {Class.<pentaho.component.properties.AnyModel>} The created property model sub-class.
      */
-    extend: function(instSpec, classSpec) {
+
+    _extend: function(name, instSpec, classSpec) {
       if(!instSpec) throw error.argRequired("instSpec");
 
       // Optional. Force stopping inheritance.
@@ -720,9 +726,16 @@ define([
       var max = instSpec.max;
       if(min != null && max != null && min > max) instSpec.max = min;
 
-      return this.base(instSpec, classSpec);
+      return this.base.apply(this, arguments);
     }
   });
+
+  AnyModel.implement({
+    id: module.id,
+    label: "any"
+  });
+
+  return AnyModel;
 
   function parseNum(num, dv) {
     if(num != null) {

@@ -90,7 +90,6 @@ define(["module"], function(module) {
   // module.id  -> "/pentaho/content/common-ui/resources/web/pentaho/component/samples/textBox/amd-config"
   // mudule.uri -> "http://localhost:8080/pentaho/content/common-ui/resources/web/pentaho/component/samples/textBox/amd-config.js"
 
-  // This is the only real drawback...?
   // Remove "/amd-config" from the end of the module id.
   // basePath, baseMid - in case you prefer to use the provided baseMid as well ?
   var basePath = module.id.replace(/\amd-config/, "");

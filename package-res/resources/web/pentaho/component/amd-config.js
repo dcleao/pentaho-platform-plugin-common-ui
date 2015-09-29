@@ -13,13 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/* AMD/requireJS configuration
- *
- * This file is loaded by the special "webcontext.js" resource,
- * which establishes the pentaho platform's context.
- */
-
 define(function() {
   "use strict";
 
