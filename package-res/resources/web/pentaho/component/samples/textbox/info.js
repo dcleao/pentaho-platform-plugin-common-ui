@@ -32,7 +32,6 @@ define([
     className: "pentaho-component-samples-textBox",
 
     // configurable info
-    enabled:     true,
     label:       messages.get("label"),
     description: messages.get("description"),
     category:    messages.get("category"),
