@@ -34,7 +34,7 @@
   requirePaths["common-repo"] = basePath + "/repo";
   requirePaths["common-data"] = basePath + "/dataapi";
 
-  requirePaths["pentaho"] = basePath + "/pentaho";
+  requirePaths["pentaho"] = basePath + "/pentaho"; // TODO: conflicts with /js in mantle...
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
 
   // AMD PLUGINS
