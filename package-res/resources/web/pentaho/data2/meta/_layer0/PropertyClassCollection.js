@@ -109,8 +109,7 @@ define([
         throw error.argInvalid("props[i]", "Incorrect property name.");
 
       if(existing.declaringType === this._declaringType) {
-        // Configure existing local property and
-        // cancel replace.
+        // Configure existing local property and cancel replace.
         // If spec is not an object, then it's a noop.
         if(spec !== name) existing.configure(spec);
         return;

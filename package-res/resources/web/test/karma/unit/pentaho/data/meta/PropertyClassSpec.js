@@ -18,8 +18,9 @@ define([
   "pentaho/data/meta/complex",
   "pentaho/data/meta/string",
   "pentaho/data/meta/boolean",
-  "pentaho/data/meta/number"
-], function(PropertyClass, Complex, StringMeta, BooleanMeta, NumberMeta) {
+  "pentaho/data/meta/number",
+  "pentaho/util/error"
+], function(PropertyClass, Complex, StringMeta, BooleanMeta, NumberMeta, error) {
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
@@ -87,7 +88,7 @@ define([
           var propClass;
 
           beforeEach(function() {
-            propClass = PropertyClass.to("foo", Derived);
+            propClass = PropertyClass.to({name: "foo"}, Derived);
           });
 
           it("should build a property class instance", function() {
@@ -224,7 +225,118 @@ define([
             var propClass = PropertyClass.to({name: "foo", label: "MyFoo"}, Derived);
             expect(propClass.label).toBe("MyFoo");
           });
+        }); // spec.label
+
+        describe("`spec.description` - ", function() {
+          it("should default to `undefined`", function() {
+            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            expect(propClass.description).toBe(undefined);
+
+            propClass = PropertyClass.to({name: "foo", description: undefined}, Derived);
+            expect(propClass.description).toBe(undefined);
+          });
+
+          it("should convert empty to null", function() {
+            var propClass = PropertyClass.to({name: "foo", description: ""}, Derived);
+            expect(propClass.description).toBe(null);
+          });
+
+          it("should respect null", function() {
+            var propClass = PropertyClass.to({name: "foo", description: null}, Derived);
+            expect(propClass.description).toBe(null);
+          });
+
+          it("should respect the specified value", function() {
+            var propClass = PropertyClass.to({name: "foo", description: "MyFoo"}, Derived);
+            expect(propClass.description).toBe("MyFoo");
+          });
+        }); // spec.description
+
+        describe("`spec.category` - ", function() {
+          it("should default to `undefined`", function() {
+            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            expect(propClass.category).toBe(undefined);
+
+            propClass = PropertyClass.to({name: "foo", category: undefined}, Derived);
+            expect(propClass.category).toBe(undefined);
+          });
+
+          it("should convert empty to null", function() {
+            var propClass = PropertyClass.to({name: "foo", category: ""}, Derived);
+            expect(propClass.category).toBe(null);
+          });
+
+          it("should respect null", function() {
+            var propClass = PropertyClass.to({name: "foo", category: null}, Derived);
+            expect(propClass.category).toBe(null);
+          });
+
+          it("should respect the specified value", function() {
+            var propClass = PropertyClass.to({name: "foo", category: "MyFoo"}, Derived);
+            expect(propClass.category).toBe("MyFoo");
+          });
+        }); // spec.category
+
+        describe("`spec.helpUrl` - ", function() {
+          it("should default to `undefined`", function() {
+            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            expect(propClass.helpUrl).toBe(undefined);
+
+            propClass = PropertyClass.to({name: "foo", helpUrl: undefined}, Derived);
+            expect(propClass.helpUrl).toBe(undefined);
+          });
+
+          it("should convert empty to null", function() {
+            var propClass = PropertyClass.to({name: "foo", helpUrl: ""}, Derived);
+            expect(propClass.helpUrl).toBe(null);
+          });
+
+          it("should respect null", function() {
+            var propClass = PropertyClass.to({name: "foo", helpUrl: null}, Derived);
+            expect(propClass.helpUrl).toBe(null);
+          });
+
+          it("should respect the specified value", function() {
+            var propClass = PropertyClass.to({name: "foo", helpUrl: "MyFoo"}, Derived);
+            expect(propClass.helpUrl).toBe("MyFoo");
+          });
+        }); // spec.helpUrl
+
+        describe("`spec.browsable` - ", function() {
+          it("should default to `true`", function() {
+            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            expect(propClass.browsable).toBe(true);
+
+            propClass = PropertyClass.to({name: "foo", browsable: undefined}, Derived);
+            expect(propClass.browsable).toBe(true);
+          });
+
+          it("should cast other values to boolean", function() {
+            var propClass = PropertyClass.to({name: "foo", browsable: 1}, Derived);
+            expect(propClass.browsable).toBe(true);
+
+            propClass = PropertyClass.to({name: "foo", browsable: 0}, Derived);
+            expect(propClass.browsable).toBe(false);
+
+            propClass = PropertyClass.to({name: "foo", browsable: ""}, Derived);
+            expect(propClass.browsable).toBe(false);
+
+            propClass = PropertyClass.to({name: "foo", browsable: null}, Derived);
+            expect(propClass.browsable).toBe(false);
+
+            propClass = PropertyClass.to({name: "foo", browsable: true}, Derived);
+            expect(propClass.browsable).toBe(true);
+
+            propClass = PropertyClass.to({name: "foo", browsable: "yes"}, Derived);
+            expect(propClass.browsable).toBe(true);
+
+            propClass = PropertyClass.to({name: "foo", browsable: "no"}, Derived);
+            expect(propClass.browsable).toBe(true);
+          });
         }); // spec.list
+
+        // TODO: attributes defaultValue, format
+
       }); // when spec is an object
     }); // new(spec, declaringType)
 
@@ -237,8 +349,17 @@ define([
           name:  "base",
           label: "Base",
           props: [
-            {name: "baseStr", type: "string", description: "Base Str", helpUrl: "Base Str Help", category: "Cat Str"},
-            {name: "baseNum", type: "number"}
+            {
+              name: "baseStr",
+              label: "BaseSTR",
+              type: "string",
+              description: "Base Str",
+              helpUrl: "Base Str Help",
+              category: "Cat Str",
+              browsable: false
+            },
+            {name: "baseNum", type: "number"},
+            {name: "baseNumLst", type: "number", list: true}
           ]
         });
 
@@ -248,7 +369,8 @@ define([
         });
       });
 
-      describe("when spec is {name: .} equal to the name of the base property -", function() {
+      // Override PropertyClass tests
+      describe("when spec is {name: '.'} and the name is equal to that of the base property -", function() {
         describe("the created property class -", function() {
           var propClass, basePropClass;
 
@@ -256,6 +378,8 @@ define([
             basePropClass = BaseType.properties.get("baseStr");
             propClass = basePropClass.extend({name: "baseStr"}, Derived);
           });
+
+          // basic fields
 
           it("should build a property class instance", function() {
             expect(propClass instanceof PropertyClass).toBe(true);
@@ -273,6 +397,8 @@ define([
           it("should have `root` equal to the base property", function() {
             expect(propClass.root).toBe(basePropClass);
           });
+
+          // should inherit all attributes
 
           it("should have the base `name`", function() {
             expect(propClass.name).toBe(basePropClass.name);
@@ -297,19 +423,96 @@ define([
           it("should have the base `category`", function() {
             expect(propClass.category).toBe(basePropClass.category);
           });
-        });
-      });
 
-      describe("when spec is {name: .} not equal to the name of the base property -", function() {
+          it("should have the base `browsable`", function() {
+            expect(propClass.browsable).toBe(basePropClass.browsable);
+          });
+        });
+
+        describe("when `spec.type` is a sub-type of the base property's type", function() {
+          var basePropClass;
+
+          var PostalCodeMeta = StringMeta.extend({
+            name: "postalCode"
+          });
+
+          beforeEach(function() {
+            basePropClass = BaseType.properties.get("baseStr");
+          });
+
+          it("should accept it", function() {
+            var propClass = basePropClass.extend({name: "baseStr", type: PostalCodeMeta}, Derived);
+
+            expect(propClass instanceof PropertyClass).toBe(true);
+            expect(propClass.ancestor).toBe(basePropClass);
+            expect(propClass.type).toBe(PostalCodeMeta);
+          });
+        });
+
+        describe("when `spec.type` is a not a sub-type of the base property's type", function() {
+          var basePropClass;
+
+          var IntegerMeta = NumberMeta.extend({
+            name: "integer"
+          });
+
+          beforeEach(function() {
+            basePropClass = BaseType.properties.get("baseStr");
+          });
+
+          it("should throw", function() {
+            expect(function() {
+              basePropClass.extend({name: "baseStr", type: IntegerMeta}, Derived);
+            }).toThrowError(error.argInvalid("spec.type", "Sub-property's 'type' does not derive from the base property's 'type'.").message);
+          });
+        });
+
+        describe("when `spec.list` is not that of the base property's type", function() {
+          it("should throw when base is list and derived isn't", function() {
+            var basePropClass = BaseType.properties.get("baseNumLst");
+            expect(function() {
+              basePropClass.extend({name: "baseNumLst", list: false}, Derived);
+            }).toThrowError(error.argInvalid("spec.list", "Sub-property has a different 'list' value.").message);
+          });
+
+          it("should throw when base is not list and derived is", function() {
+            var basePropClass = BaseType.properties.get("baseNum");
+            expect(function() {
+              basePropClass.extend({name: "baseNum", list: true}, Derived);
+            }).toThrowError(error.argInvalid("spec.list", "Sub-property has a different 'list' value.").message);
+          });
+        });
+
+        it("should respect other overridden attributes", function() {
+          var basePropClass = BaseType.properties.get("baseNum");
+          var propClass = basePropClass.extend({
+                name: "baseNum",
+                label: "A",
+                description: "B",
+                helpUrl: "C",
+                category: "D",
+                browsable: true
+              }, Derived);
+
+          expect(propClass.label).toBe("A");
+          expect(propClass.description).toBe("B");
+          expect(propClass.helpUrl).toBe("C");
+          expect(propClass.category).toBe("D");
+          expect(propClass.browsable).toBe(true);
+        });
+      }); // when spec is {name: '.'} and the name is equal ...
+
+      describe("when spec is {name: .} and the name is not that of the name of the base property -", function() {
         it("should throw", function() {
           var basePropClass = BaseType.properties.get("baseStr");
           expect(function() {
             basePropClass.extend({name: "baseStr2"}, Derived);
-          }).toThrowError("Argument invalid: 'spec.name'. Sub-property has a different 'name' value.");
+          }).toThrowError(error.argInvalid("spec.name", "Sub-property has a different 'name' value.").message);
         });
       });
-
     }); // #extend(spec, declaringType)...
+
+    
 
   }); // pentaho/data/meta/complex
 });

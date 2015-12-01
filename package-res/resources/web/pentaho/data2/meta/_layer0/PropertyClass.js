@@ -26,32 +26,9 @@ define([
       "category": 1,
       "helpUrl": 1,
       "defaultValue": 1,
-      "format": 1
+      "format": 1,
+      "browsable": 1
     };
-
-  /*
-   * The config system itself already knows about inheritance for applying configs to _complex_ sub-classes...
-   * Then, do we need to setup an inheritance chain of configured types?
-   * Configuration is applied to the leaf-types being consumed.
-   * Already "inherit" base class configs and configure with the most specific setting.
-   * Config only applies to leaf configured complex types and cannot change the mid-classes
-   * consistency.
-   * We don't really need to validate in-between consistency, as middle configs are hidden...?
-   *
-   * Type
-   *   Complex
-   *     .properties -*-> PropertyClassCollection
-   *     <Custom>
-   *
-   *   Simple
-   *     String
-   *       <Custom>
-   *     Number
-   *       <Custom>
-   *     Boolean
-   *     Date
-   *     <Custom>
-   */
 
   /**
    * @name pentaho.data.meta.PropertyClass
