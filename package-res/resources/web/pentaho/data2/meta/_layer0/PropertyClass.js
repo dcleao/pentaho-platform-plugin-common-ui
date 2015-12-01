@@ -35,7 +35,6 @@ define([
    *
    * @class
    * @sealed
-   * @implements pentaho.lang.IConfigurable
    * @implements pentaho.lang.IWithKey
    * @implements pentaho.lang.IListElement
    * @implements pentaho.lang.ICollectionElement
@@ -129,7 +128,7 @@ define([
       }
       this._name = name;
 
-      this.configure(spec);
+      this._configure(spec);
     },
 
     // TODO: self-recursive complexes won't work if we don't handle them specially:
@@ -173,19 +172,23 @@ define([
       if(spec.list != null && (!!spec.list) !== this.list)
         throw error.argInvalid("spec.list", "Sub-property has a different 'list' value.");
 
-      subProp.configure(spec);
+      subProp._configure(spec);
 
       return subProp;
     },
 
-    //region IConfigurable implementation
+    //region Private IConfigurable implementation
+
+    // Only used by constructor and extend.
+    // It is Property that is configurable by the user, not PropertyClass.
 
     /**
      * Configures a property class.
      *
      * @param {!pentaho.data.meta.spec.IPropertyClassConfig} config A property class configuration.
+     * @ignore
      */
-    configure: function(config) {
+    _configure: function(config) {
       if(!config) throw error.argRequired("config");
 
       // undefined passes through.
