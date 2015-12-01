@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
-  "use strict";
 
-  return {
-    is: function(f) {
-      return typeof f === "function";
-    },
-
-    identity: function(v) {
-      return v;
-    },
-
-    constant: function(v) {
-      return function() { return v; };
-    },
-
-    compare: function(a, b) {
-      return (a === b) ? 0 : ((a > b) ? 1 : -1);
-    }
-  };
-});
+/**
+ * The `spec.UProperty` type definition is the union of the types that can be used to
+ * define a property of a complex type.
+ *
+ * When the value is a string,
+ * it's taken to represent a property
+ * whose {@link pentaho.data.meta.spec.IProperty#name} is that string
+ * and
+ * whose {@link pentaho.data.meta.spec.IProperty#type} is {@link pentaho.data.meta.string}.
+ *
+ * @typedef {string|pentaho.data.meta.spec.IProperty} pentaho.data.meta.spec.UProperty
+ */

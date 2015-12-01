@@ -1,0 +1,278 @@
+[
+  // Type specification examples
+
+  // type id string | type spec object | array of (typeo id string | type spec object)
+  // "string"
+  // "pentaho/data/meta/string"
+  // {type: "boolean"}
+  // {props: ["foo", "bar"]}
+  // ["string"]
+  // [{props: ["foo", "bar"]}]
+
+  // Type specification
+  {
+    // type id is its AMD module id (of the component, not model)
+    // Should be readily versioned?
+    // Could also be an anonymous type for inline use in an instance or other complex type.
+    "id": "my/concepts/family",
+
+    "base": "complex", // _default_ base type
+
+    // Type name and label
+    "name": "family",
+    "label": "Family", // _default_
+
+    // Word for many elements of the type.
+    "namePlural": "families",
+    "labelPlural": "Families", // _default_
+
+    "props": [
+      {
+        "name": "name",
+        "label": "Name", // _default_
+        "type":  "string", // _default_ property type
+        "required": true
+      },
+      {
+        // This property would receive its name from its type's namePlural...: "products"
+        // but we opt to change its name to something else
+        "name": "members",
+        "list": true,
+        "type": {
+          // Inline complex type specification
+          // Can an inline type have an id?
+          "name": "product",
+          "base": "complex", // _default_ base type for a type spec
+          "props": [
+            {
+              "name": "name",
+              "required": true
+            },
+            {
+              "name": "price",
+              "required": true,
+              "type": { // inline simple type specification
+                "name": "positiveNumber",
+                "base": "number",
+                "min":  0,
+                "minOpen": true
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  // Instance specification using object form
+  {
+    // Inline metadata property is "_" and intends to be usable in virtually any context.
+    // The object form is a `spec.IProperty` and should be seen as providing
+    // the metadata of the implicit property whose value is the containing object.
+    // When in string form, though, it does not denote the name of the property,
+    // like in a `spec.UProperty`. Instead, it denotes the property's type name.
+    // Even in the presence of a metadata model,
+    // this syntax must be used in serialized instances whenever the container value type is not exactly the type
+    // declared in the property.
+    // This will always be the case when the type of a property is abstract, for example.
+    // But can also happen when a sub-class of a base type is the property's value.
+    // In a case where such a value is of an anonymous type, then the whole anonymous type's definition
+    // would have to be provided inline (or be provided at the top under some temporary serialization id).
+    // How to know the type of values when serializing?
+    // Easy for our own model objects, but for other instances....
+    "_": {
+      "list": true,
+      "type": "my/concepts/family"
+    },
+
+    "d": [
+      {
+        "name": "Car",
+        "members": [
+          {"name": "BMW i8",  "price": 120456.23},
+          {"name": "Audi A3", "price": 2456}
+        ]
+      },
+      {
+        "name": "Plain",
+        "products": [
+          {"name": "Boeing 737",  "price": 12999900},
+          {"name": "Airbus 1000", "price": 88888888}
+        ]
+      }
+    ]
+  },
+
+  // Instance specification using array form
+  {
+    "_": {
+      "list": true,
+      "type": "my/concepts/family"
+    },
+
+    "d": [
+      ["Car", [
+        ["BMW i8", 120456.23],
+        ["Audi A3", 2456]
+      ]],
+      ["Plain", [
+        ["Boeing 737", 12999900],
+        ["Airbus 1000", 88888888]
+      ]]
+    ]
+  },
+
+  // Instance specification using object form and a singular property
+  {
+    "_": "my/concepts/family",
+    "d": {
+      "name": "Car",
+      "members": [
+        {"name": "BMW i8",  "price": 120456.23},
+        {"name": "Audi A3", "price": 2456}
+      ]
+    }
+  },
+
+  // Instance specification using object form and
+  // a multiple property and list-property shorthand syntax
+  {
+    "_": ["my/concepts/family"],
+    "d": [
+      {
+        "name": "Car",
+        "members": [
+          {"name": "BMW i8",  "price": 120456.23},
+          {"name": "Audi A3", "price": 2456}
+        ]
+      }
+    ]
+  },
+
+  // How to conciliate this with the cell format?
+  // Singular property
+  {
+    // The type of singular values in "v"
+    "_": "my/concepts/family",
+    "d": {
+      "v": ["Car", [
+        ["BMW i8",  120456.23],
+        ["Audi A3", 2456]
+      ]],
+      "f": "Is this of any use here? A summary of the family? A cached result of #toString on the corresponding resulting object?",
+      "p": {
+        "Hey and why not...": "... let's also add",
+        "some arbitrary": "metadata to it"
+      }
+    }
+  },
+
+  // Plural/List property
+  // (take 1)
+  {
+    "_": ["my/concepts/family"],
+    "d": [
+      {"v":
+        ["Car", [
+          ["BMW i8",  120456.23],
+          ["Audi A3", 2456]
+        ]],
+        "f": "Is this of any use here? A summary of the family? A cached result of #toString on the corresponding resulting object?",
+        "p": {
+          "Hey and why not...": "... let's also add",
+          "some arbitrary": "metadata to it"
+        }
+      },
+      ["Plain", [
+        ["Boeing 737",  12999900],
+        ["Airbus 1000", 88888888]
+      ]]
+    ]
+  },
+
+  // (take 2)
+  {
+    "_": {
+      "baseUri": "pentaho/data/meta",
+
+      // This mode does not allow for included members by attribute...
+      "type": "my/concepts/family",
+      "list": true,
+
+      // Language used in natural language text and formatting
+      "lang": "pt",
+
+      "crossLayout": {
+        "cols": [],
+        "rows": [],
+        "meas": []
+      },
+
+      // Leaf members (non-complex?)
+      // What about complexes? Would need a _key_ concept.
+      // Only discrete attributes have referents.
+      // Although the v/f thing makes sense even for numeric values,
+      // the possible reuse is less evident.
+      // For special values, perhaps, like "0", would be good.
+      // Entity index?
+      "index": {
+        // By Type Id
+        // For anonymous types, the Type#propName where it is found
+        // Only for complex, discrete stuff?
+        "my/concepts/year": [
+          // Cells... not complexes...
+          // v -> key
+          {"id": "[DATE].[YEARS].[2019]", "name": "2019", "p": {"color": "red"}}
+        ],
+
+        "my/concepts/family": [
+          // id vs name/label
+          // only applies to entities
+          // For arbitrary, non-tabulated text values, this is useless.
+          // They are formatted to themselves... (possibly trimmed, or possibly translated to another language)
+          // The textual representation of a value:
+          // * localized to a specific user
+          // * itself (when arbitrary text)
+          // * natural language text translated to another language
+          // * formatted numbers
+          // * formatted date, time, etc
+          // * formatted boolean
+          // * entity key and entity name/label/title
+          {"id": "[FAMILY].[CAR]",   "name": "Car"},
+          {"id": "[FAMILY].[PLAIN]", "name": "Plain"}
+        ],
+
+        "my/concepts/product": [ // back pointer, reverse prop?
+          {"id": "[FAMILY].[CAR].[BMWi8]",  "name": "BMW i8",  "family": {"_": "my/concepts/family", "d": "[FAMILY].[CAR]"}},
+          {"id": "[FAMILY].[CAR].[AudiA3]", "name": "Audi A3", "family": "[FAMILY].[CAR]"},
+          {"id": "[FAMILY].[CAR].[AudiA3]", "name": "Audi A3", "family": {"v": "[FAMILY].[CAR]", "f": "Car"}}
+        ]
+      }
+    },
+
+    "d": [
+      "foo", // id of family -> {"name": "foo", "members": []}
+      ["[FAMILY].[CAR]", [
+          ["[FAMILY].[CAR].[BMWi8]",  120456.23],
+          ["[FAMILY].[CAR].[AudiA3]", 2456]
+      ]],
+      ["[FAMILY].[PLAIN]", [
+        ["Boeing 737",  12999900],
+        ["Airbus 1000", 88888888]
+      ]]
+    ]
+  },
+
+  {
+    "_": ["my/concepts/family"],
+    "d": [["Car", [
+        ["BMW i8",  120456.23],
+        ["Audi A3", 2456]
+    ]]]
+  },
+
+  {
+    "_": "number",
+    "d": 1
+  }
+]

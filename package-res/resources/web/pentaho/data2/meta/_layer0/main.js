@@ -13,24 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
-  "use strict";
-
+define([
+  "./type",
+  "./simple",
+  "./complex",
+  "./Property",
+  "./string",
+  "./number",
+  "./boolean",
+  "./date"
+], function(Type, Simple, Complex, Property, String, Number, Boolean, Date) {
+  // The layer0 module defines:
+  // * all classes at a basic level
+  // * all standard simple types (from which complex properties build complex types...)
   return {
-    is: function(f) {
-      return typeof f === "function";
-    },
-
-    identity: function(v) {
-      return v;
-    },
-
-    constant: function(v) {
-      return function() { return v; };
-    },
-
-    compare: function(a, b) {
-      return (a === b) ? 0 : ((a > b) ? 1 : -1);
-    }
+    // types
+    "type":     Type,
+    "simple":   Simple,
+    "string":   String,
+    "number":   Number,
+    "boolean":  Boolean,
+    "date":     Date,
+    "complex":  Complex,
+    "Property": Property
   };
 });

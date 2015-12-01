@@ -68,6 +68,11 @@ define([
       this.base(keyArgs);
     },
 
+    copyTo: function(col) {
+      this.base(col);
+      O.assignOwn(col._keys, this._keys);
+    },
+
     /**
      * Gets the value returned by
      * {@link pentaho.lang.Collection#get}
@@ -91,24 +96,47 @@ define([
      * @readonly
      */
 
+    _getKeyName: function() {
+      return this.elemClass.prototype.keyName;
+    },
+
+    _getKey: function(elem) {
+      return elem.key;
+    },
+
     _sayElemWithKey: function(key) {
-      var elemProto = this.elemClass.prototype;
-      return "A " + elemProto.elemName  + " with " + elemProto.keyName + " '" + key + "'";
+      return "A " + this._getElemName()  + " with " + this._getKeyName() + " '" + key + "'";
     },
 
     _sayElemCannotHaveNullyKey: function() {
-      var elemProto = this.elemClass.prototype;
-      return "A " + elemProto.elemName  + " cannot have a nully " + elemProto.keyName + " value.";
+      return "A " + this._getElemName()  + " cannot have a nully " + this._getKeyName() + " value.";
     },
 
-    _adding: function(elem) {
-      var key = elem.key;
-      if(key == null) throw new Error(this._sayElemCannotHaveNullyKey());
-      if(this.has(key)) throw new Error(this._sayElemWithKey(key) + " is already included.");
+    _adding: function(elem, index, ka) {
+      var elem2 = this._cast(elem, index, ka);
+      if(elem2 !== undefined) {
+        var key = this._getKey(elem2);
+        if(key == null) throw new Error(this._sayElemCannotHaveNullyKey());
+        if(this.has(key)) throw new Error(this._sayElemWithKey(key) + " is already included.");
+      }
+      return elem2;
+    },
+
+    _replacing: function(elem, index, elem0, ka) {
+      var elem2 = this._cast(elem, index, ka);
+      if(elem2 !== undefined) {
+        var key = this._getKey(elem2);
+        if(key == null) throw new Error(this._sayElemCannotHaveNullyKey());
+      }
+      return elem2;
     },
 
     _added: function(elem) {
-      this._keys[elem.key] = elem;
+      this._keys[this._getKey(elem)] = elem;
+    },
+
+    _replaced: function(elem) {
+      this._keys[this._getKey(elem)] = elem;
     },
 
     /**
@@ -119,7 +147,7 @@ define([
      */
     includes: function(elem) {
       if(elem) {
-        var key = elem.key;
+        var key = this._getKey(elem);
         if(key != null) return this.get(key) === elem;
       }
       return false;

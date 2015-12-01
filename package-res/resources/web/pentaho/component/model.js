@@ -137,6 +137,7 @@ define([
      * @return {Class.<pentaho.component.Model>} The created component model sub-class.
      */
 
+    /** @override */
     _extend: function(name, instSpec, classSpec) {
       if(!instSpec) throw error.argRequired("instSpec");
 

@@ -55,15 +55,22 @@ define([
      * the initialization of each list element.
      */
     constructor: function(keyArgs) {
-      this._addMany(this, true, keyArgs);
+      this._addMany(this, keyArgs);
     },
 
     // Optional hook methods
     // _adding(elem, index, keyArgs) -> replacement elem or undefined
-    _adding: null,
+    // call base in this one or call _cast
 
     // _added(elem, index, keyArgs)
     _added: null,
+
+    // _replacing(elem, index, elem0, keyArgs) -> replacement elem or undefined
+    // _replacing: null,
+    // call base or call _cast
+
+    // _replaced(elem, index, elem0, keyArgs)
+    _replaced: null,
 
     // abstract
     /**
@@ -76,6 +83,10 @@ define([
      * @readonly
      */
     elemClass: null,
+
+    _getElemName: function() {
+      return this.elemClass.prototype.elemName;
+    },
 
     /**
      * The length of the list.
@@ -101,7 +112,7 @@ define([
      * @return {number} The new length of the list.
      */
     push: function() {
-      return this._addMany(arguments, false);
+      return this._addMany(arguments);
     },
 
     /**
@@ -124,7 +135,7 @@ define([
      * @return {number} The new length of the list.
      */
     addMany: function(elems, keyArgs) {
-      return this._addMany(elems, false, keyArgs);
+      return this._addMany(elems, keyArgs);
     },
 
     /**
@@ -146,44 +157,74 @@ define([
       return this.insert(elem, this.length, keyArgs);
     },
 
-    insert: function(elem, at, keyArgs) {
-      var elem2 = this._cast(elem, at, keyArgs);
-
-      if(this._adding) this._adding(elem2, at, keyArgs);
-
-      baseProto.splice.call(this, at, 0, elem2);
-
-      if(this._added) this._added(elem2, at, keyArgs);
+    replace: function(elem, at, keyArgs) {
+      var elem0 = this[at],
+          elem2 = this._replacing(elem, at, elem0, keyArgs);
+      if(elem2 !== undefined && (elem0 !== elem2)) {
+        this[at] = elem2;
+        if(this._replaced) this._replaced(elem2, at, elem0, keyArgs);
+      }
 
       return elem2;
+    },
+
+    insert: function(elem, at, keyArgs) {
+      var elem2 = this._adding(elem, at, keyArgs);
+      if(elem2 !== undefined) {
+        baseProto.splice.call(this, at, 0, elem2);
+        if(this._added) this._added(elem2, at, keyArgs);
+      }
+
+      return elem2;
+    },
+
+    _adding: function(elem, index, keyArgs) {
+      return this._cast(elem, index, keyArgs);
+    },
+
+    _replacing: function(elem, index, keyArgs) {
+      return this._cast(elem, index, keyArgs);
     },
 
     _cast: function(elem, index, keyArgs) {
       return this.elemClass ? this.elemClass.to(elem, keyArgs) : elem;
     },
 
-    _addMany: function(elems, isReplay, keyArgs) {
-      var LE = elems.length;
+    _addMany: function(elems, keyArgs) {
+      var isReplay = elems === this,
+          LE = elems.length;
       if(!LE) return this.length;
 
-      var adding = this._adding,
-          added = this._added,
+      var added = this._added,
           i = 0,
           at = isReplay ? 0 : this.length;
       while(i < LE) {
-        var elem = elems[i++],
-            elem2 = this._cast(elem, at, keyArgs);
-        if(adding) adding.call(this, elem2, at, keyArgs);
-        if(isReplay) {
-          if(elem !== elem2) this[at] = elem2;
+        var elem = elems[i],
+            elem2 = this._adding(elem, at, keyArgs);
+        if(elem2 === undefined) {
+          // Not added afterall
+          if(isReplay) {
+            // Remove from `at`
+            this.splice(at, 1);
+            LE--;
+          }
         } else {
-          baseProto.push.call(this, elem2);
+          if(isReplay) {
+            if(elem !== elem2) this[at] = elem2;
+          } else {
+            baseProto.push.call(this, elem2);
+          }
+          if(added) added.call(this, elem2, at, keyArgs);
+          at++;
+          i++;
         }
-        if(added) added.call(this, elem2, at, keyArgs);
-        at++;
       }
 
       return at;
+    },
+
+    copyTo: function(list) {
+      baseProto.push.apply(list, this);
     },
 
     //region ISpecifiable implementation

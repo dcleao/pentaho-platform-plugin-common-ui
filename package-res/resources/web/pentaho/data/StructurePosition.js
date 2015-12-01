@@ -22,7 +22,7 @@ define([
   var StructurePosition = Base.extend("pentaho.data.StructurePosition", {
 
     // keyArgs: ordinal
-    constructor: function(keyArgs) {StructurePosition.t
+    constructor: function(keyArgs) {
       this._ord = arg.required(keyArgs, "ordinal", "keyArgs");
     },
 

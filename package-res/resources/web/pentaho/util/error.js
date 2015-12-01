@@ -21,6 +21,10 @@ define(function() {
       return new Error("Argument required: '" + name + "'." + (text ? (" " + text) : ""));
     },
 
+    argEmpty: function(name, text) {
+      return new Error("Argument cannot be empty: '" + name + "'." + (text ? (" " + text) : ""));
+    },
+
     argInvalid: function(name, text) {
       return new Error("Argument invalid: '" + name + "'." + (text ? (" " + text) : ""));
     },

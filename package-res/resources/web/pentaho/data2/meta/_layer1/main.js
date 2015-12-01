@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
-  "use strict";
+define([
+  "../_layer0/main"
+], function(layer0) {
+  // The layer1 modules defines:
+  // * all standard complex types
 
-  return {
-    is: function(f) {
-      return typeof f === "function";
-    },
+  // layer0.foo = Foo
 
-    identity: function(v) {
-      return v;
-    },
-
-    constant: function(v) {
-      return function() { return v; };
-    },
-
-    compare: function(a, b) {
-      return (a === b) ? 0 : ((a > b) ? 1 : -1);
-    }
-  };
+  return layer0;
 });

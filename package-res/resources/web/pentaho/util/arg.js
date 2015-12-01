@@ -26,6 +26,11 @@ define([
       return o && (v = o[p]) != null ? v : dv;
     },
 
+    defined: function(o, p, dv) {
+      var v;
+      return o && (v = o[p]) !== undefined ? v : dv;
+    },
+
     required: function(o, p, pscope) {
       var v;
       if(o && (v = o[p]) != null) return v;

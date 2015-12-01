@@ -40,7 +40,7 @@ define([
    * @see pentaho.data.Attribute
    */
   return Collection.extend("pentaho.data.AttributeCollection", /** @lends pentaho.data.AttributeCollection# */{
-
+    
     //region List implementation
     /**
      * Gets the class of elements of the list:

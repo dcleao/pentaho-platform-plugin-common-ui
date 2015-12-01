@@ -41,6 +41,7 @@ define(function() {
     },
 
     assignOwnDefined: assignOwnDefined,
+    assignOwn: assignOwn,
 
     copyOneDefined: copyOneDefined,
 
@@ -115,6 +116,13 @@ define(function() {
     for(var p in from)
       if(O_hasOwn.call(from, p) && (v = from[p]) !== undefined)
         to[p] = v;
+    return to;
+  }
+
+  function assignOwn(to, from) {
+    for(var p in from)
+      if(O_hasOwn.call(from, p))
+        to[p] = from[p];
     return to;
   }
 

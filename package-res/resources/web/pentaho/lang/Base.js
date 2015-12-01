@@ -36,6 +36,9 @@
  * 12. `Base#__root_proto__` is a new constant, non-enumerable property, set at each "Base" root prototype.
  * 13. `Base#__init__` is a new constant, non-enumerable, property, set at the prototype of "Base" classes
  *      that have an own initialization method (specified with the `constructor` property).
+ * 14. Added new Class.implementStatic method to allow to specify the class interface after extend.
+ *     Is parallel to Class.implement.
+ * 15. Any existing static methods are inherited (not only standard Base ones).
  */
 define([
   "../util/object",
@@ -90,6 +93,7 @@ define([
     BaseBoot.extend    = class_extend;
     BaseBoot._extend   = class_extend_core;
     BaseBoot.implement = class_implement;
+    BaseBoot.implementStatic = class_implementStatic;
     BaseBoot.toString  = properToString;
     BaseBoot.to        = class_to;
     BaseBoot.init      = null;
@@ -129,7 +133,7 @@ define([
       name = null;
     }
 
-    return this._extend(this, name, instSpec, classSpec);
+    return this._extend(name, instSpec, classSpec);
   }
 
   function class_extend_core(name, instSpec, classSpec) {
@@ -151,20 +155,14 @@ define([
       value: Class
     });
     Class.prototype = proto;
-
     Class.ancestor  = this;
 
-    // Inherit standard static interface.
-    Class.extend    = this.extend;
-    Class._extend   = this._extend;
-    Class.implement = this.implement;
-    Class.toString  = this.toString;
-    Class.to        = this.to;
-    Class.init      = this.init;
+    // Inherit _any_ static _methods_ or getter/setters
+    class_inherit_static.call(Class, this);
 
     // Extend the constructor with `classSpec`.
     // (overriding static methods sets the `base` property on the constructor)
-    if(classSpec) inst_extend_object.call(Class, classSpec);
+    Class.implementStatic(classSpec);
 
     // Class initialization.
     if(fun.is(Class.init)) Class.init();
@@ -250,6 +248,40 @@ define([
 
     return this;
   }
+
+  // Adapted from inst_extend_object to better handle the Class static inheritance case.
+  function class_inherit_static(BaseClass) {
+
+    // Do the "toString" and other methods manually.
+    for(var i = 0; i < _hidden.length; i++) {
+      var h = _hidden[i];
+      if(BaseClass[h] !== _extendProto[h])
+        inst_extend_propDesc.call(this, h, BaseClass, undefined, /*funOnly:*/true);
+    }
+
+    // Copy each of the BaseClass' properties to this object.
+    for(var name in BaseClass)
+      if(!_extendProto[name] &&
+         name !== "ancestor" &&
+         name !== "prototype" &&
+         name !== "Array" &&
+         name !== "Object" &&
+         name !== "base")
+        inst_extend_propDesc.call(this, name, BaseClass, undefined, /*funOnly:*/true);
+  }
+
+  function class_implementStatic() {
+    var i = -1,
+        L = arguments.length;
+    while(++i < L) {
+      // Extend the constructor with `classSpec`.
+      // (overriding static methods sets the `base` property on the constructor)
+      var classSpec = arguments[i];
+      if(classSpec) inst_extend_object.call(this, classSpec);
+    }
+
+    return this;
+  }
   // endregion
 
   //region Instance methods
@@ -305,7 +337,7 @@ define([
         inst_extend_propDesc.call(this, name, source, rootProto);
   }
 
-  function inst_extend_propDesc(name, source, rootProto) {
+  function inst_extend_propDesc(name, source, rootProto, funOnly) {
     var desc = O.getPropertyDescriptor(source, name);
     if(desc.get || desc.set) {
       // Property getter/setter
@@ -318,12 +350,16 @@ define([
       Object.defineProperty(this, name, desc);
     } else {
       // Property value
-      inst_extend_propAssign.call(this, name, desc.value, rootProto);
+      inst_extend_propAssign.call(this, name, desc.value, rootProto, funOnly);
     }
   }
 
-  function inst_extend_propAssign(name, value, rootProto) {
-    this[name] = fun.is(value) ? methodOverride(value, this[name], rootProto) : value;
+  function inst_extend_propAssign(name, value, rootProto, funOnly) {
+    if(fun.is(value)) {
+      this[name] = methodOverride(value, this[name], rootProto);
+    } else if(!funOnly) {
+      this[name] = value;
+    }
   }
   //endregion
 

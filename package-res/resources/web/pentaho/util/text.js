@@ -16,21 +16,21 @@
 define(function() {
   "use strict";
 
-  return {
-    is: function(f) {
-      return typeof f === "function";
+  var text = {
+    // Ensures the first letter is upper case.
+    firstUpperCase: function(s) {
+      if(s) {
+        var c  = s.charAt(0),
+            cU = c.toUpperCase();
+        if(c !== cU) s = cU + s.substr(1);
+      }
+      return s;
     },
 
-    identity: function(v) {
-      return v;
-    },
-
-    constant: function(v) {
-      return function() { return v; };
-    },
-
-    compare: function(a, b) {
-      return (a === b) ? 0 : ((a > b) ? 1 : -1);
+    titleFromName: function(name) {
+      return text.firstUpperCase(name).replace(/([a-z\d])([A-Z])/, "$1 $2");
     }
   };
+
+  return text;
 });
