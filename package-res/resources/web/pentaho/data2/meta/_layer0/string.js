@@ -29,10 +29,13 @@ define([
    */
   return Simple.extend("pentaho.data.meta.String", /** @lends pentaho.data.meta.String# */{
     id: "pentaho/data/meta/string",
+
     name: "string",
     namePlural: "strings",
+
     label: "String",
     labelPlural: "Strings",
+
     description: "A textual value.",
 
     validateNonEmpty: function(value) {

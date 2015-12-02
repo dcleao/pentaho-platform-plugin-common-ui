@@ -27,6 +27,7 @@ define([
   // Will cause requiring Component during it's own build procedure...
   // Need to recognize requests for the currently being built _top-level_ complex in a special way -
   // the one that can not be built and have a module id.
+  // ^ This should be handled by the metadata IContext, used below.
 
   /**
    * @name pentaho.data.meta.Property
@@ -99,33 +100,31 @@ define([
     /**
      * Creates a property metadata instance.
      *
-     * @param {Object} keyArgs Keyword arguments object.
-     * @param {pentaho.data.meta.IDomain} [keyArgs.metaDomain] The metadata domain.
-     * @param {pentaho.data.meta.PropertyClass} keyArgs.propClass The property's `PropertyClass`.
-     * @param {pentaho.data.meta.Complex} keyArgs.declaringType The complex type that declares this property.
-     * @param {pentaho.data.meta.Property} [keyArgs.ancestorProp] The ancestor property, if any.
-     * @param {pentaho.data.meta.IPropertyConfig} [config] The property configuration.
+     * @param {pentaho.data.meta.Complex} ownerType The complex type that holds this property.
+     * @param {pentaho.data.meta.PropertyClass} propClass The property's `PropertyClass`.
      * @ignore
      */
-    constructor: function(metaDomain, propClass, declaringType, ancestorProp, config) {
-      if(!metaDomain) throw error.argRequired("metaDomain");
+    constructor: function(ownerType, propClass) {
+      if(!ownerType) throw error.argRequired("ownerType");
       if(!propClass) throw error.argRequired("propClass");
-      if(!declaringType) throw error.argRequired("declaringType");
 
-      this._declaringType = declaringType;
+      this._ownerType = ownerType;
       this._propClass = propClass;
-      this._ancestor = ancestorProp || null;
 
       this._name = propClass.name;
       this._list = propClass.list;
-      this._type = metaDomain.get(propClass.type);
+      this._type = ownerType._context.get(propClass.type, /* assertPresent: */true);
+
+      // Obtain this property's configuration, which is, actually,
+      // provided as part of the owner type's configuration.
+      var ownerConfig = ownerType._context.getConfig(ownerType.constructor),
+          config = ownerConfig && ownerConfig.props && ownerConfig.props[propClass.name];
 
       // These must be explicitly set in the constructor to force proper initialization.
       this.label = arg.defined(config, "label");
       this.description = arg.defined(config, "description");
       this.category = arg.defined(config, "category");
       this.helpUrl = arg.defined(config, "helpUrl");
-
     },
 
     //region IListElement
@@ -163,25 +162,14 @@ define([
     //endregion
 
     /**
-     * The complex type that declares this property.
+     * The complex type that owns this property.
      *
      * @type !pentaho.data.meta.Complex
      * @readonly
      * @immutable
      */
-    get declaringType() {
-      return this._declaringType;
-    },
-
-    /**
-     * The base property, if any.
-     *
-     * @type ?pentaho.data.meta.Property
-     * @readonly
-     * @immutable
-     */
-    get ancestor() {
-      return this._ancestor;
+    get ownerType() {
+      return this._ownerType;
     },
 
     /**

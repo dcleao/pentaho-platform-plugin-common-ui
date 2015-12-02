@@ -26,6 +26,11 @@ define([
       expect(typeof Type).toBe("function");
     });
 
+    it("should have an `uid`", function() {
+      expect(Type.prototype.uid != null).toBe(true);
+      expect(typeof Type.prototype.uid).toBe("number");
+    });
+
     describe(".extend({...}) -", function() {
       it("should return a function", function() {
         var Derived = Type.extend({
@@ -472,9 +477,24 @@ define([
 
       // ====
 
+      describe("#uid -", function() {
+        it("should not be inherited", function() {
+          var Derived = Type.extend();
+          expect(Derived.prototype.uid).not.toBe(Type.uid);
+        });
+
+        it("should be unique", function() {
+          var DerivedA = Type.extend(),
+              DerivedB = Type.extend();
+          expect(DerivedA.prototype.uid).not.toBe(DerivedB.prototype.uid);
+          expect(DerivedA.prototype.uid).not.toBe(Type.prototype.uid);
+        });
+      }); // #uid
+
       // TODO: remaining poperties: defaultValue, format, domain, annotations...
       // TODO: methods resolve, resolveAsync
-    });
+
+    }); // .extend({...})
   });
 
 });

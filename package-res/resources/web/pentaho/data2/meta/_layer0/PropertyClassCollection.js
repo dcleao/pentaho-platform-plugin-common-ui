@@ -43,7 +43,7 @@ define([
      * @ignore
      */
     constructor: function(declaringType) {
-      if(!declaringType) throw arg.required("declaringType");
+      if(!declaringType) throw error.argRequired("declaringType");
 
       /**
        * The complex type class that owns this collection.
@@ -81,7 +81,7 @@ define([
     elemClass: PropertyClass,
 
     _adding: function(spec, index, ka) {
-      if(!spec) throw arg.required("props[i]");
+      if(!spec) throw error.argRequired("props[i]");
 
       var name = getSpecName(spec), existing;
       if(name && (existing = this.get(name))) {
@@ -102,7 +102,7 @@ define([
     },
 
     _replacing: function(spec, index, existing, ka) {
-      if(!spec) throw arg.required("props[i]");
+      if(!spec) throw error.argRequired("props[i]");
 
       var name = getSpecName(spec);
       if(name !== existing.name)

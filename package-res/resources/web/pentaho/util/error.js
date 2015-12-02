@@ -29,8 +29,8 @@ define(function() {
       return new Error("Argument invalid: '" + name + "'." + (text ? (" " + text) : ""));
     },
 
-    argInvalidType: function(name) {
-      return error.argInvalid(name, "Invalid type" + + (type ? (": '" + type + "'.") : "."));
+    argInvalidType: function(name, text) {
+      return error.argInvalid(name, "Invalid type." + (text ? (" " + text) : ""));
     },
 
     argNotArray: function(name) {

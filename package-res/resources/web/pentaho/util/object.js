@@ -29,6 +29,14 @@ define(function() {
       return o && O_hasOwn.call(o, p) ? o[p] : dv;
     },
 
+    eachOwn: function(o, fun, ctx) {
+      for(var p in o)
+        if(O_hasOwn.call(o, p) && fun.call(ctx || o, o[p], p) === false)
+          return false;
+
+      return true;
+    },
+
     eachOwnDefined: function(o, fun, ctx) {
       var v;
       for(var p in o)

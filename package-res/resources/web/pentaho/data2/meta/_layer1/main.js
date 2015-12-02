@@ -17,7 +17,7 @@ define([
   "../_layer0/main"
 ], function(layer0) {
   // The layer1 modules defines:
-  // * all standard complex types
+  // * any _standard_ complex types
 
   // layer0.foo = Foo
 

@@ -335,7 +335,7 @@ define([
           });
         }); // spec.list
 
-        // TODO: attributes defaultValue, format
+        // TODO: attributes defaultValue, format, metadata
 
       }); // when spec is an object
     }); // new(spec, declaringType)
@@ -512,7 +512,7 @@ define([
       });
     }); // #extend(spec, declaringType)...
 
-    
+    // TODO: see above
 
   }); // pentaho/data/meta/complex
 });

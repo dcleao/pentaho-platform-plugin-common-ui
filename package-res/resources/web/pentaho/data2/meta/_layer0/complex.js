@@ -16,13 +16,17 @@
 define([
   "./type",
   "./PropertyClassCollection",
-  "../../../util/error"
-], function(Type, PropertyClassCollection, error) {
+  "./PropertyCollection",
+  "./Context",
+  "../../../util/error",
+  "../../../util/object"
+], function(Type, Context, PropertyCollection, PropertyClassCollection, error, O) {
   /**
    * @name pentaho.data.meta.Complex
    * @class
    * @abstract
    * @extends pentaho.data.meta.Type
+   * @implements pentaho.lang.IConfigurable
    *
    * @classdesc The base abstract class of metadata of complex types.
    *
@@ -40,8 +44,16 @@ define([
    * });
    * ```
    *
-   * @description Creates a complex metadata instance for a given configuration.
-   * @param {pentaho.data.spec.Complex} [config] A complex metadata configuration.
+   * @description Creates a complex metadata instance and, optionally, registers it in a given context.
+   *
+   * Note that event when a context is not provided,
+   * one is still created and used internally to assist in the complex type
+   * construction and ensure the uniqueness of all types accessible
+   * through the complex type's properties.
+   *
+   * @param {Object} keyArgs Keyword arguments object.
+   * @param {pentaho.data.meta.IContext} [keyArgs.context] The metadata context.
+   * @param {pentaho.data.meta.spec.IComplexConfig} [keyArgs.config] A complex metadata configuration.
    */
   var Complex = Type.extend("pentaho.data.meta.Complex", /** @lends pentaho.data.meta.Complex# */{
     id: "pentaho/data/meta/complex",
@@ -49,7 +61,60 @@ define([
     namePlural: "complexes",
     label: "Complex",
     labelPlural: "Complexes",
-    description: "A structured type of value. One that has properties."
+    description: "A structured type of value. One that has properties.",
+
+    constructor: function(keyArgs) {
+      if(!keyArgs) keyArgs = {};
+      var context = keyArgs.context || (keyArgs.context = new Context());
+
+      // 1. Register `this` in `context` before props, to avoid endless recursion in cyclic complex types.
+      this.base(keyArgs);
+
+      // 2. Store context to support addition of _dyanmic_ properties
+      //    (for static props, it would be enough to send `context` as a keyword argument below, along with `owner`).
+      /**
+       * The metadata context.
+       * @type pentaho.data.meta.IContext
+       * @ignore
+       */
+      this._context = context;
+
+      // 3. Configure the complex type _locally_ only, _before_ building properties.
+      //    Properties configure themselves upon construction.
+      var config = context.getConfig(this.constructor);
+      if(config) this._configureLocal(config);
+
+      // 4. Create properties, recursively instantiating their types.
+      this._properties = PropertyCollection.to([], {owner: this});
+    },
+
+    //region properties property
+    _properties: null,
+
+    /**
+     * Gets the `Property` collection of the complex type instance.
+     *
+     * @type pentaho.data.meta.PropertyCollection
+     * @reaonly
+     */
+    get properties() {
+      return this._properties;
+    },
+    //endregion
+
+    //region IConfigurable implementation
+    /**
+      * Configures the complex type metadata instance.
+     *
+     * @param {Object.<string,pentaho.data.meta.spec.IComplexConfig} config A complex type metadata configuration.
+     */
+    configure: function(config) {
+      this.base(config);
+
+      if(config.props) this._properties.configure(config.props);
+    }
+    //endregion
+
   }, /** @lends pentaho.data.meta.Complex */{
     /**
      * Creates a subclass of this type metadata class.
@@ -81,7 +146,8 @@ define([
     _properties: null,
 
     /**
-     * @name pentaho.data.meta.Complex.properties
+     * The complex type class `PropertyClass` collection.
+     *
      * @type pentaho.data.meta.PropertyClassCollection
      * @reaonly
      */
