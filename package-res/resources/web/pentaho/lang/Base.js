@@ -50,6 +50,8 @@ define([
 
   // Used by `inst_extend_object`
   var _hidden = ["toString", "valueOf"],
+      _hiddenClass = ["toString"],
+      F_toString   = Function.prototype.toString,
       _extendProto = {
         toSource: null
         // Others from Object.prototype:
@@ -94,7 +96,7 @@ define([
     BaseBoot._extend   = class_extend_core;
     BaseBoot.implement = class_implement;
     BaseBoot.implementStatic = class_implementStatic;
-    BaseBoot.toString  = properToString;
+    BaseBoot.toString  = properFunToString;
     BaseBoot.to        = class_to;
     BaseBoot.init      = null;
 
@@ -253,8 +255,8 @@ define([
   function class_inherit_static(BaseClass) {
 
     // Do the "toString" and other methods manually.
-    for(var i = 0; i < _hidden.length; i++) {
-      var h = _hidden[i];
+    for(var i = 0; i < _hiddenClass.length; i++) {
+      var h = _hiddenClass[i];
       if(BaseClass[h] !== _extendProto[h])
         inst_extend_propDesc.call(this, h, BaseClass, undefined, /*funOnly:*/true);
     }
@@ -264,6 +266,7 @@ define([
       if(!_extendProto[name] &&
          name !== "ancestor" &&
          name !== "prototype" &&
+         name !== "valueOf" &&
          name !== "Array" &&
          name !== "Object" &&
          name !== "base")
@@ -383,7 +386,7 @@ define([
       return type === "object" ? value : method;
     };
 
-    value.toString = properToString;
+    value.toString = properFunToString;
 
     return value;
   }
@@ -414,8 +417,8 @@ define([
   //region Helpers
   // The native String function or toString method do not call .valueOf() on its argument.
   // However, concatenating with a string does...
-  function properToString() {
-    return String(this.valueOf());
+  function properFunToString() {
+    return F_toString.call(this.valueOf());
   }
 
   // Because `Function#name` is non-writable but configurable it

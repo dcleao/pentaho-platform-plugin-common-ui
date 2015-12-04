@@ -15,5 +15,8 @@
 * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
 */
 
-// Included by webcontext.js to configure the RequireJS system
+/*global requireCfg:true*/
+
+// Included by webcontext.js to configure the RequireJS system.
+
 require.config(requireCfg);

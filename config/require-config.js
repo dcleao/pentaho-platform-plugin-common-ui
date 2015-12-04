@@ -1,6 +1,6 @@
 // Find and inject tests using require
 requireCfg.deps = Object.keys(window.__karma__.files).filter(function(file) {
-    return (/package\-res\/resources\/web\/test\/karma\/unit\/pentaho\/data\/.*Spec\.js$/).test(file);
+    return (/package\-res\/resources\/web\/test\/karma\/unit\/pentaho\/type\/.*Spec\.js$/).test(file);
 });
 
 requireCfg.baseUrl = "/base/build-res/module-scripts/";
@@ -22,8 +22,6 @@ requireCfg.paths["pentaho/visual/type/registryMock"] =
 
 // Reset "service" module configuration.
 requireCfg.config.service = {};
-
-requireCfg.paths["pentaho/data"] = "/base/package-res/resources/web/pentaho/data2";
 
 requireCfg.callback = function() {
   window.__karma__.start();
