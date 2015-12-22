@@ -346,8 +346,9 @@ define([
       // Property getter/setter
       var baseDesc = O.getPropertyDescriptor(this, name);
       if(baseDesc) {
-        if(desc.get || baseDesc.get) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
-        if(desc.set || baseDesc.set) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
+        // Specify null to block inheritance and, for example, make a property read-only.
+        if((desc.get !== null) && (desc.get || baseDesc.get)) desc.get = methodOverride(desc.get, baseDesc.get, rootProto);
+        if((desc.set !== null) && (desc.set || baseDesc.set)) desc.set = methodOverride(desc.set, baseDesc.set, rootProto);
       }
 
       Object.defineProperty(this, name, desc);

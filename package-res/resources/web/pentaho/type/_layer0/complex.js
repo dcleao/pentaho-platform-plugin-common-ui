@@ -15,12 +15,12 @@
  */
 define([
   "./value",
+  "../../i18n!types",
   "./Context",
-  "./PropertyCollection",
-  "./PropertyClassCollection",
+  "./PropertyDefCollection",
   "../../util/error",
   "../../util/object"
-], function(Value, Context, PropertyCollection, PropertyClassCollection, error, O) {
+], function(Value, bundle, Context, PropertyDefCollection, error, O) {
 
   "use strict";
 
@@ -47,83 +47,54 @@ define([
    * });
    * ```
    *
-   * @description Creates a complex type instance and, optionally, registers it in a given context.
-   *
-   * Note that event when a context is not provided,
-   * one is still created and used internally to assist in the complex type
-   * construction and ensure the uniqueness of all types accessible
-   * through the complex type's properties.
-   *
-   * @param {Object} keyArgs Keyword arguments object.
-   * @param {pentaho.type.IContext} [keyArgs.context] The type context.
-   * @param {pentaho.type.spec.IComplexConfig} [keyArgs.config] A complex type configuration.
+   * @description Creates a complex type instance.
    */
   var Complex = Value.extend("pentaho.type.Complex", /** @lends pentaho.type.Complex# */{
     id: "pentaho/type/complex",
-    label: "Complex",
-    labelPlural: "Complexes",
-    description: "A structured type of value. One that has properties.",
 
-    constructor: function(keyArgs) {
-      if(!keyArgs) keyArgs = {};
-      var context = keyArgs.context || (keyArgs.context = new Context());
-
-      // 1. Register `this` in `context` before props, to avoid endless recursion in cyclic complex types.
-      this.base(keyArgs);
-
-      // 2. Store context to support addition of _dyanmic_ properties
-      //    (for static props, it would be enough to send `context` as a keyword argument below, along with `owner`).
-      /**
-       * The type context.
-       * @type pentaho.type.IContext
-       * @ignore
-       */
-      this._context = context;
-
-      // 3. Configure the complex type _locally_ only, _before_ building properties.
-      //    Properties configure themselves upon construction.
-      var config = context.getConfig(this.constructor);
-      if(config) this._configureLocal(config);
-
-      // 4. Create properties, recursively instantiating their types.
-      this._properties = PropertyCollection.to([], {owner: this});
-    },
+    styleClass: "pentaho-type-complex",
 
     //region properties property
-    _properties: null,
+    _props: null,
 
     /**
-     * Gets the `Property` collection of the complex type instance.
+     * Gets the `Property` collection of the complex type.
      *
      * @type pentaho.type.PropertyCollection
-     * @reaonly
+     * @readonly
      */
-    get properties() {
-      return this._properties;
+    get props() {
+      return this._props;
     },
     //endregion
 
-    //region IConfigurable implementation
+    //region IConfigurable _class_ implementation support
     /**
-      * Configures the complex type instance.
+     * Configures the complex class.
      *
-     * @param {Object.<string,pentaho.type.spec.IComplexConfig} config A complex type configuration.
+     * This method _must not_ be called directly on type instances.
+     * It is expected to be called on the `prototype` of
+     * the constructor function, to configure the class.
+     *
+     * @param {pentaho.type.spec.IComplexConfig} config A complex type class configuration.
+     * @protected
+     * @virtual
      */
-    configure: function(config) {
+    _configure: function(config) {
       this.base(config);
 
-      if(config.props) this._properties.configure(config.props);
+      if(config.props) this._props.configure(config.props);
     }
     //endregion
 
   }, /** @lends pentaho.type.Complex */{
     /**
-     * Creates a subclass of this type class.
+     * Creates a sub-type of this one.
      *
      * @name pentaho.type.Complex.extend
      *
      * @param {string} [name] The name of the complex type sub-class.
-     *   This is used mostly for debugging and is unrelated to {@link pentaho.type.Value#name}.
+     *   This is used mostly for debugging and is otherwise unrelated to {@link pentaho.type.Value#id}.
      *
      * @param {pentaho.type.spec.IComplex} instSpec The complex type specification.
      * @param {Object} [classSpec] Class-level members of the class.
@@ -137,31 +108,22 @@ define([
 
       var Derived = this.base.apply(this, arguments);
 
-      // Create properties classes collection.
-      Derived._properties = PropertyClassCollection.to(propSpecs, Derived);
+      // Not using Class.init, cause there would be no way to pass propSpecs to it
+      // (unless an alternate instSpec prop was used...)
+      initType(Derived);
 
       return Derived;
-    },
-
-    //region properties property
-    _properties: null,
-
-    /**
-     * The complex type class `PropertyClass` collection.
-     *
-     * @type pentaho.type.PropertyClassCollection
-     * @reaonly
-     */
-    get properties() {
-      return this._properties;
     }
-    //endregion
-  });
+  }).configure(bundle.structured.complex);
 
-  // Create root properties classes collection.
-  Complex._properties = PropertyClassCollection.to(undefined, Complex);
+  // Create root properties collection.
+  initType(Complex);
 
   return Complex;
+
+  function initType(ComplexType, propSpecs) {
+    ComplexType.prototype._props = PropertyDefCollection.to(propSpecs, /*declaringType:*/ComplexType);
+  }
 
   function removeProp(o, p) {
     var v;

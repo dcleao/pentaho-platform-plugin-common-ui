@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./simple"
-], function(Simple) {
+  "./simple",
+  "../../i18n!types",
+], function(Simple, bundle) {
 
   "use strict";
 
@@ -32,9 +33,8 @@ define([
    */
   return Simple.extend("pentaho.type.Date", /** @lends pentaho.type.Date# */{
     id: "pentaho/type/date",
-    label: "Date",
-    labelPlural: "Dates",
-    description: "A date value.",
+
+    styleClass: "pentaho-type-date",
 
     validateNonEmpty: function(value) {
       return this.base(value) ||
@@ -42,5 +42,5 @@ define([
           ? null
           : [new Error("Value is not of type 'date'.")]);
     }
-  });
+  }).configure(bundle.structured["date"]);
 });

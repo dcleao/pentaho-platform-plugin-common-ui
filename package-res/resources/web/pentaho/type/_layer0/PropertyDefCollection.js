@@ -14,47 +14,46 @@
  * limitations under the License.
  */
 define([
-  "./PropertyClass",
+  "./PropertyDef",
   "../../lang/Collection",
   "../../util/arg",
   "../../util/error"
-], function(PropertyClass, Collection, arg, error) {
+], function(PropertyDef, Collection, arg, error) {
 
   "use strict";
 
   /**
-   * @name PropertyClassCollection
+   * @name PropertyDefCollection
    * @memberOf pentaho.type
    * @class
    * @extends pentaho.lang.Collection
    *
-   * @classdesc A collection of property classes.
+   * @classdesc A collection of properties.
    *
-   * @description Initializes a property classes collection.
+   * @description Initializes a property collection.
    * This constructor is used internally by the type package and should not be used directly.
    *
-   * @see pentaho.type.Property
+   * @see pentaho.type.PropertyDef
    */
-  return Collection.extend("pentaho.type.PropertyClassCollection", /** @lends pentaho.type.PropertyClassCollection# */{
+  return Collection.extend("pentaho.type.PropertyDefCollection", /** @lends pentaho.type.PropertyDefCollection# */{
 
     /**
-     * Initializes a property classes collection.
+     * Initializes a property collection.
      *
-     * @param {Class.<pentaho.type.Complex>} declaringType The complex type class that declares
-     *   non-inherited property classes.
+     * @param {Class.<pentaho.type.Complex>} declaringType The complex type class that declares non-inherited properties.
      * @ignore
      */
     constructor: function(declaringType) {
       if(!declaringType) throw error.argRequired("declaringType");
 
       /**
-       * The complex type class that owns this collection.
+       * The complex type class that _owns_ this collection.
        * @type Class.<pentaho.type.Complex>
        * @ignore
        */
       this._declaringType = declaringType;
 
-      // Copy owner ancestor's properties.
+      // Copy owner's ancestor's properties.
       var ownerBase = this._declaringType.ancestor,
           colBase = ownerBase && ownerBase.properties;
 
@@ -71,16 +70,16 @@ define([
         // All base properties. Preserve original positions.
         colBase.copyTo(this);
 
-        // New/Override properties.
+        // Create/Override properties.
         if(newProps) this.addMany(newProps);
       } else {
-        // Default: addMany of contained specs.
+        // Default: calls `addMany` on contained specs.
         this.base();
       }
     },
 
     //region List implementation
-    elemClass: PropertyClass,
+    elemClass: PropertyDef,
 
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
@@ -117,13 +116,13 @@ define([
         return;
       }
 
-      // Replace with overridden property class.
+      // Replace with overridden property.
       return existing.extend(spec, this._declaringType);
     },
 
     _cast: function(spec) {
-      // For new, local properties.
-      return PropertyClass.to(spec, this._declaringType);
+      // For new, root, local properties.
+      return PropertyDef.to(spec, this._declaringType);
     }
     //endregion
   });

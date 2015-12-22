@@ -18,8 +18,11 @@ define([
   "../../lang/_AnnotatableLinked",
   "../../lang/Base",
   "../../util/error",
-  "../../util/arg"
-], function(Value, AnnotatableLinked, Base, error, arg) {
+  "../../util/arg",
+  "../../util/text",
+  "../../util/fun",
+  "../../util/object"
+], function(Value, AnnotatableLinked, Base, error, arg, text, fun, O) {
 
   "use strict";
 
@@ -34,7 +37,7 @@ define([
     };
 
   /**
-   * @name pentaho.type.PropertyClass
+   * @name pentaho.type.Property
    *
    * @class
    * @sealed
@@ -42,17 +45,28 @@ define([
    * @implements pentaho.lang.IListElement
    * @implements pentaho.lang.ICollectionElement
    *
-   * @classdesc Describes a property class of complex type class.
+   * @classdesc A property of a complex type.
    *
-   * Example property class:
+   * Example property:
    * ```javascript
-   * require(["pentaho/type/PropertyClass"], function(PropertyClass) {
+   * require(["pentaho/type/Property"], function(Property) {
    *
-   *   return new PropertyClass({ // spec
+   *   return new Property({ // spec
    *     type: "string",
+   *     name: "name",
+   *     list: false,
+   *
+   *     // countMin, countMax, required
+   *     // applicable, readonly, visible
+   *     browsable: true,
+   *
+   *     // (Some) known values, along with their metadata.
+   *     // TODO: is this the right place for this?
+   *     // Contrast with Value#domain.
+   *     members: [
+   *     ],
    *
    *     // Override inherited #type properties
-   *     name: "name",
    *     label: "Name",      // override, localized
    *     category: "foo",    // override, localized
    *     description: "Foo", // override, localized
@@ -64,42 +78,29 @@ define([
    *        geoRole: ""
    *     },
    *
-   *     // (Some) known values, along with their metadata.
-   *     // TODO: is this the right place for this?
-   *     // Contrast with Value#domain.
-   *     members: [
-   *     ],
-   *
    *     // Formatting specification
    *     format: {},
    *
-   *     list: false,
-   *     // countMin, countMax, required
-   *
-   *     // applicable, readonly, visible
-   *
    *     // default value
    *     // (uses domain, list and countMin to determine a default)
-   *     defaultValue: null,
-   *
-   *     browsable: true
+   *     defaultValue: null
    *   });
    * });
    * ```
    * @see pentaho.type.Complex
-   * @description Creates a `PropertyClass` instance.
+   * @description Creates a `Property`.
    *
    * This constructor is used internally by the type package and should not be used directly.
    */
-  var PropertyClass = Base.extend("pentaho.type.PropertyClass", /** @lends pentaho.type.PropertyClass# */{
+  var Property = Base.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
 
     // TODO: countMin, countMax, required, applicable, readonly, visible, defaultValue, members?, p
 
     /**
-     * Creates a _root_ `PropertyClass` instance, given a property class specification.
+     * Creates a _root_ `Property` instance, given a property specification.
      *
-     * Non-root property classes are created by calling {@link pentaho.type.PropertyClass#extend}
-     * on the base property class.
+     * Non-root properties are created by calling {@link pentaho.type.Property#extend}
+     * on the base property.
      *
      * @param {pentaho.type.spec.UProperty} spec A property name or specification object.
      * @param {Class.<pentaho.type.Complex>} declaringType The complex type class that declares the property.
@@ -112,15 +113,23 @@ define([
       // A singular string property whith the specified name.
       if(typeof spec === "string") spec = {name: spec};
 
+      // Root attributes
       this._name = spec.name;
       if(!this._name) throw error.argRequired("spec.name");
 
+      this._list = !!spec.list;
+
       this._root = this;
+
+      // Others
       this._declaringType = declaringType;
 
       // Resolve value type synchronously.
       this._type = Value.resolve(spec.type);
-      this._list = !!spec.list;
+
+      // Instances interface
+      this._owner = null;
+      this._value = null;
 
       this._configure(spec);
     },
@@ -132,11 +141,11 @@ define([
     // the one that can not be built and have a module id.
 
     /**
-     * Creates a sub-property class of this one given its specification.
+     * Creates a sub-property of this one given its specification.
      *
      * @param {pentaho.type.spec.UProperty} spec A property name or specification object.
      * @param {Class.<pentaho.type.Complex>} declaringType The complex type class that declares the sub-property.
-     * @return {pentaho.type.PropertyClass} The created `PropertyClass`.
+     * @return {pentaho.type.Property} The created `Property`.
      * @ignore
      */
     extend: function(spec, declaringType) {
@@ -146,7 +155,6 @@ define([
       var subProp = Object.create(this);
 
       subProp._declaringType = declaringType;
-      subProp._root = this._root;
 
       // Resolve value type synchronously.
       var ValueType = spec.type != null ? Value.resolve(spec.type) : null;
@@ -171,15 +179,18 @@ define([
       return subProp;
     },
 
+    // Call only on the prototype
+    attribute: addAttribute,
+
     //region Private IConfigurable implementation
 
     // Only used by constructor and extend.
-    // It is Property that is configurable by the user, not PropertyClass.
+    // It is Property that is configurable by the user, not Property.
 
     /**
-     * Configures a property class.
+     * Configures a property.
      *
-     * @param {!pentaho.type.spec.IPropertyClassConfig} config A property class configuration.
+     * @param {!pentaho.type.spec.IPropertyClassConfig} config A property configuration.
      * @ignore
      */
     _configure: function(config) {
@@ -202,7 +213,7 @@ define([
      * @readonly
      * @default "property"
      */
-    elemName: "property class",
+    elemName: "property",
     //endregion
 
     //region IWithKey implementation
@@ -228,7 +239,7 @@ define([
     //endregion
 
     /**
-     * The complex type class that declares this property class.
+     * The complex type class that declares this property.
      *
      * @type !Class.<pentaho.type.Complex>
      * @readonly
@@ -238,9 +249,9 @@ define([
     },
 
     /**
-     * The root property class.
+     * The root property.
      *
-     * @type !pentaho.type.PropertyClass
+     * @type !pentaho.type.Property
      * @readonly
      */
     get root() {
@@ -248,9 +259,9 @@ define([
     },
 
     /**
-     * The base property class, if any.
+     * The base property, if any.
      *
-     * @type ?pentaho.type.PropertyClass
+     * @type ?pentaho.type.Property
      * @readonly
      */
     get ancestor() {
@@ -258,7 +269,7 @@ define([
     },
 
     /**
-     * The type class of the _single_ values that the property can hold.
+     * The type of the _single_ values that the property can hold.
      *
      * @type !Class.<pentaho.type.Value>
      * @readonly
@@ -267,11 +278,42 @@ define([
       return this._type;
     },
 
+    /**
+     * The complex that owns this property.
+     *
+     * This attribute is non-null only in "leaf-properties" -
+     * those that are used by actual instances of {@link pentaho.type.Complex} and
+     * not by their prototypes.
+     *
+     * @type ?pentaho.type.Complex
+     * @readonly
+     * @immutable
+     */
+    get owner() {
+      return this._owner;
+    },
+
+    /**
+     * The value of the property.
+     *
+     * This attribute can only be non-null in "leaf-properties" -
+     * those that are used by actual instances of {@link pentaho.type.Complex} and
+     * not by their prototypes.
+     *
+     * @type pentaho.type.Value | pentaho.type.Value[] | null
+     */
+    get value() {
+      return this._value;
+    },
+
+    set value(value) {
+      // TODO
+      this._value = value;
+    },
+
     //region name property
 
-    // -> nonEmptyString, Required, Immutable,
-    //    Same as base property class or, when a root property class,
-    //    defaults from #type#name or #type#namePlural according to #list.
+    // -> nonEmptyString, Required, Immutable, Root-only.
     _name: undefined,
 
     get name() {
@@ -281,127 +323,130 @@ define([
 
     //region list property
 
-    // -> Optional(false), Immutable,
-    //    Same as base property or, when a root property, defaults to false.
+    // -> Optional(false), Immutable, Root-only.
     _list: false,
 
     get list() {
       return this._list;
     },
     //endregion
-
-    // -----------------
-
-    //region label property
-
-    // -> nonEmptyString, Optional, Configurable, Localized
-    // undefined sets the default (inherit; root undefined)
-    // "" -> null conversion
-    _label: undefined,
-
-    get label() {
-      return this._label;
-    },
-
-    set label(value) {
-      if(value === undefined) {
-        delete this._label;
-      } else {
-        this._label = value || null;
-      }
-    },
-    //endregion
-
-    //region description property
-
-    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
-    // undefined sets the default (inherit; root undefined)
-    // "" -> null conversion
-
-    _description: undefined,
-
-    get description() {
-      return this._description;
-    },
-
-    set description(value) {
-      if(value === undefined)
-        delete this._description;
-      else
-        this._description = value || null;
-    },
-    //endregion
-
-    //region category property
-
-    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
-    // undefined sets the default (inherit; root undefined)
-    // "" -> null conversion
-
-    _category: undefined,
-
-    get category() {
-      return this._category;
-    },
-
-    set category(value) {
-      if(value === undefined)
-        delete this._category;
-      else
-        this._category = value || null;
-    },
-    //endregion
-
-    //region helpUrl property
-
-    // -> nonEmptyString, Optional, Inherited, Configurable, Localized?
-    // undefined sets the default (inherit; root undefined)
-    // "" -> null conversion
-
-    _helpUrl: undefined,
-
-    get helpUrl() {
-      return this._helpUrl;
-    },
-
-    set helpUrl(value) {
-      if(value === undefined)
-        delete this._helpUrl;
-      else
-        this._helpUrl = value || null;
-    },
-    //endregion
-
-    //region browsable property
-
-    // -> Optional(true), Configurable
-    // undefined sets the default (inherit; root true)
-    // other -> Boolean(other) conversion
-    _browsable: true,
-
-    get browsable() {
-      return this._browsable;
-    },
-
-    set browsable(value) {
-      if(value === undefined)
-        delete this._browsable;
-      else
-        this._browsable = !!value;
-    }
-    //endregion
-  }, /** @lends pentaho.type.PropertyClass */{
+  }, /** @lends pentaho.type.Property */{
     /**
-     * Converts a property specification to a `PropertyClass` instance.
+     * Converts a property specification to a `Property` instance.
      *
      * @param {pentaho.type.spec.UProperty} spec A property name or specification object.
      * @param {Class.<pentaho.type.Complex>} declaringType The complex type class that declares the property.
-     * @return {pentaho.type.PropertyClass} The created `PropertyClass` instance.
+     * @return {pentaho.type.Property} The created `Property` instance.
      */
     to: function(spec, declaringType) {
-      return new PropertyClass(spec, declaringType);
+      return new Property(spec, declaringType);
     }
   });
 
-  return PropertyClass;
+  Property.prototype
+    .attribute("label", {
+      cast: nonEmptyString,
+      "default": function() {
+        return (this._list && this._type.prototype.labelPlural) ||
+            this._type.prototype.label ||
+            text.titleFromName(this._name);
+      }
+    })
+    .attribute("description", {
+      cast: nonEmptyString,
+      "default": function() {
+        return this._type.prototype.description;
+      }
+    })
+    .attribute("category", {
+      cast: nonEmptyString,
+      "default": function() {
+        return this._type.prototype.category;
+      }
+    })
+    .attribute("helpUrl", {
+      cast: nonEmptyString,
+      "default": function() {
+        return this._type.prototype.helpUrl;
+      }
+    })
+    .attribute("browsable", {
+      cast: Boolean,
+      value: true,
+      "default": function() { return true; }
+    });
+
+  function nonEmptyString(value) {
+    return value != null ? null : (String(value) || null);
+  }
+
+  // When creating a derived property class, new attributes can be defined.
+  // However, only when creating or extending a property instance can attribute values be changed.
+  function addAttribute(name, spec) {
+    var namePriv = "_" + name,
+        cast = spec.cast,
+        getDefault = spec["default"];
+
+    // The public property descriptor.
+    Object.defineProperty(this, name, {get: getter, set: setter});
+
+    // The configuration method.
+    this[namePriv + "Configure"] = configurer;
+
+    // Set the root's default value (for future base calls?)
+    this[name] = spec.value;
+
+    if(!getDefault) {
+      (function(v0) {
+        if(v0 != null) getDefault = fun.constant(v0);
+      }(this[namePriv]));
+    }
+
+    return this;
+
+    function getter() {
+      // Get value from private property, own or inherited, calculated or not.
+      // Already casted.
+      var value = this[namePriv];
+
+      // Dynamic, local default, determined on each get.
+      // Cannot have a cache when there's no way to invalidate it.
+      if(value === undefined && (!getDefault || (value = getDefault.call(this)) === undefined))
+        value = null;
+
+      return value;
+    }
+
+    function setter(value) {
+      if(cast && value != null) value = cast(value);
+
+      if(value === undefined)
+        delete this[namePriv]; // Inherit value
+      else
+        this[namePriv] = value;
+    }
+
+    function configurer(propDesc) {
+      var getter = propDesc.get;
+      if(getter) {
+        // Calculated, read-only attribute.
+        if(cast) getter = wrapGetter(getter, cast);
+        Object.defineProperty(this, namePriv, {get: getter, configurable: true});
+      } else {
+        Object.defineProperty(this, namePriv, {value: propDesc.value, configurable: true});
+      }
+    }
+  }
+
+  function wrapGetter(getter, cast) {
+
+    function wrappedGetter() {
+      var value = getter.call(this);
+      return value != null ? cast(value) : value;
+    }
+
+    return wrappedGetter;
+  }
+
+  return Property;
 });

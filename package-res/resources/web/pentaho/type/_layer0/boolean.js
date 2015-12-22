@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 define([
-  "./simple"
-], function(Simple) {
+  "./simple",
+  "../../i18n!types",
+], function(Simple, bundle) {
 
   "use strict";
-  
+
   /**
    * @name pentaho.type.Boolean
    * @class
@@ -32,11 +33,7 @@ define([
    */
   return Simple.extend("pentaho.type.Boolean", /** @lends pentaho.type.Boolean# */{
     id: "pentaho/type/boolean",
-    label: "Boolean",
-    labelPlural: "Booleans",
-    description: "A boolean value.",
 
-    // category, helpUrl,
     styleClass: "pentaho-type-boolean",
 
     validateNonEmpty: function(value) {
@@ -45,5 +42,5 @@ define([
           ? [new Error("Value is not of type 'boolean'.")]
           : null);
     }
-  });
+  }).configure(bundle.structured["boolean"]);
 });

@@ -1,0 +1,7 @@
+{
+  "main": "Type",
+  "themes": {
+    "default": "./themes/crystal",
+    "crystal": "./themes/crystal"
+  }
+}

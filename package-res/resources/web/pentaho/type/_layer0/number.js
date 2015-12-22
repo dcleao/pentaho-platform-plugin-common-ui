@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./simple"
-], function(Simple) {
+  "./simple",
+  "../../i18n!types",
+], function(Simple, bundle) {
 
   "use strict";
 
@@ -32,9 +33,8 @@ define([
    */
   return Simple.extend("pentaho.type.Number", /** @lends pentaho.type.Number# */{
     id: "pentaho/type/number",
-    label: "Number",
-    labelPlural: "Numbers",
-    description: "A numeric value.",
+
+    styleClass: "pentaho-type-number",
 
     validateNonEmpty: function(value) {
       return this.base(value) ||
@@ -42,5 +42,5 @@ define([
           ? [new Error("Value is not of type 'number'.")]
           : null);
     }
-  });
+  }).configure(bundle.structured["number"]);
 });

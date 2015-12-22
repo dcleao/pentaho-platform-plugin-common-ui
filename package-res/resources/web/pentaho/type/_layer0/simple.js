@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./value"
-], function(Value) {
+  "./value",
+  "../../i18n!types",
+], function(ValueType, bundle) {
 
   "use strict";
 
@@ -39,10 +40,8 @@ define([
    * @description Creates a simple type instance, given a configuration.
    * @param {pentaho.type.spec.ISimpleConfig} [config] A simple type configuration.
    */
-  return Value.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
+  return ValueType.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
     id: "pentaho/type/simple",
-    label: "Simple",
-    labelPlural: "Simples",
-    description: "An unstructured, indivisible type of value, that has no properties."
-  });
+    styleClass: "pentaho-type-simple",
+  }).configure(bundle.structured.simple);
 });

@@ -16,10 +16,14 @@
 define(function() {
   "use strict";
 
-  return {
+  var fun = {
     is: function(f) {
       return typeof f === "function";
     },
+
+    to: function(v) {
+      return fun.is(v) ? v : fun.to(v);
+    }
 
     identity: function(v) {
       return v;
@@ -33,4 +37,6 @@ define(function() {
       return (a === b) ? 0 : ((a > b) ? 1 : -1);
     }
   };
+
+  return fun;
 });

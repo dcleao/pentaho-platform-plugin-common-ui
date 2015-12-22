@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./simple"
-], function(Simple) {
+  "./simple",
+  "../../i18n!types",
+], function(Simple, bundle) {
 
   "use strict";
 
@@ -24,17 +25,12 @@ define([
    * @class
    * @abstract
    * @extends pentaho.type.Simple
-   *
    * @classdesc A textual type.
-   *
-   * @description Creates a string type instance, for a given configuration.
-   * @param {pentaho.type.spec.ISimpleConfig} [config] A simple type configuration.
+   * @description Creates a string type.
    */
   return Simple.extend("pentaho.type.String", /** @lends pentaho.type.String# */{
     id: "pentaho/type/string",
-    label: "String",
-    labelPlural: "Strings",
-    description: "A textual value.",
+    styleClass: "pentaho-type-string",
 
     validateNonEmpty: function(value) {
       return this.base(value) ||
@@ -42,5 +38,5 @@ define([
           ? [new Error("Value is not of type 'string'.")]
           : null);
     }
-  });
+  }).configure(bundle.structured["string"]);
 });

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "../../i18n!types",
    "../../lang/Base",
    "../../lang/_AnnotatableLinked",
    "../../util/error",
@@ -21,13 +22,19 @@ define([
    "../../util/object",
    "../../util/promise",
    "../../util/text"
-], function(Base, AnnotatableLinked, error, fun, O, promise, text) {
+], function(bundle, Base, AnnotatableLinked, error, fun, O, promise, text) {
 
   "use strict";
 
   /*global Promise:true*/
 
   var baseMid = "pentaho/type/";
+
+  // Default type, in a type specification.
+  var defaultTypeMid = "string";
+
+  // Default `base` type in a type specification.
+  var defaultBaseTypeMid = "complex";
 
   // Unique type class id exposed through Type.prototype.uid and
   // used by Context instances.
@@ -45,7 +52,8 @@ define([
       "description": 1,
       "category": 1,
       "helpUrl": 1,
-      "defaultValue": 1,
+      "styleClass": 1,
+      "value": 1,
       "format": 1
     };
 
@@ -53,43 +61,43 @@ define([
    * @name pentaho.type.Value
    * @class
    * @abstract
-   * @implements pentaho.lang.IConfigurable
    * @implements pentaho.lang.IAnnotatable
    *
    * @classdesc
    *
+   * The static class interface implements {@link pentaho.lang.IConfigurable}.
+   *
+   * A type class is a _singleton_ class.
+   * Its sole instance is accessible through property {@link pentaho.type.Value.the}.
+   *
    * Example value type:
    * ```javascript
-   * define(["pentaho/type/value"], function(Value) {
-   *   return Value.extend({
+   * define(["pentaho/type/value"], function(ValueType) {
+   *   return ValueType.extend({
    *     // Defaults
    *
    *     // Name of a single element of this type of value.
    *     name: "name",
    *
-   *     // Plural name of elements of this type of value.
-   *     // not the same as a set name...
-   *     namePlural: "names",
-   *
    *     // Label of a single element of this type of value.
-   *     label: "Name", // localized
+   *     label: "Name",
    *
    *     // Plural label of elements of this type of value.
    *     labelPlural: "Names",
    *
    *     // Category of the type of value or concept
-   *     category: "foo", // localized
+   *     category: "foo",
    *
    *     // Description of the type of value
-   *     description: "Foo", // localized
+   *     description: "Foo",
    *
    *     helpUrl: "foo/bar"
    *
-   *     defaultValue: null,
+   *     value: null,
    *
    *     // min, max - for _ordered_ types (number, string, any having compare specified?)
-   *     // minOpened, maxOpened? false (exclusive?)
-   *     // lengthMin, lengthMax, pattern - facets for strings only?
+   *     // minOpen, maxOpen? false
+   *     // lengthMin, lengthMax, pattern - facets for strings only
    *
    *     // Arbitrary metadata
    *     p: {
@@ -105,68 +113,40 @@ define([
    *     // Default formatting specification for values of this type
    *     format: {},
    *
-   *     // Not configurable, changeable, etc.
-   *     // Overridable upon extension:
-   *
-   *     // Serialization of a Specification to/from JSON
-   *     toJSON: function(value) {
-   *     },
-   *
-   *     fromJSON: function(json) {
-   *     },
-   *
-   *     // Unit validation of a value of this type
-   *     // Should call base method first.
-   *     validate: function(value) {
-   *        var valid = this.base.apply(this, arguments);
-   *        if(!valid) { }
-   *        return valid;
-   *     },
-   *
-   *     isEmpty: function(value) {
-   *       return value == null || value === "";
-   *     },
-   *
-   *     getKey: function(value) {
-   *      // A unique key of the value among values of the same "kind".
-   *      // Specifically, among values of its first sub-class???
-   *     },
-   *
-   *     comparer: function(va, vb) {
-   *     }
+   *     styleClass: ""
    *   });
    * });
    * ```
    *
-   * @description Creates a type instance and, optionally, registers it in a given context.
-   * @param {Object} keyArgs Keyword arguments object.
-   * @param {pentaho.type.IContext} [keyArgs.context] The type context.
+   * @description Creates a type instance.
    */
   var Value = Base.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
-    constructor: function(keyArgs) {
-      // Register in the current context, if any.
-      var context = keyArgs && keyArgs.context
-      if(context) context.add(this);
+    constructor: function() {
     },
 
     // Implementation note:
-    //  Some of the following JS properties are used to set
-    //  both class defaults (set on the prototype) and instance JS properties.
-    //  This is an implementation convenience to support the extend method.
-    //  Use of property getters/setters to set the prototype properties is not documented
-    //   and should not be used directly by the user.
-    //  The user should use these getters and setters on actual `Type` instances only.
+    //  The following JS properties are used to set properties on the class' prototypes,
+    //  upon calls to Class.extend and Class.configure,
+    //  through the properties' setters.
+    //
+    //  Generally, type instances are immutable and are not changeable.
+    //
+    //  The user should not use the setters on actual `Type` instances...
 
     //region uid property
     _uid: _nextUid++,
 
     /**
-     * Gets the unique type _class_ id.
+     * Gets the unique type id.
      *
-     * The unique type id is autogenerated upon {@link pentaho.type.Value.extend}.
-     * A different unique id can be assigned each time.
+     * The unique type id is autogenerated when creating a new class through {@link pentaho.type.Value.extend}.
      * All instances of the type have the same unique id.
+     *
+     * Note that anonymous types do not have a {@link pentaho.type.Value#id}.
+     * However, all types an unique id.
+     *
+     * This property is (obviously) not inherited.
      *
      * @type number
      * @readonly
@@ -176,19 +156,30 @@ define([
     },
     //endregion
 
+    //region ancestor property
+    /**
+     * Gets the ancestor (singleton) type instance, if any, or `null`.
+     * @type pentaho.type.Value
+     */
+    get ancestor() {
+      return this !== Value.prototype ? this.constructor.ancestor.the : null;
+    },
+    //endregion
+
     //region id property
 
     // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)
     // "" -> null conversion
 
-    _id: "pentaho/type/value",
+    _id: baseMid + "value",
 
     /**
-     * Gets or sets the id of the value type.
+     * Gets the id of the value type.
      *
-     * Can only be specified when extending a value type class.
+     * Can only be specified when extending a type.
      *
-     * Only value types which have an associated AMD/RequireJS module have an id.
+     * Only types which have an associated AMD/RequireJS module have an id.
+     * However, all types a {@link pentaho.type.Value#uid}.
      *
      * This property is not inherited.
      *
@@ -201,11 +192,10 @@ define([
 
     //region label property
     // @type !nonEmptyString
-    // -> nonEmptyString, "Required", Inherited, Configurable, Localized
+    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
     // null or "" -> undefined conversion
-    // Defaulted from name, when local, or inherited from base label.
 
-    _label: "Value", // TODO: localize
+    _label: null, // set through configure, below
 
     get label() {
       return this._label;
@@ -214,9 +204,15 @@ define([
     set label(value) {
       // null or "" -> undefined conversion
       if(!value) {
-        delete this._label;
+        if(this !== Value.prototype) {
+          delete this._label;
+        }
+        // else ignore... nowhere to inherit from
       } else {
         this._label = value;
+        if(!this.hasOwnProperty("_labelPlural")) {
+          this._labelPlural = value + "s";
+        }
       }
     },
     //endregion
@@ -224,11 +220,11 @@ define([
     //region labelPlural property
 
     // @type !nonEmptyString
-    // -> nonEmptyString, "Required", Inherited, Configurable, Localized
+    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
     // null or "" -> undefined conversion
-    // Defaulted from namePlural or label, when local, or inherited from base labelPlural.
+    // Defaulted from `label`, when set locally, or inherited from base `labelPlural`.
 
-    _labelPlural: "Values", // TODO: localize
+    _labelPlural: null, // set through configure, below
 
     get labelPlural() {
       return this._labelPlural;
@@ -236,10 +232,9 @@ define([
 
     set labelPlural(value) {
       if(!value) {
-        if(this.hasOwnProperty("_label"))
-          this._labelPlural = this._label + "s";
-        else
+        if(this !== Value.prototype) {
           delete this._labelPlural;
+        }
       } else {
         this._labelPlural = value;
       }
@@ -251,7 +246,7 @@ define([
     // -> nonEmptyString, Optional, Inherited, Configurable, Localized
     // "" -> null conversion
 
-    _description: "The most abstract type of value.", // TODO: localize
+    _description: null, // set through configure, below
 
     get description() {
       return this._description;
@@ -306,43 +301,60 @@ define([
     },
     //endregion
 
-    //region defaultValue
+    //region styleClass property
+    // @type nonEmptyString
+    // -> nonEmptyString, Optional(null), Configurable, Localized
+    // "" or undefined -> null conversion
+
+    _styleClass: null,
+
+    get styleClass() {
+      return this._styleClass;
+    },
+
+    set styleClass(value) {
+      // undefined or "" -> null conversion
+      this._styleClass = value || null;
+    },
+    //endregion
+
+    //region value
 
     // -> Optional, Inherited, Configurable
-    _defaultValue: null,
+    _value: null,
 
     /**
      * Gets or sets the default value of the type.
      *
      * Can be specified when defining a type class
-     * through {@link pentaho.type.spec.ITypeExtend#defaultValue}.
+     * through {@link pentaho.type.spec.ITypeExtend#value}.
      *
      * A type instance can be configured through
-     * {@link pentaho.type.spec.ITypeConfig#defaultValue}.
+     * {@link pentaho.type.spec.ITypeConfig#value}.
      *
      * Set to `null` to force the value to be `null`
      * and break inheritance.
      *
      * Set to `undefined` to reset the value to its default.
      *
-     * The default `defaultValue` is that inherited from the base value type.
+     * The default `value` is that inherited from the base value type.
      * That of the root value type is `null`.
      *
-     * @type ?pentaho.data.Value
+     * @type ?pentaho.type.Value
      */
-    get defaultValue() {
-      return this._defaultValue;
+    get value() {
+      return this._value;
     },
 
-    set defaultValue(value) {
+    set value(value) {
       if(value === undefined) {
         // Prevent setting to undefined at the root type
-        if(Object.getPrototypeOf(this)._defaultValue !== undefined)
-          delete this._defaultValue;
+        if(this !== Value.prototype)
+          delete this._value;
         else
-          this._defaultValue = null;
+          this._value = null;
       } else {
-        this.defaultValue = value;
+        this.value = value;
       }
     },
     //endregion
@@ -361,7 +373,7 @@ define([
     set format(value) {
       if(value === undefined) {
         // Reset
-        if(Object.getPrototypeOf(this)._format)
+        if(this !== Value.prototype)
           delete this._format;
         else
           this._format = {};
@@ -398,7 +410,7 @@ define([
           this._domain = null;
       } else {
         if(baseDomain && !isSubsetOf(value, baseDomain))
-          throw error.argInvalid("domain", "Must be a subset of the base domain.");
+          throw error.argInvalid("domain", bundle.structured.errors.type.domainIsNotSubsetOfBase);
 
         this._domain = value;
       }
@@ -407,25 +419,38 @@ define([
 
     //region IConfigurable implementation
     /**
-     * Configures a type instance.
+     * Configures a type _class_.
      *
-     * @param {!pentaho.type.spec.ITypeConfig} config A type instance configuration.
+     * This method _must not_ be called directly on type instances.
+     * It is expected to be called on the `prototype` of
+     * the constructor function, to configure the class.
+     *
+     * @param {!pentaho.type.spec.ITypeConfig} config A type class configuration.
+     * @protected
+     * @virtual
+     * @see pentaho.type.Value.configure
      */
-    configure: function(config) {
+    _configure: function(config) {
       this._configureLocal(config);
     },
 
     /**
-     * Configures the local part of the type medatata instance.
+     * Configures the local part of a type class.
+     *
+     * This method _must not_ be called directly on type instances.
+     * It is expected to be called on the `prototype` of
+     * the constructor function, to configure the class.
      *
      * Complex types have a "non-local part", constituted by their properties.
-     * This method exposes local configuration alone.
+     * This method exposes only "local" configurations.
      *
      * This method can be overridden by sub-classes to handle
      * additional local configurations.
      *
      * @param {!pentaho.type.spec.ITypeConfig} config A type instance configuration.
+     * @protected
      * @virtual
+     * @see pentaho.type.Value.configure
      */
     _configureLocal: function(config) {
       if(!config) throw error.argRequired("config");
@@ -484,8 +509,8 @@ define([
     // Should call the base method first.
     // TODO: Only undefined and arrays are not possible values?
     validateNonEmpty: function(value) {
-      return value === undefined    ? [new Error("Values cannot be 'undefined'.")] :
-             value instanceof Array ? [new Error("Single values cannot be arrays.")] :
+      return value === undefined    ? [new Error(bundle.structured.errors.value.isUndefined)] :
+             value instanceof Array ? [new Error(bundle.structured.errors.value.singleValueIsArray)] :
              null;
     },
 
@@ -502,7 +527,7 @@ define([
     }
   }, /** @lends pentaho.type.Value */{
 
-    // Override documentation only.
+    // Overrides documentation only.
     /**
      * Creates a subclass of this value type class.
      *
@@ -519,30 +544,49 @@ define([
     _extend: function(name, instSpec) {
       if(!instSpec) instSpec = {};
 
-      var id = consumeProp(instSpec, "id"),
-          labelSingular = consumeProp(instSpec, "label"),
-          labelPlural = consumeProp(instSpec, "labelPlural");
-
-      if(!labelSingular) labelPlural = undefined;
-
-      // -----
+      var id = consumeProp(instSpec, "id");
 
       var Derived = this.base.apply(this, arguments);
 
       // -----
-      // Shared (only settable when extending), Immutable, Non-inheritable
-      Derived.prototype._id = id || null;
-      Derived.prototype._uid = _nextUid++;
+      // Shared, Immutable, Non-inheritable
+      var derived = Derived.prototype;
+      derived._id  = id || null;
+      derived._uid = _nextUid++;
 
-      // These have setters, as they're instance-configurable.
-      // Because the set order is relevant :-( ,
-      //  the set cannot be done through `this.base.apply`, above.
-      // Also, must set these, even if to `undefined`, so that defaults are determined.
-      Derived.prototype.label = labelSingular;
-      Derived.prototype.labelPlural = labelPlural;
+      // Block inheritance
+      if(!("styleClass" in instSpec)) derived._styleClass = null;
 
       return Derived;
     },
+
+    //region the property
+    _the: null,
+
+    /**
+     * Gets the single type instance.
+     * @type pentaho.type.Value
+     */
+    get the() {
+      return this._the || (this._the = new this());
+    },
+    //endregion
+
+    //region IConfigurable _class_ implementation
+    /**
+     * Configures a type _class_.
+     *
+     * @param {!pentaho.type.spec.ITypeConfig} config A type class configuration.
+     * @return {Class.<pentaho.type.Value>} The class.
+     *
+     * @see pentaho.type.Value#_configure
+     * @see pentaho.type.Value#_configureLocal
+     */
+    configure: function(config) {
+      this.prototype._configure(config);
+      return this;
+    },
+    //endregion
 
     resolveAsync: function(typeSpec) {
       return resolve(typeSpec, true);
@@ -552,45 +596,21 @@ define([
       return resolve(typeSpec, false);
     }
   })
-  .implement(AnnotatableLinked);
+  .implement(AnnotatableLinked)
+  .configure(bundle.structured.value);
 
   return Value;
 
-  function consumeProp(o, p) {
-    var v;
-    if(o && (p in o)) {
-      v = o[p];
-      delete o[p];
-    }
-    return v;
-  }
-
-  function isSubsetOf(sub, sup, key) {
-    if(!key) key = fun.identity;
-
-    var L1 = sup.length, L2 = sub.length, i, supIndex;
-    if(L2 > L1) return false;
-
-    supIndex = {};
-    i = L1;
-    while(i--) supIndex[key(sup[i])] = 1;
-
-    i = L2;
-    while(i--) if(!O.hasOwn(supIndex, key(sub[i]))) return false;
-
-    return true;
-  }
-
   function resolve(typeSpec, async) {
     // Default property type is "string".
-    if(!typeSpec) typeSpec = "string";
+    if(!typeSpec) typeSpec = defaultTypeMid;
 
     switch(typeof typeSpec) {
       case "string":
         // It's considered an AMD id only if it has at least one "/".
         // Otherwise, append pentaho's base amd id.
         if(typeSpec.indexOf("/") < 0) {
-          typeSpec = "pentaho/type/" + typeSpec;
+          typeSpec = baseMid + typeSpec;
         }
 
         // This fails if a module with the id in the `typeSpec` var
@@ -598,11 +618,11 @@ define([
         return async ? promise.require([typeSpec]) : require(typeSpec);
 
       case "function":
-        // Already a Type class?
+        // Is it a ValueType class?
         if(!(typeSpec.prototype instanceof Value)) {
           throw error.argInvalid(
             "typeSpec",
-            "The type specification is a function that is not a class derived from 'Value'.");
+            bundle.structured.errors.typeSpec.isInvalidFun);
         }
 
         return async ? Promise.resolve(typeSpec) : typeSpec;
@@ -612,7 +632,7 @@ define([
         // Inline type spec: {[base: "complex", ] ... }
         if(typeSpec instanceof Array) typeSpec = {props: typeSpec};
 
-        var baseTypeSpec = typeSpec.base || "complex",
+        var baseTypeSpec = typeSpec.base || defaultBaseTypeMid,
             resolveSync = function() {
               resolve(baseTypeSpec, false).extend(typeSpec);
             };
@@ -663,5 +683,30 @@ define([
         });
         return;
     }
+  }
+
+  function consumeProp(o, p) {
+    var v;
+    if(o && (p in o)) {
+      v = o[p];
+      delete o[p];
+    }
+    return v;
+  }
+
+  function isSubsetOf(sub, sup, key) {
+    if(!key) key = fun.identity;
+
+    var L1 = sup.length, L2 = sub.length, i, supIndex;
+    if(L2 > L1) return false;
+
+    supIndex = {};
+    i = L1;
+    while(i--) supIndex[key(sup[i])] = 1;
+
+    i = L2;
+    while(i--) if(!O.hasOwn(supIndex, key(sub[i]))) return false;
+
+    return true;
   }
 });

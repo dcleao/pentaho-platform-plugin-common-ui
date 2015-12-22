@@ -38,7 +38,7 @@
         },
         //"string", // _default_ property type
         get required() {
-          return this.owner.properties.get();
+          return this.get();
         }
         //"category": "General"
       },
