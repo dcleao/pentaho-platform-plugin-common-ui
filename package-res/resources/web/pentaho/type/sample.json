@@ -90,7 +90,12 @@
     // Easy for our own model objects, but for other instances....
     "_": {
       "list": true,
-      "type": "my/concepts/family"
+      "type": {
+        //"base": "complex"
+        props: [
+
+        ]
+      }
     },
 
     "d": [
@@ -120,7 +125,7 @@
 
     "d": [
       ["Car", [
-        ["BMW i8", 120456.23],
+        ["BMW i8",  120456.23],
         ["Audi A3", 2456]
       ]],
       ["Plain", [

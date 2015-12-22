@@ -35,6 +35,7 @@ define([
         }
       ]
     })
-    .configure(bundle.structured);
+    .configure(bundle.structured)
+    .instance;
 
 });

@@ -123,6 +123,7 @@ define([
   var Value = Base.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
     constructor: function() {
+      // NOTE: block default Base.js copy arg to this
     },
 
     // Implementation note:

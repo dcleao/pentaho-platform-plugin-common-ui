@@ -1,5 +1,10 @@
 {
   "main": "Type",
+  "config": {
+    "pentaho/service": {
+      ".": "pentaho/type"
+    }
+  }
   "themes": {
     "default": "./themes/crystal",
     "crystal": "./themes/crystal"

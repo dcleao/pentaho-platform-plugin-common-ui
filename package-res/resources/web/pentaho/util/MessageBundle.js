@@ -80,6 +80,7 @@ define([
     return MessageBundle.format(text, scope);
   };
 
+
   /**
    * Formats a string by
    * replacing the property tags it contains by
