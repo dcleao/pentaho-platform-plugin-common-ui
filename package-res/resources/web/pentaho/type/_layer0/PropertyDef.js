@@ -324,24 +324,21 @@ define([
     _label: null,
 
     get label() {
-      return this._label;
+      var value = this._label;
+      if(value == null) {
+        if(this.hasOwnProperty("_type")) {
+          value = (this._list && this.type.labelPlural) || this.type.label;
+        } else {
+          // Never the root, cause root always has a local _type.
+          // assert this.root !== this
+          value = this.ancestor.label;
+        }
+      }
+      return value;
     },
 
     set label(value) {
-      // null or "" -> undefined conversion
-      if(value == null || value === "") {
-        // reset
-        if(this.hasOwnProperty("_type")) {
-          this._label = (this._list && this.type.labelPlural) || this.type.label;
-        } else {
-          // Never the root cause root always has a local _type.
-          // assert this.root !== this
-          delete this._label;
-          // assert !!this._label
-        }
-      } else {
-        this._label = String(value);
-      }
+      this._label = nonEmptyString(value);
     },
     //endregion
 

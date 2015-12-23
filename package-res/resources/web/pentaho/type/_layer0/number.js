@@ -16,31 +16,46 @@
 define([
   "./simple",
   "../../i18n!types"
-], function(Simple, bundle) {
+], function(simpleFactory, bundle) {
 
   "use strict";
 
   /**
-   * @name pentaho.type.Number
-   * @class
-   * @abstract
-   * @extends pentaho.type.Simple
+   * Creates the `NumberType` class for the given context.
    *
-   * @classdesc The base class of numeric types.
+   * ### AMD
    *
-   * @description Creates a numeric type instance, for a given configuration.
-   * @param {pentaho.type.spec.ISimpleConfig} [config] A simple type configuration.
+   * Module Id: `pentaho/type/number`
+   *
+   * @alias numberFactory
+   * @memberOf pentaho.type
+   * @type pentaho.type.TypeFactory
+   * @amd pentaho/type/number
+   * @return {Class.<pentaho.type.NumberType>} The `NumberType` class of the given context.
    */
-  return Simple.extend("pentaho.type.Number", /** @lends pentaho.type.Number# */{
-    id: "pentaho/type/number",
+  return function(context) {
 
-    styleClass: "pentaho-type-number",
+    var SimpleType = context.get(simpleFactory);
 
-    validateNonEmpty: function(value) {
-      return this.base(value) ||
-        (typeof value !== "number"
-          ? [new Error("Value is not of type 'number'.")]
-          : null);
-    }
-  }).configure(bundle.structured["number"]);
+    /**
+     * @name pentaho.type.NumberType
+     * @class
+     * @extends pentaho.type.SimpleType
+     *
+     * @classDesc The base class of numeric types.
+     * @description Creates a numeric type instance.
+     */
+    return SimpleType.extend("pentaho.type.NumberType", /** @lends pentaho.type.NumberType# */{
+      id: "pentaho/type/number",
+
+      styleClass: "pentaho-type-number",
+
+      validateNonEmpty: function(value) {
+        return this.base(value) ||
+          (typeof value !== "number"
+            ? [new Error("Value is not of type 'number'.")]
+            : null);
+      }
+    }).implement(bundle.structured["number"]);
+  };
 });

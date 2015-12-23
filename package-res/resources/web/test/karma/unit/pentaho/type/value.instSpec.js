@@ -20,7 +20,7 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/value -", function() {
+  xdescribe("pentaho/type/value -", function() {
     // Although Value is abstract, we want to test the part that it implements.
     // So whenever needed, a class is derived from it.
 

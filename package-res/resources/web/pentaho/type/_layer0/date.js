@@ -16,31 +16,46 @@
 define([
   "./simple",
   "../../i18n!types"
-], function(Simple, bundle) {
+], function(simpleFactory, bundle) {
 
   "use strict";
 
   /**
-   * @name pentaho.type.Date
-   * @class
-   * @abstract
-   * @extends pentaho.type.Simple
+   * Creates the `DateType` class for the given context.
    *
-   * @classdesc The class of the date type.
+   * ### AMD
    *
-   * @description Creates a date type instance, for a given configuration.
-   * @param {pentaho.type.spec.ISimpleConfig} [config] A simple type configuration.
+   * Module Id: `pentaho/type/date`
+   *
+   * @alias dateFactory
+   * @memberOf pentaho.type
+   * @type pentaho.type.TypeFactory
+   * @amd pentaho/type/date
+   * @return {Class.<pentaho.type.DateType>} The `DateType` class of the given context.
    */
-  return Simple.extend("pentaho.type.Date", /** @lends pentaho.type.Date# */{
-    id: "pentaho/type/date",
+  return function(context) {
 
-    styleClass: "pentaho-type-date",
+    var SimpleType = context.get(simpleFactory);
 
-    validateNonEmpty: function(value) {
-      return this.base(value) ||
-        ((value instanceof Date)
-          ? null
-          : [new Error("Value is not of type 'date'.")]);
-    }
-  }).configure(bundle.structured["date"]);
+    /**
+     * @name pentaho.type.DateType
+     * @class
+     * @extends pentaho.type.SimpleType
+     *
+     * @classDesc The class of the date type.
+     * @description Creates a date type instance.
+     */
+    return SimpleType.extend("pentaho.type.DateType", /** @lends pentaho.type.DateType# */{
+      id: "pentaho/type/date",
+
+      styleClass: "pentaho-type-date",
+
+      validateNonEmpty: function(value) {
+        return this.base(value) ||
+          ((value instanceof Date)
+            ? null
+            : [new Error("Value is not of type 'date'.")]);
+      }
+    }).implement(bundle.structured["date"]);
+  };
 });

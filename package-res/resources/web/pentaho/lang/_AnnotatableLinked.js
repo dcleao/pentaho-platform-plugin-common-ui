@@ -61,6 +61,7 @@ define([
     }
   }, {
     configure: function(inst, config) {
+      // TODO: what if inst already has _annots????
       var ps = config.p;
       if(ps) inst._annots = inst._createAnnots(ps);
     },

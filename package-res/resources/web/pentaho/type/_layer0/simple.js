@@ -16,32 +16,55 @@
 define([
   "./value",
   "../../i18n!types"
-], function(ValueType, bundle) {
+], function(valueFactory, bundle) {
 
   "use strict";
 
   /**
-   * @name pentaho.type.Simple
-   * @class
-   * @abstract
-   * @extends pentaho.type.Value
+   * Creates the `SimpleType` class for the given context.
    *
-   * @classDesc The base abstract class of un-structured, indivisible types.
+   * ### AMD
    *
-   * Simple type example:
-   * ```javascript
-   * define(["pentaho/type/simple"], function(SimpleType) {
-   *   return SimpleType.extend({
+   * Module Id: `pentaho/type/simple`
    *
-   *   });
-   * });
-   * ```
-   *
-   * @description Creates a simple type instance, given a configuration.
-   * @param {pentaho.type.spec.ISimpleConfig} [config] A simple type configuration.
+   * @alias simpleFactory
+   * @memberOf pentaho.type
+   * @type pentaho.type.TypeFactory
+   * @amd pentaho/type/simple
+   * @return {Class.<pentaho.type.SimpleType>} The `SimpleType` class of the given context.
    */
-  return ValueType.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
-    id: "pentaho/type/simple",
-    styleClass: "pentaho-type-simple",
-  }).configure(bundle.structured.simple);
+  return function(context) {
+
+    var ValueType = context.get(valueFactory);
+
+    /**
+     * @name pentaho.type.SimpleType
+     * @class
+     * @extends pentaho.type.Value
+     *
+     * @classDesc The base abstract class of un-structured, indivisible types.
+     *
+     * Simple type example:
+     * ```javascript
+     * define(["pentaho/type/simple"], function(simpleFactory) {
+     *
+     *   return function(context) {
+     *
+     *     var SimpleType = context.get(simpleFactory);
+     *
+     *     return SimpleType.extend({
+     *
+     *     });
+     *   };
+     * });
+     * ```
+     *
+     * @description Creates a simple type instance.
+     */
+    return ValueType.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
+      id: "pentaho/type/simple",
+      "abstract": true,
+      styleClass: "pentaho-type-simple"
+    }).implement(bundle.structured.simple);
+  };
 });

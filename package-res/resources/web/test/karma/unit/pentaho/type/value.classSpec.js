@@ -14,38 +14,43 @@
  * limitations under the License.
  */
 define([
+  "pentaho/type/Context",
   "pentaho/type/value"
-], function(Value) {
+], function(Context, valueFactory) {
+
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
+  var context = new Context(),
+      ValueType = context.get(valueFactory);
+
   describe("pentaho/type/value -", function() {
     it("is a function", function() {
-      expect(typeof Value).toBe("function");
+      expect(typeof ValueType).toBe("function");
     });
 
     it("should have an `uid`", function() {
-      expect(Value.prototype.uid != null).toBe(true);
-      expect(typeof Value.prototype.uid).toBe("number");
+      expect(ValueType.prototype.uid != null).toBe(true);
+      expect(typeof ValueType.prototype.uid).toBe("number");
     });
 
     describe(".extend({...}) -", function() {
       it("should return a function", function() {
-        var Derived = Value.extend({
+        var Derived = ValueType.extend({
           label: "Derived"
         });
 
         expect(typeof Derived).toBe("function");
       });
 
-      it("should return a sub-class of Value", function() {
-        var Derived = Value.extend({
+      it("should return a sub-class of ValueType", function() {
+        var Derived = ValueType.extend({
           label: "Derived"
         });
 
-        expect(Derived).not.toBe(Value);
-        expect(Derived.prototype instanceof Value).toBe(true);
+        expect(Derived).not.toBe(ValueType);
+        expect(Derived.prototype instanceof ValueType).toBe(true);
       });
 
       describe("#label -", function() {
@@ -53,8 +58,8 @@ define([
         describe("when `label` is falsy -", function() {
           it("should inherit `label`", function() {
             function expectIt(derivedSpec) {
-              var Derived = Value.extend(derivedSpec);
-              expect(Derived.prototype.label).toBe(Value.prototype.label);
+              var Derived = ValueType.extend(derivedSpec);
+              expect(Derived.prototype.label).toBe(ValueType.prototype.label);
             }
 
             expectIt({});
@@ -67,7 +72,7 @@ define([
         describe("when `label` is truthy", function() {
           // Can change the label
           it("should respect the `label`", function() {
-            var Derived = Value.extend({label: "Foo"});
+            var Derived = ValueType.extend({label: "Foo"});
             expect(Derived.prototype.label).toBe("Foo");
           });
         });
@@ -78,8 +83,8 @@ define([
           describe("when `label` is locally set", function() {
             it("should default `labelPlural` by appending and 's' to `label`", function() {
               function expectIt(derivedSpec) {
-                var Derived = Value.extend(derivedSpec);
-                expect(Derived.prototype.label).toBe(Value.prototype.label + "s");
+                var Derived = ValueType.extend(derivedSpec);
+                expect(Derived.prototype.label).toBe(ValueType.prototype.label + "s");
               }
 
               expectIt({label: "Foo"});
@@ -91,8 +96,8 @@ define([
 
           describe("when `label` is not locally set", function() {
             it("should inherit `labelPlural`", function() {
-              var Derived = Value.extend({});
-              expect(Derived.prototype.labelPlural).toBe(Value.prototype.labelPlural);
+              var Derived = ValueType.extend({});
+              expect(Derived.prototype.labelPlural).toBe(ValueType.prototype.labelPlural);
             });
           });
         });
@@ -104,7 +109,7 @@ define([
         describe("when `id` is falsy -", function() {
           it("should have `null` as a default `id`", function() {
             function expectIt(spec) {
-              var Derived = Value.extend(spec);
+              var Derived = ValueType.extend(spec);
               expect(Derived.prototype.id).toBe(null);
             }
 
@@ -117,7 +122,7 @@ define([
 
         describe("when `id` is truthy -", function() {
           it("should respect it", function() {
-            var Derived = Value.extend({
+            var Derived = ValueType.extend({
               id: "foo/bar"
             });
 
@@ -132,9 +137,9 @@ define([
         describe("when not specified -", function() {
           it("should inherit the base description", function() {
             function expectIt(spec) {
-              var Derived = Value.extend(spec);
+              var Derived = ValueType.extend(spec);
 
-              expect(Derived.prototype.description).toBe(Value.prototype.description);
+              expect(Derived.prototype.description).toBe(ValueType.prototype.description);
             }
 
             expectIt({});
@@ -145,7 +150,7 @@ define([
         describe("when specified as `null` or an empty string -", function() {
           it("should set the description to `null`", function() {
             function expectIt(spec) {
-              var Derived = Value.extend(spec);
+              var Derived = ValueType.extend(spec);
 
               expect(Derived.prototype.description).toBe(null);
             }
@@ -157,7 +162,7 @@ define([
 
         describe("when specified as a non-empty string -", function() {
           it("should respect it", function() {
-            var Derived = Value.extend({description: "Foo"});
+            var Derived = ValueType.extend({description: "Foo"});
 
             expect(Derived.prototype.description).toBe("Foo");
           });
@@ -170,9 +175,9 @@ define([
         describe("when not specified -", function() {
           it("should inherit the base category", function() {
             function expectIt(spec) {
-              var Derived = Value.extend(spec);
+              var Derived = ValueType.extend(spec);
 
-              expect(Derived.prototype.category).toBe(Value.prototype.category);
+              expect(Derived.prototype.category).toBe(ValueType.prototype.category);
             }
 
             expectIt({});
@@ -183,7 +188,7 @@ define([
         describe("when specified as `null` or an empty string -", function() {
           it("should set the category to `null`", function() {
             function expectIt(spec) {
-              var Derived = Value.extend(spec);
+              var Derived = ValueType.extend(spec);
 
               expect(Derived.prototype.category).toBe(null);
             }
@@ -195,7 +200,7 @@ define([
 
         describe("when specified as a non-empty string", function() {
           it("should respect it", function() {
-            var Derived = Value.extend({category: "Foo"});
+            var Derived = ValueType.extend({category: "Foo"});
 
             expect(Derived.prototype.category).toBe("Foo");
           });
@@ -208,9 +213,9 @@ define([
         describe("when not specified", function() {
           it("should inherit the base helpUrl", function() {
             function expectIt(spec) {
-              var Derived = Value.extend(spec);
+              var Derived = ValueType.extend(spec);
 
-              expect(Derived.prototype.helpUrl).toBe(Value.prototype.helpUrl);
+              expect(Derived.prototype.helpUrl).toBe(ValueType.prototype.helpUrl);
             }
 
             expectIt({});
@@ -221,7 +226,7 @@ define([
         describe("when specified as `null` or an empty string -", function() {
           it("should set the helpUrl to `null`", function() {
             function expectIt(spec) {
-              var Derived = Value.extend(spec);
+              var Derived = ValueType.extend(spec);
 
               expect(Derived.prototype.helpUrl).toBe(null);
             }
@@ -233,7 +238,7 @@ define([
 
         describe("when specified as a non-empty string -", function() {
           it("should respect it", function() {
-            var Derived = Value.extend({helpUrl: "Foo"});
+            var Derived = ValueType.extend({helpUrl: "Foo"});
 
             expect(Derived.prototype.helpUrl).toBe("Foo");
           });
@@ -244,19 +249,19 @@ define([
 
       describe("#uid -", function() {
         it("should not be inherited", function() {
-          var Derived = Value.extend();
-          expect(Derived.prototype.uid).not.toBe(Value.uid);
+          var Derived = ValueType.extend();
+          expect(Derived.prototype.uid).not.toBe(ValueType.uid);
         });
 
         it("should be unique", function() {
-          var DerivedA = Value.extend(),
-              DerivedB = Value.extend();
+          var DerivedA = ValueType.extend(),
+              DerivedB = ValueType.extend();
           expect(DerivedA.prototype.uid).not.toBe(DerivedB.prototype.uid);
-          expect(DerivedA.prototype.uid).not.toBe(Value.prototype.uid);
+          expect(DerivedA.prototype.uid).not.toBe(ValueType.prototype.uid);
         });
       }); // #uid
 
-      // TODO: remaining poperties: defaultValue, format, domain, annotations...
+      // TODO: remaining poperties: value, format, domain, annotations...
       // TODO: methods resolve, resolveAsync
 
     }); // .extend({...})
