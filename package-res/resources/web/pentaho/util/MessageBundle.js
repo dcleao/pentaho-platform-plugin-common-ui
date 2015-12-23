@@ -38,6 +38,7 @@ define([
      * @readonly
      */
     this.source = (source && typeof source === "object") ? source : {};
+    this._structured = null;
   }
 
   /**
@@ -80,6 +81,21 @@ define([
     return MessageBundle.format(text, scope);
   };
 
+  /**
+   * Object representation of the message bundle.
+   *
+   * @type Object
+   * @readonly
+   */
+  Object.defineProperty(MessageBundle.prototype, "structured", {
+    get: function() {
+      if(!this._structured) {
+        this._structured = propertiesToObject(this.source);
+      }
+
+      return this._structured;
+    }
+  });
 
   /**
    * Formats a string by
@@ -119,4 +135,29 @@ define([
   };
 
   return MessageBundle;
+
+  function propertiesToObject(source) {
+    var output = {};
+    O.eachOwn(source, buildPath, output);
+    return output;
+  }
+
+  function buildPath(value, key) {
+    var path = key.split('.');
+    var obj = this;
+
+    for (var i = 0, ic = path.length; i != ic; ++i) {
+      var p = path[i];
+
+      if(i < ic-1) {
+        if(!O.hasOwn(obj, p)) {
+          obj[p] = {};
+        }
+
+        obj = obj[p];
+      } else {
+        obj[p] = value;
+      }
+    }
+  }
 });

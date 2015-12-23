@@ -588,7 +588,7 @@ define([
 
         var baseTypeSpec = typeSpec.base || defaultBaseTypeMid,
             resolveSync = function() {
-              resolve(baseTypeSpec, false).extend(typeSpec);
+              return resolve(baseTypeSpec, false).extend(typeSpec);
             };
 
         if(!async) return resolveSync();
