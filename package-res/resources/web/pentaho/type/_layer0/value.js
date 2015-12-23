@@ -20,13 +20,10 @@ define([
    "../../util/error",
    "../../util/fun",
    "../../util/object",
-   "../../util/promise",
-   "../../util/text"
-], function(bundle, Base, AnnotatableLinked, error, fun, O, promise, text) {
+   "../../util/promise"
+], function(bundle, Base, AnnotatableLinked, error, fun, O, promise) {
 
   "use strict";
-
-  /*global Promise:true*/
 
   var baseMid = "pentaho/type/";
 
@@ -61,9 +58,8 @@ define([
    * @name pentaho.type.Value
    * @class
    * @abstract
-   * @implements pentaho.lang.IAnnotatable
    *
-   * @classdesc
+   * @classDesc
    *
    * The static class interface implements {@link pentaho.lang.IConfigurable}.
    *
@@ -204,7 +200,7 @@ define([
 
     set label(value) {
       // null or "" -> undefined conversion
-      if(!value) {
+      if(value == null || value === "") {
         if(this !== Value.prototype) {
           delete this._label;
         }
@@ -319,47 +315,6 @@ define([
     },
     //endregion
 
-    //region value
-
-    // -> Optional, Inherited, Configurable
-    _value: null,
-
-    /**
-     * Gets or sets the default value of the type.
-     *
-     * Can be specified when defining a type class
-     * through {@link pentaho.type.spec.ITypeExtend#value}.
-     *
-     * A type instance can be configured through
-     * {@link pentaho.type.spec.ITypeConfig#value}.
-     *
-     * Set to `null` to force the value to be `null`
-     * and break inheritance.
-     *
-     * Set to `undefined` to reset the value to its default.
-     *
-     * The default `value` is that inherited from the base value type.
-     * That of the root value type is `null`.
-     *
-     * @type ?pentaho.type.Value
-     */
-    get value() {
-      return this._value;
-    },
-
-    set value(value) {
-      if(value === undefined) {
-        // Prevent setting to undefined at the root type
-        if(this !== Value.prototype)
-          delete this._value;
-        else
-          this._value = null;
-      } else {
-        this.value = value;
-      }
-    },
-    //endregion
-
     //region format
 
     // TODO: recursively inherit? clone? merge on set?
@@ -428,7 +383,6 @@ define([
      *
      * @param {!pentaho.type.spec.ITypeConfig} config A type class configuration.
      * @protected
-     * @virtual
      * @see pentaho.type.Value.configure
      */
     _configure: function(config) {
@@ -450,7 +404,6 @@ define([
      *
      * @param {!pentaho.type.spec.ITypeConfig} config A type instance configuration.
      * @protected
-     * @virtual
      * @see pentaho.type.Value.configure
      */
     _configureLocal: function(config) {
@@ -535,7 +488,7 @@ define([
      * @name pentaho.type.Value.extend
      *
      * @param {string} [name] The name of the value type sub-class.
-     * @param {pentaho.type.spec.ITypeExtend} instSpec The value type extend specification.
+     * @param {pentaho.type.spec.IType} instSpec The value type extend specification.
      * @param {Object} [classSpec] Class-level members of the value type class.
      *
      * @return {Class.<pentaho.type.Value>} The created value type sub-class.
@@ -562,14 +515,13 @@ define([
     },
 
     //region the property
-    _the: null,
-
     /**
      * Gets the single type instance.
      * @type pentaho.type.Value
      */
     get the() {
-      return this._the || (this._the = new this());
+      //noinspection JSValidateTypes
+      return this.prototype;
     },
     //endregion
 
@@ -585,6 +537,7 @@ define([
      */
     configure: function(config) {
       this.prototype._configure(config);
+      //noinspection JSValidateTypes
       return this;
     },
     //endregion

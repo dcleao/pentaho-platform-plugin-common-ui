@@ -28,7 +28,7 @@ define([
    * @class
    * @extends pentaho.lang.Collection
    *
-   * @classdesc A collection of properties.
+   * @classDesc A collection of properties.
    *
    * @description Initializes a property collection.
    * This constructor is used internally by the type package and should not be used directly.
@@ -40,21 +40,21 @@ define([
     /**
      * Initializes a property collection.
      *
-     * @param {Class.<pentaho.type.Complex>} declaringType The complex type class that declares non-inherited properties.
+     * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares non-inherited properties.
      * @ignore
      */
-    constructor: function(declaringType) {
-      if(!declaringType) throw error.argRequired("declaringType");
+    constructor: function(declaringTypeCtor) {
+      if(!declaringTypeCtor) throw error.argRequired("declaringTypeCtor");
 
       /**
        * The complex type class that _owns_ this collection.
        * @type Class.<pentaho.type.Complex>
        * @ignore
        */
-      this._declaringType = declaringType;
+      this._declaringTypeCtor = declaringTypeCtor;
 
       // Copy owner's ancestor's properties.
-      var ownerBase = this._declaringType.ancestor,
+      var ownerBase = this._declaringTypeCtor.ancestor,
           colBase = ownerBase && ownerBase.properties;
 
       if(colBase) {
@@ -89,7 +89,7 @@ define([
         // An object spec? Otherwise it's a noop - nothing to configure or override.
         // Configure existing local property or override inherited one.
         if(spec !== name) {
-          if(existing.declaringType === this._declaringType)
+          if(existing.declaringType === this._declaringTypeCtor.the)
             existing.configure(spec);
           else
             this.replace(spec, this.indexOf(existing));
@@ -102,14 +102,14 @@ define([
       return this.base.apply(this, arguments);
     },
 
-    _replacing: function(spec, index, existing, ka) {
+    _replacing: function(spec, index, existing) {
       if(!spec) throw error.argRequired("props[i]");
 
       var name = getSpecName(spec);
       if(name !== existing.name)
         throw error.argInvalid("props[i]", "Incorrect property name.");
 
-      if(existing.declaringType === this._declaringType) {
+      if(existing.declaringType === this._declaringTypeCtor.the) {
         // Configure existing local property and cancel replace.
         // If spec is not an object, then it's a noop.
         if(spec !== name) existing.configure(spec);
@@ -117,12 +117,12 @@ define([
       }
 
       // Replace with overridden property.
-      return existing.extend(spec, this._declaringType);
+      return existing.extend(spec, this._declaringTypeCtor);
     },
 
-    _cast: function(spec) {
+    _cast: function(spec, index) {
       // For new, root, local properties.
-      return PropertyDef.to(spec, this._declaringType);
+      return PropertyDef.to(spec, this._declaringTypeCtor, index);
     }
     //endregion
   });

@@ -20,6 +20,9 @@ requireCfg.paths["dijit"] = "/base/dev-res/dojo/dojo-release-1.9.2-src/dijit";
 requireCfg.paths["pentaho/visual/type/registryMock"] =
     "/base/package-res/resources/web/test/karma/unit/visual/type/registryMock";
 
+requireCfg.paths["pentaho/i18n"] =
+    "/base/package-res/resources/web/test/karma/unit/pentaho/i18nMock";
+
 // Reset "service" module configuration.
 requireCfg.config.service = {};
 

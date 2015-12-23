@@ -13,31 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./value",
-  "./simple",
-  "./complex",
-  "./PropertyDef",
-  "./string",
-  "./number",
-  "./boolean",
-  "./date"
-], function(Value, Simple, Complex, PropertyDef, String, Number, Boolean, Date) {
 
-  "use strict";
-  
-  // The layer0 module defines:
-  // * all classes at a basic level
-  // * all standard simple types (from which complex properties build complex types...)
-  return {
-    // types
-    "value":    Value,
-    "simple":   Simple,
-    "string":   String,
-    "number":   Number,
-    "boolean":  Boolean,
-    "date":     Date,
-    "complex":  Complex,
-    "PropertyDef": PropertyDef
-  };
-});
+/**
+ * The `spec.IType` interface represents the information used to
+ * define a type.
+ *
+ * @name pentaho.type.spec.IType
+ *
+ * @interface
+ *
+ * @property {string} [id] The id of the corresponding AMD module, if any.
+ */

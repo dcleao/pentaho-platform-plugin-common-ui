@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/value",
-  "pentaho/util/error"
-], function(Value, error) {
+  "pentaho/type/value"
+], function(Value) {
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
@@ -74,66 +73,13 @@ define([
         });
       }); // #label
 
-      // =====
-
-      describe("#label and #labelPlural -", function() {
-        // labelPlural is ignored when label is not specified
-        describe("when `label` is falsy -", function() {
-          describe("when `labelPlural` falsy -", function() {
-            it("should inherit both `label` and `labelPlural`", function() {
+      describe("#labelPlural -", function() {
+        describe("when `labelPlural` falsy -", function() {
+          describe("when `label` is locally set", function() {
+            it("should default `labelPlural` by appending and 's' to `label`", function() {
               function expectIt(derivedSpec) {
                 var Derived = Value.extend(derivedSpec);
-                expect(Derived.prototype.label).toBe(Value.prototype.label);
-                expect(Derived.prototype.labelPlural).toBe(Value.prototype.labelPlural);
-              }
-
-              expectIt({});
-              expectIt({labelPlural: undefined});
-              expectIt({labelPlural: null});
-              expectIt({labelPlural: ""});
-
-              expectIt({label: undefined});
-              expectIt({label: null});
-              expectIt({label: ""});
-
-              expectIt({label: undefined, labelPlural: undefined});
-              expectIt({label: undefined, labelPlural: null});
-              expectIt({label: undefined, labelPlural: ""});
-
-              expectIt({label: null, labelPlural: undefined});
-              expectIt({label: null, labelPlural: null});
-              expectIt({label: null, labelPlural: ""});
-
-              expectIt({label: "", labelPlural: undefined});
-              expectIt({label: "", labelPlural: null});
-              expectIt({label: "", labelPlural: ""});
-            });
-          });
-
-          describe("when `labelPlural` is truthy -", function() {
-            it("it is ignored and inherited", function() {
-              function expectIt(derivedSpec) {
-                var Derived = Value.extend(derivedSpec);
-                expect(Derived.prototype.label).toBe(Value.prototype.label);
-                expect(Derived.prototype.labelPlural).toBe(Value.prototype.labelPlural);
-              }
-              expectIt({labelPlural: "Foos"});
-              expectIt({label: undefined, labelPlural: "Foos"});
-              expectIt({label: null, labelPlural: "Foos"});
-              expectIt({label: "", labelPlural: "Foos"});
-            });
-          });
-        }); // when `label` is truthy
-
-        describe("when `label` is truthy -", function() {
-          describe("when `labelPlural` is falsy -", function() {
-
-            it("it is generated from the local `label`", function() {
-              function expectIt(derivedSpec) {
-                var label = derivedSpec.label;
-                var Derived = Value.extend(derivedSpec);
-                expect(Derived.prototype.label).toBe(label);
-                expect(Derived.prototype.labelPlural).toBe(label + "s");
+                expect(Derived.prototype.label).toBe(Value.prototype.label + "s");
               }
 
               expectIt({label: "Foo"});
@@ -143,18 +89,14 @@ define([
             });
           });
 
-          describe("when `labelPlural` is truthy -", function() {
-            it("it is respected", function() {
-              var Derived = Value.extend({
-                label: "Derived",
-                labelPlural: "MyDeriveds"
-              });
-
-              expect(Derived.prototype.labelPlural).toBe("MyDeriveds");
+          describe("when `label` is not locally set", function() {
+            it("should inherit `labelPlural`", function() {
+              var Derived = Value.extend({});
+              expect(Derived.prototype.labelPlural).toBe(Value.prototype.labelPlural);
             });
           });
-        }); // when `label` is falsy
-      }); // #label and #labelPlural
+        });
+      }); // #labelPlural
 
       // =====
 
@@ -208,8 +150,8 @@ define([
               expect(Derived.prototype.description).toBe(null);
             }
 
-            expect({description: null});
-            expect({description: ""});
+            expectIt({description: null});
+            expectIt({description: ""});
           });
         });
 
@@ -246,8 +188,8 @@ define([
               expect(Derived.prototype.category).toBe(null);
             }
 
-            expect({category: null});
-            expect({category: ""});
+            expectIt({category: null});
+            expectIt({category: ""});
           });
         });
 
@@ -284,8 +226,8 @@ define([
               expect(Derived.prototype.helpUrl).toBe(null);
             }
 
-            expect({helpUrl: null});
-            expect({helpUrl: ""});
+            expectIt({helpUrl: null});
+            expectIt({helpUrl: ""});
           });
         });
 

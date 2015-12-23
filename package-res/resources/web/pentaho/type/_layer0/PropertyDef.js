@@ -17,12 +17,8 @@ define([
   "./value",
   "../../lang/_AnnotatableLinked",
   "../../lang/Base",
-  "../../util/error",
-  "../../util/arg",
-  "../../util/text",
-  "../../util/fun",
-  "../../util/object"
-], function(Value, AnnotatableLinked, Base, error, arg, text, fun, O) {
+  "../../util/error"
+], function(Value, AnnotatableLinked, Base, error) {
 
   "use strict";
 
@@ -37,7 +33,7 @@ define([
     };
 
   /**
-   * @name pentaho.type.Property
+   * @name pentaho.type.PropertyDef
    *
    * @class
    * @sealed
@@ -49,9 +45,9 @@ define([
    *
    * Example property:
    * ```javascript
-   * require(["pentaho/type/Property"], function(Property) {
+   * require(["pentaho/type/PropertyDef"], function(PropertyDef) {
    *
-   *   return new Property({ // spec
+   *   return new PropertyDef({ // spec
    *     type: "string",
    *     name: "name",
    *     list: false,
@@ -88,11 +84,11 @@ define([
    * });
    * ```
    * @see pentaho.type.Complex
-   * @description Creates a `Property`.
+   * @description Creates a `PropertyDef`.
    *
    * This constructor is used internally by the type package and should not be used directly.
    */
-  var Property = Base.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
+  var PropertyDef = Base.extend("pentaho.type.PropertyDef", /** @lends pentaho.type.PropertyDef# */{
 
     // TODO: countMin, countMax, required, applicable, readonly, visible, defaultValue, members?, p
 
@@ -104,13 +100,14 @@ define([
      *
      * @param {pentaho.type.spec.UPropertyDef} spec A property name or specification object.
      * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares the property.
+     * @param {number} ordinal The index of the property within its complex type.
      * @ignore
      */
-    constructor: function(spec, declaringTypeCtor) {
+    constructor: function(spec, declaringTypeCtor, ordinal) {
       if(!spec) throw error.argRequired("spec");
       if(!declaringTypeCtor) throw error.argRequired("declaringTypeCtor");
 
-      // A singular string property whith the specified name.
+      // A singular string property with the specified name.
       if(typeof spec === "string") spec = {name: spec};
 
       // Root attributes
@@ -123,6 +120,7 @@ define([
 
       // Others
       this._declaringTypeCtor = declaringTypeCtor;
+      this._ordinal = ordinal;
 
       // Resolve value type synchronously.
       this._typeCtor = Value.resolve(spec.type);
@@ -175,9 +173,6 @@ define([
       return subProp;
     },
 
-    // Call only on the prototype
-    attribute: addAttribute,
-
     //region Private IConfigurable implementation
 
     // Only used by constructor and extend.
@@ -203,7 +198,7 @@ define([
 
     //region IListElement
     /**
-     * Gets the singular name of `Property` list-elements.
+     * Gets the singular name of `PropertyDef` list-elements.
      * @type string
      * @readonly
      * @default "property"
@@ -213,7 +208,7 @@ define([
 
     //region IWithKey implementation
     /**
-     * Gets the singular name of `Property` keys.
+     * Gets the singular name of `PropertyDef` keys.
      * @type string
      * @readonly
      * @default "name"
@@ -244,9 +239,19 @@ define([
     },
 
     /**
+     * The index of the property in the containing complex type.
+     *
+     * @type number
+     * @readonly
+     */
+    get ordinal() {
+      return this._ordinal;
+    },
+
+    /**
      * The root property.
      *
-     * @type !pentaho.type.Property
+     * @type !pentaho.type.PropertyDef
      * @readonly
      */
     get root() {
@@ -256,7 +261,7 @@ define([
     /**
      * The base property, if any.
      *
-     * @type ?pentaho.type.Property
+     * @type ?pentaho.type.PropertyDef
      * @readonly
      */
     get ancestor() {
@@ -266,7 +271,7 @@ define([
     /**
      * The type of the _single_ values that the property can hold.
      *
-     * @type !Class.<pentaho.type.Value>
+     * @type !pentaho.type.Value
      * @readonly
      */
     get type() {
@@ -436,16 +441,40 @@ define([
       } else {
         this._browsable = !!value;
       }
+    },
+    //endregion
+
+    //region advanced property
+    // @type boolean
+    // -> boolean, Optional(false), Inherited, Configurable
+    // null || undefined -> reset
+    _advanced: false,
+
+    get advanced() {
+      return this._advanced;
+    },
+
+    set advanced(value) {
+      if(value == null) {
+        // reset
+        if(this.hasOwnProperty("_type")) {
+          this._advanced = this.type.advanced;
+        } else {
+          delete this._advanced;
+        }
+      } else {
+        this._advanced = !!value;
+      }
     }
     //endregion
 
-  }, /** @lends pentaho.type.Property */{
+  }, /** @lends pentaho.type.PropertyDef */{
     /**
-     * Converts a property specification to a `Property` instance.
+     * Converts a property specification to a `PropertyDef` instance.
      *
-     * @param {pentaho.type.spec.UProperty} spec A property name or specification object.
+     * @param {pentaho.type.spec.UPropertyDef} spec A property name or specification object.
      * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares the property.
-     * @return {pentaho.type.Property} The created `Property` instance.
+     * @return {pentaho.type.PropertyDef} The created `PropertyDef` instance.
      */
     to: function(spec, declaringTypeCtor) {
       return new PropertyDef(spec, declaringTypeCtor);

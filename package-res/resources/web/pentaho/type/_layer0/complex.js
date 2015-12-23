@@ -17,10 +17,8 @@ define([
   "./value",
   "../../i18n!types",
   "./Context",
-  "./PropertyDefCollection",
-  "../../util/error",
-  "../../util/object"
-], function(Value, bundle, Context, PropertyDefCollection, error, O) {
+  "./PropertyDefCollection"
+], function(Value, bundle, Context, PropertyDefCollection) {
 
   "use strict";
 
@@ -110,7 +108,7 @@ define([
 
       // Not using Class.init, cause there would be no way to pass propSpecs to it
       // (unless an alternate instSpec prop was used...)
-      initType(Derived);
+      initType(Derived, propSpecs);
 
       return Derived;
     }

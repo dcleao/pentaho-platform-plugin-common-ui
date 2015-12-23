@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/_layer0/PropertyClass",
+  "pentaho/type/_layer0/PropertyDef",
   "pentaho/type/complex",
   "pentaho/type/string",
   "pentaho/type/boolean",
   "pentaho/type/number",
   "pentaho/util/error"
-], function(PropertyClass, ComplexType, StringType, BooleanType, NumberType, error) {
+], function(PropertyDef, ComplexType, StringType, BooleanType, NumberType, error) {
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/PropertyClass -", function() {
+  xdescribe("pentaho/type/PropertyDef -", function() {
     it("is a function", function() {
-      expect(typeof PropertyClass).toBe("function");
+      expect(typeof PropertyDef).toBe("function");
     });
 
     describe("#new(spec, declaringType) =>", function() {
@@ -45,11 +45,11 @@ define([
         var propClass;
 
         beforeEach(function() {
-          propClass = PropertyClass.to("foo", Derived);
+          propClass = PropertyDef.to("foo", Derived);
         });
 
         it("should build a property class instance", function() {
-          expect(propClass instanceof PropertyClass).toBe(true);
+          expect(propClass instanceof PropertyDef).toBe(true);
         });
 
         it("should have `declaringType` equal to containing Complex class", function() {
@@ -88,11 +88,11 @@ define([
           var propClass;
 
           beforeEach(function() {
-            propClass = PropertyClass.to({name: "foo"}, Derived);
+            propClass = PropertyDef.to({name: "foo"}, Derived);
           });
 
           it("should build a property class instance", function() {
-            expect(propClass instanceof PropertyClass).toBe(true);
+            expect(propClass instanceof PropertyDef).toBe(true);
           });
 
           it("should have `declaringType` equal to containing Complex class", function() {
@@ -110,21 +110,21 @@ define([
 
         describe("`spec.list` - ", function() {
           it("should default to `false`", function() {
-            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo"}, Derived);
             expect(propClass.list).toBe(false);
           });
 
           it("should respect the specified value", function() {
-            var propClass = PropertyClass.to({name: "foo", list: true}, Derived);
+            var propClass = PropertyDef.to({name: "foo", list: true}, Derived);
             expect(propClass.list).toBe(true);
 
-            propClass = PropertyClass.to({name: "foo", list: false}, Derived);
+            propClass = PropertyDef.to({name: "foo", list: false}, Derived);
             expect(propClass.list).toBe(false);
 
-            propClass = PropertyClass.to({name: "foo", list: 0}, Derived);
+            propClass = PropertyDef.to({name: "foo", list: 0}, Derived);
             expect(propClass.list).toBe(false);
 
-            propClass = PropertyClass.to({name: "foo", list: 1}, Derived);
+            propClass = PropertyDef.to({name: "foo", list: 1}, Derived);
             expect(propClass.list).toBe(true);
           });
         }); // spec.list
@@ -134,21 +134,21 @@ define([
           // NOTE: tests of Type.resolve test type resolution more thoroughly.
 
           it("should default to String", function() {
-            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo"}, Derived);
             expect(propClass.type).toBe(StringType);
           });
 
           it("should resolve the specified value", function() {
-            var propClass = PropertyClass.to({name: "foo", type: "string"}, Derived);
+            var propClass = PropertyDef.to({name: "foo", type: "string"}, Derived);
             expect(propClass.type).toBe(StringType);
 
-            propClass = PropertyClass.to({name: "foo", type: "boolean"}, Derived);
+            propClass = PropertyDef.to({name: "foo", type: "boolean"}, Derived);
             expect(propClass.type).toBe(BooleanType);
           });
 
           it("should throw if the specified value is an unloaded module", function() {
             expect(function() {
-              PropertyClass.to({name: "foo", type: "bar/oof"}, Derived);
+              PropertyDef.to({name: "foo", type: "bar/oof"}, Derived);
             }).toThrowError(/bar\/oof/);
           });
         }); // spec.type
@@ -158,7 +158,7 @@ define([
             it("should throw`", function() {
               function expectIt(name) {
                 expect(function() {
-                  PropertyClass.to({
+                  PropertyDef.to({
                       name: name,
                       list: false,
                       type: "string"
@@ -174,7 +174,7 @@ define([
 
           describe("when truthy -", function() {
             it("should respect it", function() {
-              var propClass = PropertyClass.to({
+              var propClass = PropertyDef.to({
                     name: "fooBar",
                     list: true,
                     type: "string"
@@ -187,130 +187,130 @@ define([
 
         describe("`spec.label` - ", function() {
           it("should default to `undefined`", function() {
-            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo"}, Derived);
             expect(propClass.label).toBe(undefined);
           });
 
           it("should convert empty to null", function() {
-            var propClass = PropertyClass.to({name: "foo", label: ""}, Derived);
+            var propClass = PropertyDef.to({name: "foo", label: ""}, Derived);
             expect(propClass.label).toBe(null);
           });
 
           it("should respect null", function() {
-            var propClass = PropertyClass.to({name: "foo", label: null}, Derived);
+            var propClass = PropertyDef.to({name: "foo", label: null}, Derived);
             expect(propClass.label).toBe(null);
           });
 
           it("should respect the specified value", function() {
-            var propClass = PropertyClass.to({name: "foo", label: "MyFoo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo", label: "MyFoo"}, Derived);
             expect(propClass.label).toBe("MyFoo");
           });
         }); // spec.label
 
         describe("`spec.description` - ", function() {
           it("should default to `undefined`", function() {
-            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo"}, Derived);
             expect(propClass.description).toBe(undefined);
 
-            propClass = PropertyClass.to({name: "foo", description: undefined}, Derived);
+            propClass = PropertyDef.to({name: "foo", description: undefined}, Derived);
             expect(propClass.description).toBe(undefined);
           });
 
           it("should convert empty to null", function() {
-            var propClass = PropertyClass.to({name: "foo", description: ""}, Derived);
+            var propClass = PropertyDef.to({name: "foo", description: ""}, Derived);
             expect(propClass.description).toBe(null);
           });
 
           it("should respect null", function() {
-            var propClass = PropertyClass.to({name: "foo", description: null}, Derived);
+            var propClass = PropertyDef.to({name: "foo", description: null}, Derived);
             expect(propClass.description).toBe(null);
           });
 
           it("should respect the specified value", function() {
-            var propClass = PropertyClass.to({name: "foo", description: "MyFoo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo", description: "MyFoo"}, Derived);
             expect(propClass.description).toBe("MyFoo");
           });
         }); // spec.description
 
         describe("`spec.category` - ", function() {
           it("should default to `undefined`", function() {
-            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo"}, Derived);
             expect(propClass.category).toBe(undefined);
 
-            propClass = PropertyClass.to({name: "foo", category: undefined}, Derived);
+            propClass = PropertyDef.to({name: "foo", category: undefined}, Derived);
             expect(propClass.category).toBe(undefined);
           });
 
           it("should convert empty to null", function() {
-            var propClass = PropertyClass.to({name: "foo", category: ""}, Derived);
+            var propClass = PropertyDef.to({name: "foo", category: ""}, Derived);
             expect(propClass.category).toBe(null);
           });
 
           it("should respect null", function() {
-            var propClass = PropertyClass.to({name: "foo", category: null}, Derived);
+            var propClass = PropertyDef.to({name: "foo", category: null}, Derived);
             expect(propClass.category).toBe(null);
           });
 
           it("should respect the specified value", function() {
-            var propClass = PropertyClass.to({name: "foo", category: "MyFoo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo", category: "MyFoo"}, Derived);
             expect(propClass.category).toBe("MyFoo");
           });
         }); // spec.category
 
         describe("`spec.helpUrl` - ", function() {
           it("should default to `undefined`", function() {
-            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo"}, Derived);
             expect(propClass.helpUrl).toBe(undefined);
 
-            propClass = PropertyClass.to({name: "foo", helpUrl: undefined}, Derived);
+            propClass = PropertyDef.to({name: "foo", helpUrl: undefined}, Derived);
             expect(propClass.helpUrl).toBe(undefined);
           });
 
           it("should convert empty to null", function() {
-            var propClass = PropertyClass.to({name: "foo", helpUrl: ""}, Derived);
+            var propClass = PropertyDef.to({name: "foo", helpUrl: ""}, Derived);
             expect(propClass.helpUrl).toBe(null);
           });
 
           it("should respect null", function() {
-            var propClass = PropertyClass.to({name: "foo", helpUrl: null}, Derived);
+            var propClass = PropertyDef.to({name: "foo", helpUrl: null}, Derived);
             expect(propClass.helpUrl).toBe(null);
           });
 
           it("should respect the specified value", function() {
-            var propClass = PropertyClass.to({name: "foo", helpUrl: "MyFoo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo", helpUrl: "MyFoo"}, Derived);
             expect(propClass.helpUrl).toBe("MyFoo");
           });
         }); // spec.helpUrl
 
         describe("`spec.browsable` - ", function() {
           it("should default to `true`", function() {
-            var propClass = PropertyClass.to({name: "foo"}, Derived);
+            var propClass = PropertyDef.to({name: "foo"}, Derived);
             expect(propClass.browsable).toBe(true);
 
-            propClass = PropertyClass.to({name: "foo", browsable: undefined}, Derived);
+            propClass = PropertyDef.to({name: "foo", browsable: undefined}, Derived);
             expect(propClass.browsable).toBe(true);
           });
 
           it("should cast other values to boolean", function() {
-            var propClass = PropertyClass.to({name: "foo", browsable: 1}, Derived);
+            var propClass = PropertyDef.to({name: "foo", browsable: 1}, Derived);
             expect(propClass.browsable).toBe(true);
 
-            propClass = PropertyClass.to({name: "foo", browsable: 0}, Derived);
+            propClass = PropertyDef.to({name: "foo", browsable: 0}, Derived);
             expect(propClass.browsable).toBe(false);
 
-            propClass = PropertyClass.to({name: "foo", browsable: ""}, Derived);
+            propClass = PropertyDef.to({name: "foo", browsable: ""}, Derived);
             expect(propClass.browsable).toBe(false);
 
-            propClass = PropertyClass.to({name: "foo", browsable: null}, Derived);
+            propClass = PropertyDef.to({name: "foo", browsable: null}, Derived);
             expect(propClass.browsable).toBe(false);
 
-            propClass = PropertyClass.to({name: "foo", browsable: true}, Derived);
+            propClass = PropertyDef.to({name: "foo", browsable: true}, Derived);
             expect(propClass.browsable).toBe(true);
 
-            propClass = PropertyClass.to({name: "foo", browsable: "yes"}, Derived);
+            propClass = PropertyDef.to({name: "foo", browsable: "yes"}, Derived);
             expect(propClass.browsable).toBe(true);
 
-            propClass = PropertyClass.to({name: "foo", browsable: "no"}, Derived);
+            propClass = PropertyDef.to({name: "foo", browsable: "no"}, Derived);
             expect(propClass.browsable).toBe(true);
           });
         }); // spec.list
@@ -349,7 +349,7 @@ define([
         });
       });
 
-      // Override PropertyClass tests
+      // Override PropertyDef tests
       describe("when spec is {name: '.'} and the name is equal to that of the base property -", function() {
         describe("the returned property class -", function() {
           var propClass, basePropClass;
@@ -361,8 +361,8 @@ define([
 
           // basic fields
 
-          it("should be an instance of `PropertyClass`", function() {
-            expect(propClass instanceof PropertyClass).toBe(true);
+          it("should be an instance of `PropertyDef`", function() {
+            expect(propClass instanceof PropertyDef).toBe(true);
           });
 
           it("should have the overridden property as `ancestor`", function() {
@@ -423,7 +423,7 @@ define([
           it("should accept it", function() {
             var propClass = basePropClass.extend({name: "baseStr", type: PostalCodeType}, Derived);
 
-            expect(propClass instanceof PropertyClass).toBe(true);
+            expect(propClass instanceof PropertyDef).toBe(true);
             expect(propClass.ancestor).toBe(basePropClass);
             expect(propClass.type).toBe(PostalCodeType);
           });

@@ -15,7 +15,7 @@
  */
 define([
   "./value",
-  "../../i18n!types",
+  "../../i18n!types"
 ], function(ValueType, bundle) {
 
   "use strict";
@@ -26,7 +26,7 @@ define([
    * @abstract
    * @extends pentaho.type.Value
    *
-   * @classdesc The base abstract class of un-structured, indivisible types.
+   * @classDesc The base abstract class of un-structured, indivisible types.
    *
    * Simple type example:
    * ```javascript

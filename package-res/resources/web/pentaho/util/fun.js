@@ -23,7 +23,7 @@ define(function() {
 
     to: function(v) {
       return fun.is(v) ? v : fun.to(v);
-    }
+    },
 
     identity: function(v) {
       return v;

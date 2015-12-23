@@ -17,15 +17,15 @@ define([
   "pentaho/type/complex",
   "pentaho/type/value",
   "pentaho/type/string",
-  "pentaho/type/_layer0/PropertyClass",
-  "pentaho/type/_layer0/PropertyClassCollection",
-  "pentaho/util/error"
-], function(Complex, Value, StringMeta, PropertyClass, PropertyClassCollection, error) {
+  "pentaho/type/_layer0/PropertyDef",
+  "pentaho/type/_layer0/PropertyDefCollection"
+], function(Complex, Value, StringMeta, PropertyDef, PropertyDefCollection) {
+
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  describe("pentaho/type/complex -", function() {
+  xdescribe("pentaho/type/complex -", function() {
     describe("anatomy -", function() {
       it("is a function", function() {
         expect(typeof Complex).toBe("function");
@@ -43,17 +43,17 @@ define([
         expect(Complex.prototype.description).not.toBe(Value.prototype.description);
       });
 
-      describe("the `properties` static property", function() {
+      describe("the `props` static property", function() {
         it("should be defined", function() {
-           expect(Complex.properties).toBeTruthy();
+           expect(Complex.props).toBeTruthy();
         });
 
-        it("should contain an instance of PropertyClassCollection", function() {
-           expect(Complex.properties instanceof PropertyClassCollection).toBe(true);
+        it("should contain an instance of PropertyDefCollection", function() {
+           expect(Complex.props instanceof PropertyDefCollection).toBe(true);
         });
 
         it("should be an empty collection", function() {
-           expect(Complex.properties.length).toBe(0);
+           expect(Complex.props.length).toBe(0);
         });
       });
     }); // anatomy
@@ -91,14 +91,14 @@ define([
             expect(Derived.prototype.props).toBeUndefined();
           });
 
-          it("should have a `properties` collection", function() {
+          it("should have a `props` collection", function() {
             var Derived = Complex.extend({
               name:  "derived",
               label: "Derived"
             });
 
-            expect(Derived.properties != null).toBe(true);
-            expect(Derived.properties instanceof PropertyClassCollection).toBe(true);
+            expect(Derived.props != null).toBe(true);
+            expect(Derived.props instanceof PropertyDefCollection).toBe(true);
 
             Derived = Complex.extend({
               name:  "derived",
@@ -106,17 +106,17 @@ define([
               props: []
             });
 
-            expect(Derived.properties != null).toBe(true);
-            expect(Derived.properties instanceof PropertyClassCollection).toBe(true);
+            expect(Derived.props != null).toBe(true);
+            expect(Derived.props instanceof PropertyDefCollection).toBe(true);
           });
 
-          it("should have an empty properties collection", function() {
+          it("should have an empty props collection", function() {
             var Derived = Complex.extend({
               name:  "derived",
               label: "Derived"
             });
 
-            expect(Derived.properties.length).toBe(0);
+            expect(Derived.props.length).toBe(0);
 
             Derived = Complex.extend({
               name:  "derived",
@@ -124,7 +124,7 @@ define([
               props: []
             });
 
-            expect(Derived.properties.length).toBe(0);
+            expect(Derived.props.length).toBe(0);
           });
         }); // when [#props is] not specified or specified empty
 
@@ -139,15 +139,15 @@ define([
                   props: ["foo"]
                 });
 
-            it("should result in a properties collection with length 1", function() {
-              expect(Derived.properties.length).toBe(1);
+            it("should result in a props collection with length 1", function() {
+              expect(Derived.props.length).toBe(1);
             });
 
             describe("the single property class -", function() {
-              var propClass = Derived.properties[0];
+              var propClass = Derived.props[0];
 
               it("should be a property class instance", function() {
-                expect(propClass instanceof PropertyClass).toBe(true);
+                expect(propClass instanceof PropertyDef).toBe(true);
               });
 
               it("should have `name` equal to the specified string", function() {

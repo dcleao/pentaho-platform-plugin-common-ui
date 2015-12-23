@@ -15,14 +15,14 @@
  */
 
 /**
- * The `spec.UProperty` type definition is the union of the types that can be used to
+ * The `spec.UPropertyDef` type definition is the union of the types that can be used to
  * define a property of a complex type.
  *
  * When the value is a string,
  * it's taken to represent a property
- * whose {@link pentaho.type.spec.IProperty#name} is that string
+ * whose {@link pentaho.type.spec.IPropertyDef#name} is that string
  * and
- * whose {@link pentaho.type.spec.IProperty#type} is {@link pentaho.type.string}.
+ * whose {@link pentaho.type.spec.IPropertyDef#type} is {@link pentaho.type.string}.
  *
- * @typedef {string|pentaho.type.spec.IProperty} pentaho.type.spec.UProperty
+ * @typedef {string|pentaho.type.spec.IPropertyDef} pentaho.type.spec.UPropertyDef
  */

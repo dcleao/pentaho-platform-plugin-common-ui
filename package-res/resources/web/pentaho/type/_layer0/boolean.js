@@ -15,7 +15,7 @@
  */
 define([
   "./simple",
-  "../../i18n!types",
+  "../../i18n!types"
 ], function(Simple, bundle) {
 
   "use strict";
@@ -26,7 +26,7 @@ define([
    * @abstract
    * @extends pentaho.type.Simple
    *
-   * @classdesc The class of the boolean type.
+   * @classDesc The class of the boolean type.
    *
    * @description Creates a boolean type instance, for a given configuration.
    * @param {pentaho.type.spec.ISimpleConfig} [config] A simple type configuration.

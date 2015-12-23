@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/value",
-  "pentaho/util/error"
-], function(Value, error) {
+  "pentaho/type/value"
+], function(Value) {
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
