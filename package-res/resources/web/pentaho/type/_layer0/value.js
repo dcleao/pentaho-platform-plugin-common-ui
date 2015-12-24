@@ -27,33 +27,9 @@ define([
 
   var _baseMid = "pentaho/type/",
 
-      // Default type, in a type specification.
-      _defaultTypeMid = "string",
-
-      // Default `base` type in a type specification.
-      _defaultBaseTypeMid = "complex",
-
       // Unique type class id exposed through Type.prototype.uid and
       // used by Context instances.
-      _nextUid = 1,
-
-      // Standard types which can be assumed to already be loaded.
-      _basicStandardTypes = {};
-
-  ["value", "complex", "simple", "string", "number", "boolean", "date"].forEach(function(name) {
-    _basicStandardTypes[_baseMid + name] = 1;
-  });
-
-  var _configurableProps = {
-      "label": 1,
-      "labelPlural": 1,
-      "description": 1,
-      "category": 1,
-      "helpUrl": 1,
-      "styleClass": 1,
-      "value": 1,
-      "format": 1
-    };
+      _nextUid = 1;
 
   /**
    * Creates the `ValueType` class for the given context.
@@ -93,9 +69,6 @@ define([
      *
      *       // Label of a single element of this type of value.
      *       label: "Name",
-     *
-     *       // Plural label of elements of this type of value.
-     *       labelPlural: "Names",
      *
      *       // Category of the type of value or concept
      *       category: "foo",
@@ -170,13 +143,25 @@ define([
       },
       //endregion
 
+      //region context property
+      _context: null,
+
+      /**
+       * Gets the context that defined this type class.
+       * @type pentaho.type.IContext
+       */
+      get context() {
+        return this._context;
+      },
+      //endregion
+
       //region ancestor property
       /**
        * Gets the ancestor (singleton) type instance, if any, or `null`.
        * @type pentaho.type.ValueType
        */
       get ancestor() {
-        return this !== ValueType.prototype ? this.constructor.ancestor.the : null;
+        return this.constructor !== ValueType ? this.constructor.ancestor.the : null;
       },
       //endregion
 
@@ -221,36 +206,11 @@ define([
           if(this !== ValueType.prototype) {
             delete this._label;
           }
-          // else ignore... nowhere to inherit from
         } else {
           this._label = value;
           if(!this.hasOwnProperty("_labelPlural")) {
-            this._labelPlural = value + "s";
+            this._labelPlural = null;
           }
-        }
-      },
-      //endregion
-
-      //region labelPlural property
-
-      // @type !nonEmptyString
-      // -> nonEmptyString, Optional, Inherited, Configurable, Localized
-      // null or "" -> undefined conversion
-      // Defaulted from `label`, when set locally, or inherited from base `labelPlural`.
-
-      _labelPlural: null, // set through implement bundle, below
-
-      get labelPlural() {
-        return this._labelPlural;
-      },
-
-      set labelPlural(value) {
-        if(!value) {
-          if(this !== ValueType.prototype) {
-            delete this._labelPlural;
-          }
-        } else {
-          this._labelPlural = value;
         }
       },
       //endregion
@@ -268,7 +228,9 @@ define([
 
       set description(value) {
         if(value === undefined) {
-          delete this._description;
+          if(this !== ValueType.prototype) {
+            delete this._description;
+          }
         } else {
           this._description = value || null;
         }
@@ -288,7 +250,9 @@ define([
 
       set category(value) {
         if(value === undefined) {
-          delete this._category;
+          if(this !== ValueType.prototype) {
+            delete this._category;
+          }
         } else {
           this._category = value || null;
         }
@@ -308,9 +272,33 @@ define([
 
       set helpUrl(value) {
         if(value === undefined) {
-          delete this._helpUrl;
+          if(this !== ValueType.prototype) {
+            delete this._helpUrl;
+          }
         } else {
           this._helpUrl = value || null;
+        }
+      },
+      //endregion
+
+      //region browsable property
+      // @type boolean
+      // -> boolean, Optional(true), Inherited, Configurable
+      // undefined or null -> resets
+
+      _browsable: true,
+
+      get browsable() {
+        return this._browsable;
+      },
+
+      set browsable(value) {
+        if(value == null) {
+          if(this !== ValueType.prototype) {
+            delete this._browsable;
+          }
+        } else {
+          this._browsable = !!value;
         }
       },
       //endregion
@@ -492,6 +480,7 @@ define([
         // -----
         // Shared, Immutable, Non-inheritable
         var derived = Derived.prototype;
+        derived._context = context;
         derived._id  = id || null;
         derived._uid = _nextUid++;
 
@@ -506,113 +495,26 @@ define([
       },
 
       //region the property
+      _the: null,
+
       /**
        * Gets the single type instance.
        * @type pentaho.type.ValueType
        */
       get the() {
-        //noinspection JSValidateTypes
-        return this.prototype;
-      },
-      //endregion
-
-      resolveAsync: function(typeSpec) {
-        return resolve(typeSpec, true);
-      },
-
-      resolve: function(typeSpec) {
-        return resolve(typeSpec, false);
+        // Using an instance instead of `this.prototype` helps
+        // the debugging experience, cause getter/setter methods,
+        // and normal methods also,
+        // don't show up mixed with the smart get/set properties...
+        return this._the || (this._the = new this());
       }
+      //endregion
     })
     .implement(AnnotatableLinked)
     .implement(bundle.structured.value);
 
     return ValueType;
   };
-
-  function resolve(typeSpec, async) {
-    // Default property type is "string".
-    if(!typeSpec) typeSpec = _defaultTypeMid;
-
-    switch(typeof typeSpec) {
-      case "string":
-        // It's considered an AMD id only if it has at least one "/".
-        // Otherwise, append pentaho's base amd id.
-        if(typeSpec.indexOf("/") < 0) {
-          typeSpec = _baseMid + typeSpec;
-        }
-
-        // This fails if a module with the id in the `typeSpec` var
-        // is not already _loaded_.
-        return async ? promise.require([typeSpec]) : require(typeSpec);
-
-      case "function":
-        // Is it a ValueType class?
-        if(!(typeSpec.prototype instanceof ValueType)) {
-          throw error.argInvalid(
-            "typeSpec",
-            bundle.structured.errors.typeSpec.isInvalidFun);
-        }
-
-        return async ? Promise.resolve(typeSpec) : typeSpec;
-
-      case "object":
-        // Properties only: [string||{}, ...] or
-        // Inline type spec: {[base: "complex", ] ... }
-        if(typeSpec instanceof Array) typeSpec = {props: typeSpec};
-
-        var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
-            resolveSync = function() {
-              return resolve(baseTypeSpec, false).extend(typeSpec);
-            };
-
-        if(!async) return resolveSync();
-
-        // Collect the module ids of all custom types used within typeSpec.
-        var customTypeIds = [];
-        collectTypeIds(typeSpec, customTypeIds);
-
-        // Require them all and only then invoke the synchronous BaseType.extend method.
-        if(customTypeIds.length)
-          return promise.require(customTypeIds).then(resolveSync);
-
-        // All types are standard and can be assumed to be already loaded.
-        // Anyway, must only extend async...
-        return new Promise(function(resolve) { resolve(resolveSync()); });
-    }
-
-    throw error.argInvalid("typeSpec");
-  }
-
-  // Recursively collect the module ids of all custom types used within typeSpec.
-  function collectTypeIds(typeSpec, outIds) {
-    if(!typeSpec) return;
-
-    switch(typeof typeSpec) {
-      case "string":
-        // It's considered an AMD id only if it has at least one "/".
-        // Otherwise, append pentaho's base amd id.
-        if(typeSpec.indexOf("/") < 0) typeSpec = _baseMid + typeSpec;
-
-        // A standard type that is surely loaded?
-        if(_basicStandardTypes[typeSpec] === 1) return;
-
-        outIds.push(typeSpec);
-        return;
-
-      case "object":
-        // Properties only: [string||{}, ...] or
-        // Inline type spec: {[base: "complex", ] ... }
-        if(typeSpec instanceof Array) typeSpec = {props: typeSpec};
-
-        collectTypeIds(typeSpec.base, outIds);
-
-        if(typeSpec.props) typeSpec.props.forEach(function(propSpec) {
-          collectTypeIds(propSpec && propSpec.type, outIds);
-        });
-        return;
-    }
-  }
 
   function consumeProp(o, p) {
     var v;

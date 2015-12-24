@@ -78,33 +78,6 @@ define([
         });
       }); // #label
 
-      describe("#labelPlural -", function() {
-        describe("when `labelPlural` falsy -", function() {
-          describe("when `label` is locally set", function() {
-            it("should default `labelPlural` by appending and 's' to `label`", function() {
-              function expectIt(derivedSpec) {
-                var Derived = ValueType.extend(derivedSpec);
-                expect(Derived.prototype.label).toBe(ValueType.prototype.label + "s");
-              }
-
-              expectIt({label: "Foo"});
-              expectIt({label: "Foo", labelPlural: undefined});
-              expectIt({label: "Foo", labelPlural: null});
-              expectIt({label: "Foo", labelPlural: ""});
-            });
-          });
-
-          describe("when `label` is not locally set", function() {
-            it("should inherit `labelPlural`", function() {
-              var Derived = ValueType.extend({});
-              expect(Derived.prototype.labelPlural).toBe(ValueType.prototype.labelPlural);
-            });
-          });
-        });
-      }); // #labelPlural
-
-      // =====
-
       describe("#id -", function() {
         describe("when `id` is falsy -", function() {
           it("should have `null` as a default `id`", function() {
@@ -261,7 +234,7 @@ define([
         });
       }); // #uid
 
-      // TODO: remaining poperties: value, format, domain, annotations...
+      // TODO: remaining properties: value, format, domain, abstract browsable, annotations...
       // TODO: methods resolve, resolveAsync
 
     }); // .extend({...})

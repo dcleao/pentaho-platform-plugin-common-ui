@@ -57,7 +57,7 @@ define(["pentaho/util/MessageBundle", "json"], function(MessageBundle) {
       if(!/^\s*#/.test(line)) {
         var m = /^\s*(.+?)\s*=(.*?)\s*$/.exec(line);
         if(m) {
-          props[m[0]] = m[1];
+          props[m[1]] = m[2];
         }
       }
     });

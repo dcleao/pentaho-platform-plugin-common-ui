@@ -24,8 +24,6 @@
 
     // Type label
     "label": "Family", // _default_
-    "labelPlural": "Families", // _default_
-
     "description": "A family.",
 
     "props": [

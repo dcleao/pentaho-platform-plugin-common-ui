@@ -13,24 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(function() {
-  "use strict";
 
-  var text = {
-    // Ensures the first letter is upper case.
-    firstUpperCase: function(s) {
-      if(s) {
-        var c  = s.charAt(0),
-            cU = c.toUpperCase();
-        if(c !== cU) s = cU + s.substr(1);
-      }
-      return s;
-    },
+/**
+ * The `spec.UType` union represents the set of types that can be used
+ * to reference or describe a `ValueType`.
+ *
+ * @typedef {string|pentaho.type.TypeFactory|pentaho.type.spec.IType} pentaho.type.spec.UType
+ */
 
-    titleFromName: function(name) {
-      return text.firstUpperCase(name).replace(/([a-z\d])([A-Z])/g, "$1 $2");
-    }
-  };
 
-  return text;
-});

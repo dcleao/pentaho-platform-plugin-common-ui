@@ -22,10 +22,8 @@ define([
     call: function(fun, ctx) {
       // Wrapping the call of `fun` this way
       // ensures that any sync Error flows to the outer promise.
-      return new Promise(function(resolve, reject) {
-        Promise
-            .resolve(fun.call(ctx))
-            .then(resolve, reject);
+      return new Promise(function(resolve) {
+        resolve(fun.call(ctx));
       });
     },
 

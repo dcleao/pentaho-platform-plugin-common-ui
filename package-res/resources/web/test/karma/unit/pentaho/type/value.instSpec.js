@@ -35,14 +35,12 @@ define([
       it("returns an instance whose attributes' values are the class defaults", function() {
         var Derived = Value.extend({
               id: "my/derived",
-              label: "Derived",
-              labelPlural: "Deriveds"
+              label: "Derived"
             }),
             derived = new Derived();
 
         expect(derived.id).toBe("my/derived");
         expect(derived.label).toBe("Derived");
-        expect(derived.labelPlural).toBe("Deriveds");
       });
 
       describe("#label -", function() {
@@ -64,9 +62,9 @@ define([
               expect(derived.label).toBe("Derived");
             }
 
-            expect(undefined);
-            expect(null);
-            expect("");
+            expectIt(undefined);
+            expectIt(null);
+            expectIt("");
           });
         });
 
@@ -83,78 +81,8 @@ define([
 
             expect(derived.label).toBe("MyDerived");
           });
-
-          it("should preserve the value of `labelPlural`", function() {
-            var Derived = Value.extend({
-                  label: "Derived",
-                  labelPlural: "Deriveds"
-                }),
-                derived = new Derived();
-
-            expect(derived.labelPlural).toBe("Deriveds");
-
-            derived.label = "MyDerived";
-
-            expect(derived.labelPlural).toBe("Deriveds");
-          });
         });
       }); // #label
-
-      describe("#labelPlural -", function() {
-        describe("when set to falsy -", function() {
-          describe("when `label` is locally defined", function() {
-            it("should be generated from pluralization of `label`", function() {
-
-              function expectIt(labelPlural) {
-                var Derived = Value.extend(),
-                    derived = new Derived();
-
-                expect(derived.label).toBe("Value");
-                expect(derived.labelPlural).toBe("Values");
-
-                derived.label = "MyDerived";
-
-                expect(derived.label).toBe("MyDerived");
-                // Doesn't get reset when label changes...
-                expect(derived.labelPlural).toBe("Values");
-
-                // resetting labelPlural, however,
-                // makes it be the plural of label
-                derived.labelPlural = labelPlural;
-                expect(derived.labelPlural).toBe("MyDeriveds");
-              }
-
-              expectIt(undefined);
-              expectIt(null);
-              expectIt("");
-            });
-          }); // when `label` is locally defined
-
-          describe("when `label` is not locally defined", function() {
-            it("should restore the class default", function() {
-              function expectIt(labelPlural) {
-                var Derived = Value.extend(),
-                    derived = new Derived();
-
-                expect(derived.label).toBe("Value");
-                expect(derived.labelPlural).toBe("Values");
-
-                derived.labelPlural = "MyDerived123s";
-                expect(derived.labelPlural).toBe("MyDerived123s");
-
-                // reset
-                derived.labelPlural = labelPlural;
-
-                expect(derived.labelPlural).toBe(Derived.prototype.labelPlural);
-              }
-
-              expectIt(undefined);
-              expectIt(null);
-              expectIt("");
-            });
-          }); // when `label` is not locally defined
-        }); // when set to undefined
-      }); // #labelPlural
 
       // ====
 
@@ -256,8 +184,8 @@ define([
               expect(derived.category).toBe(null);
             }
 
-            expect(null);
-            expect("");
+            expectIt(null);
+            expectIt("");
           });
         });
       }); // #category
@@ -309,15 +237,15 @@ define([
               expect(derived.helpUrl).toBe(null);
             }
 
-            expect(null);
-            expect("");
+            expectIt(null);
+            expectIt("");
           });
         });
       }); // #helpUrl
 
       // =====
 
-      // TODO: remaining poperties: defaultValue, format, domain, ...
+      // TODO: remaining ppoperties: defaultValue, format, domain, ...
       // TODO: methods: isEmpty, getKey, ...
 
     });

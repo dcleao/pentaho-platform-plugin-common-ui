@@ -26,10 +26,10 @@ define([
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context = new Context(),
-      ValueType = context.get(valueFactory),
+  var context     = new Context(),
+      ValueType   = context.get(valueFactory),
       ComplexType = context.get(complexFactory),
-      StringType = context.get(stringFactory);
+      StringType  = context.get(stringFactory);
 
   describe("pentaho/type/complex -", function() {
     describe("anatomy -", function() {
@@ -44,7 +44,6 @@ define([
 
       it("has different 'info' attributes from those of ValueType", function() {
         expect(ComplexType.the.label).not.toBe(ValueType.the.label);
-        expect(ComplexType.the.labelPlural).not.toBe(ValueType.the.labelPlural);
 
         expect(ComplexType.the.description).not.toBe(ValueType.the.description);
       });
@@ -124,7 +123,7 @@ define([
           });
         }); // when [#props is] not specified or specified empty
 
-        // Tests UProperty
+        // Tests UPropertyDef
         describe("when specified non-empty -", function() {
 
           // string
@@ -132,7 +131,7 @@ define([
             var Derived = ComplexType.extend({
                   name:  "derived",
                   label: "Derived",
-                  props: ["foo"]
+                  props: ["fooBar"]
                 });
 
             it("should result in a props collection with length 1", function() {
@@ -147,20 +146,19 @@ define([
               });
 
               it("should have `name` equal to the specified string", function() {
-                expect(propDef.name).toBe("foo");
+                expect(propDef.name).toBe("fooBar");
               });
 
-              it("should have `label` be undefined", function() {
-                // only resolved after type is instantiated and, possibly, configured.
-                expect(propDef.label).toBeUndefined();
+              it("should have `label` derived by 'capitalization' of name", function() {
+                expect(propDef.label).toBe("Foo Bar");
               });
 
               it("should have `type` string", function() {
-                expect(propDef.type).toBe(StringType);
+                expect(propDef.type).toBe(StringType.the);
               });
 
               it("should have `declaringType` equal to containing ComplexType class", function() {
-                expect(propDef.declaringType).toBe(Derived);
+                expect(propDef.declaringType).toBe(Derived.the);
               });
 
               it("should have `list=false`", function() {

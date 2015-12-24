@@ -29,14 +29,23 @@
  */
 
 /**
- * Obtains the contextualized type class for a given type factory or type id.
+ * Obtains the contextualized type class for a given type specification.
  *
- * When a type id is specified, its corresponding AMD module must already
- * have been loaded or an error is thrown.
+ * An error is thrown if the type specification contains ids of not yet loaded AMD modules.
  *
  * @name get
  * @memberOf pentaho.type.IContext
  * @type function
- * @param {string|pentaho.type.TypeFactory} typeFactory The factory of the desired type or the type id.
+ * @param {pentaho.type.spec.UType} typeSpec The factory, the id or the specification of the desired type.
  * @return {Class.<pentaho.type.ValueType>} The corresponding type class.
+ */
+
+/**
+ * Obtains a promise for the contextualized type class of a given type specification.
+ *
+ * @name getAsync
+ * @memberOf pentaho.type.IContext
+ * @type function
+ * @param {pentaho.type.spec.UType} typeSpec The factory, the id or the specification of the desired type.
+ * @return {Promise.<Class.<pentaho.type.ValueType>>} A promise for the corresponding type class.
  */

@@ -17,8 +17,9 @@ define([
   "./value",
   "../../lang/_AnnotatableLinked",
   "../../lang/Base",
-  "../../util/error"
-], function(Value, AnnotatableLinked, Base, error) {
+  "../../util/error",
+  "../../util/text"
+], function(Value, AnnotatableLinked, Base, error, text) {
 
   "use strict";
 
@@ -90,7 +91,7 @@ define([
    */
   var PropertyDef = Base.extend("pentaho.type.PropertyDef", /** @lends pentaho.type.PropertyDef# */{
 
-    // TODO: countMin, countMax, required, applicable, readonly, visible, defaultValue, members?, p
+    // TODO: countMin, countMax, required, applicable, readonly, visible, value, members?, p
 
     /**
      * Creates a _root_ `PropertyDef` instance, given a property specification.
@@ -99,7 +100,8 @@ define([
      * on the base property.
      *
      * @param {pentaho.type.spec.UPropertyDef} spec A property name or specification object.
-     * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares the property.
+     * @param {Class.<pentaho.type.ComplexType>} declaringTypeCtor The complex type class that
+     *    declares the property.
      * @param {number} ordinal The index of the property within its complex type.
      * @ignore
      */
@@ -123,7 +125,9 @@ define([
       this._ordinal = ordinal;
 
       // Resolve value type synchronously.
-      this._typeCtor = Value.resolve(spec.type);
+      this._typeCtor = declaringTypeCtor.prototype.context.get(spec.type);
+
+      if(!("label" in spec)) this._label = text.titleFromName(this._name);
 
       this._configure(spec);
     },
@@ -151,7 +155,7 @@ define([
       subProp._declaringTypeCtor = declaringTypeCtor;
 
       // Resolve value type synchronously.
-      var ValueTypeCtor = spec.type != null ? Value.resolve(spec.type) : null;
+      var ValueTypeCtor = spec.type != null ? declaringTypeCtor.prototype.context.get(spec.type) : null;
 
       // Validate that it is a sub-type of the base property's type.
       if(ValueTypeCtor && ValueTypeCtor !== this._typeCtor) {
@@ -259,19 +263,27 @@ define([
     },
 
     /**
+     * Gets a value that indicates if the property is the root property.
+     * @type boolean
+     */
+    get isRoot() {
+      return this._root === this;
+    },
+
+    /**
      * The base property, if any.
      *
      * @type ?pentaho.type.PropertyDef
      * @readonly
      */
     get ancestor() {
-      return this.root === this ? null : Object.getPrototypeOf(this);
+      return this.isRoot ? null : Object.getPrototypeOf(this);
     },
 
     /**
      * The type of the _single_ values that the property can hold.
      *
-     * @type !pentaho.type.Value
+     * @type !pentaho.type.ValueType
      * @readonly
      */
     get type() {
@@ -280,10 +292,6 @@ define([
 
     /**
      * The value of the property.
-     *
-     * This attribute can only be non-null in "leaf-properties" -
-     * those that are used by actual instances of {@link pentaho.type.Complex} and
-     * not by their prototypes.
      *
      * @type pentaho.type.Value | pentaho.type.Value[] | null
      */
@@ -319,26 +327,19 @@ define([
 
     //region label property
     // @type !nonEmptyString
-    // -> nonEmptyString, Optional, Inherited, Configurable, Localized
+    // -> nonEmptyString, Optional, Inheritable, Configurable, Localized
     // null or "" -> undefined conversion
+    // default is a Capitalization of name
     _label: null,
 
     get label() {
-      var value = this._label;
-      if(value == null) {
-        if(this.hasOwnProperty("_type")) {
-          value = (this._list && this.type.labelPlural) || this.type.label;
-        } else {
-          // Never the root, cause root always has a local _type.
-          // assert this.root !== this
-          value = this.ancestor.label;
-        }
-      }
-      return value;
+      return this._label;
     },
 
     set label(value) {
-      this._label = nonEmptyString(value);
+      this._label = (value == null || value === "")
+          ? text.titleFromName(this.name)
+          : String(value);
     },
     //endregion
 
@@ -354,10 +355,7 @@ define([
 
     set description(value) {
       if(value === undefined) {
-        // reset
-        if(this.hasOwnProperty("_type")) {
-          this._description = this.type.description;
-        } else {
+        if(this !== PropertyDef.prototype) {
           delete this._description;
         }
       } else {
@@ -379,10 +377,7 @@ define([
 
     set category(value) {
       if(value === undefined) {
-        // reset
-        if(this.hasOwnProperty("_type")) {
-          this._category = this.type.category;
-        } else {
+        if(this !== PropertyDef.prototype) {
           delete this._category;
         }
       } else {
@@ -404,10 +399,7 @@ define([
 
     set helpUrl(value) {
       if(value === undefined) {
-        // reset
-        if(this.hasOwnProperty("_type")) {
-          this._helpUrl = this.type.helpUrl;
-        } else {
+        if(this !== PropertyDef.prototype) {
           delete this._helpUrl;
         }
       } else {
@@ -429,10 +421,7 @@ define([
 
     set browsable(value) {
       if(value == null) {
-        // reset
-        if(this.hasOwnProperty("_type")) {
-          this._browsable = this.type.browsable;
-        } else {
+        if(this !== PropertyDef.prototype) {
           delete this._browsable;
         }
       } else {
@@ -453,10 +442,7 @@ define([
 
     set advanced(value) {
       if(value == null) {
-        // reset
-        if(this.hasOwnProperty("_type")) {
-          this._advanced = this.type.advanced;
-        } else {
+        if(this !== PropertyDef.prototype) {
           delete this._advanced;
         }
       } else {
@@ -471,15 +457,16 @@ define([
      *
      * @param {pentaho.type.spec.UPropertyDef} spec A property name or specification object.
      * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares the property.
+     * @param {number} ordinal The index of the property within its complex type.
      * @return {pentaho.type.PropertyDef} The created `PropertyDef` instance.
      */
-    to: function(spec, declaringTypeCtor) {
-      return new PropertyDef(spec, declaringTypeCtor);
+    to: function(spec, declaringTypeCtor, ordinal) {
+      return new PropertyDef(spec, declaringTypeCtor, ordinal);
     }
   });
 
   function nonEmptyString(value) {
-    return value != null ? null : (String(value) || null);
+    return value == null ? null : (String(value) || null);
   }
 
   return PropertyDef;
