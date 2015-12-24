@@ -2,15 +2,30 @@ define([
   "pentaho/visual",
   "pentaho/i18n!type",
   "./theme/type"
-], function(VisualType, bundle) {
+], function(visualFactory, bundle) {
 
-  return VisualType.extend({
+  "use strict";
+
+  /**
+   * Creates a `CalcType` for a given context.
+   *
+   * @name calcFactory
+   * @memberOf pentaho.visual.samples
+   * @type pentaho.type.TypeFactory
+   * @amd pentaho/visual/samples/calc
+   */
+  return function(context) {
+
+    var VisualType = context.get(visualFactory);
+
+    return VisualType.extend({
       id: "pentaho/visual/samples/calc",
       v2Id: "sample_calc",
 
       viewId: "View", // relative to declaring type's `id` unless prefixed with /. When type is anonymous, it's global?
       styleClass: "pentaho-visual-samples-calculator",
       props: [
+        // TODO: review how to declare visual roles...
         {
           name: "levels",
           type: "stringBinding",
@@ -35,7 +50,6 @@ define([
         }
       ]
     })
-    .configure(bundle.structured)
-    .instance;
-
+    .implement(bundle.structured);
+  };
 });

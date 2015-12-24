@@ -1,10 +1,10 @@
 {
-  "main": "Type",
+  "main": "typeFactory",
   "config": {
     "pentaho/service": {
-      ".": "pentaho/type"
+      ".": "pentaho/type/value"
     }
-  }
+  },
   "themes": {
     "default": "./themes/crystal",
     "crystal": "./themes/crystal"
