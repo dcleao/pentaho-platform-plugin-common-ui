@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 define([
-  "../../i18n!types",
+  "../../i18n!../i18n/types",
    "../../lang/Base",
    "../../lang/_AnnotatableLinked",
    "../../util/error",
    "../../util/fun",
-   "../../util/object",
-   "../../util/promise"
-], function(bundle, Base, AnnotatableLinked, error, fun, O, promise) {
+   "../../util/object"
+], function(bundle, Base, AnnotatableLinked, error, fun, O) {
 
   "use strict";
 

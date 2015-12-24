@@ -56,7 +56,7 @@ define([
    * @param {string?} [spec.theme] The id of the theme. Defaults to the current theme.
    * @param {string?} [spec.locale] The id of the locale. Defaults to the current locale.
    */
-  return Base.extend(/** @lends pentaho.type.Context# */{
+  var Context = Base.extend(/** @lends pentaho.type.Context# */{
 
     constructor: function(spec) {
       this._container = arg.optional(spec, "container") || getCurrentContainer();
@@ -99,21 +99,8 @@ define([
       if(!typeSpec) typeSpec = _defaultTypeMid;
 
       switch(typeof typeSpec) {
-        case "string": return this._getById(typeSpec, sync);
-
-        case "function":
-          // Is it a ValueType directly?
-          var context = typeSpec.prototype.context;
-          if(context) {
-            // Weak test. Assume it's a ValueType.
-            if(context !== this) throw error.argInvalid("typeSpec", "'Value type' is from a different context.");
-            typeSpec = this._linkType(typeSpec);
-            return sync ? typeSpec : Promise.resolve(typeSpec);
-          }
-
-          // Assume it's a factory function.
-          return this._getByFactory(typeSpec, sync);
-
+        case "string":   return this._getById(typeSpec, sync);
+        case "function": return this._getByFun(typeSpec, sync);
         case "object":   return this._getByObject(typeSpec, sync);
       }
 
@@ -128,6 +115,22 @@ define([
           // is not already _loaded_.
           ? this._get(require(id), true)
           : promise.require([id]).then(this._get.bind(this));
+    },
+
+    _getByFun: function(fun, sync) {
+      // Is it a ValueType directly?
+      var context = fun.prototype.context;
+      if(context && context instanceof Context) {
+        // Weak test. Assume it's a ValueType.
+        if(context !== this)
+          throw error.argInvalid("typeSpec", "'Value type' is from a different context.");
+
+        fun = this._linkType(fun);
+        return sync ? fun : Promise.resolve(fun);
+      }
+
+      // Assume it's a factory function.
+      return this._getByFactory(fun, sync);
     },
 
     _getByFactory: function(typeFactory, sync) {
@@ -187,6 +190,8 @@ define([
       return null;
     }
   });
+
+  return Context;
 
   function getCurrentContainer() {
     // TODO: should try to find webcontext.js in scripts collection?

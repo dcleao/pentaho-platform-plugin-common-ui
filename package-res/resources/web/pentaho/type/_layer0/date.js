@@ -15,7 +15,7 @@
  */
 define([
   "./simple",
-  "../../i18n!types"
+  "../../i18n!../i18n/types"
 ], function(simpleFactory, bundle) {
 
   "use strict";

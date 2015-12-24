@@ -15,7 +15,7 @@
  */
 define([
   "./value",
-  "../../i18n!types",
+  "../../i18n!../i18n/types",
   "./PropertyDefCollection"
 ], function(valueFactory, bundle, PropertyDefCollection) {
 
@@ -87,28 +87,7 @@ define([
        */
       get props() {
         return this._props;
-      }, //endregion
-
-      //region IConfigurable _class_ implementation support
-      /**
-       * Configures the complex class.
-       *
-       * This method _must not_ be called directly on type instances.
-       * It is expected to be called on the `prototype` of
-       * the constructor function, to configure the class.
-       *
-       * @param {pentaho.type.spec.IComplexConfig} config A complex type class configuration.
-       * @protected
-       * @virtual
-       */
-      _configure: function(config) {
-        if(!config) return; // TODO: remove this later
-        this.base(config);
-
-        if(config.props) this._props.configure(config.props);
-      }
-      //endregion
-
+      } //endregion
     }, /** @lends pentaho.type.ComplexType */{
       /**
        * Creates a sub-type of this one.

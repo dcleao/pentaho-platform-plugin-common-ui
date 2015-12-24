@@ -15,7 +15,7 @@
  */
 define([
   "./value",
-  "../../i18n!types"
+  "../../i18n!../i18n/types"
 ], function(valueFactory, bundle) {
 
   "use strict";

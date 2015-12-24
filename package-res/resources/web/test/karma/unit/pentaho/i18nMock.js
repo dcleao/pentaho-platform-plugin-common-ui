@@ -36,13 +36,14 @@ define(["pentaho/util/MessageBundle", "json"], function(MessageBundle) {
       // The path is, directly, an absolute module id of a message bundle (without the /).
       bundleMid = bundlePath.substr(1);
       if(!bundleMid) throw new Error("[pentaho/i18n!] Bundle path argument cannot be a single '/'.");
-    } else if(bundlePath[0] !== ".") {
+    } else if(bundlePath[0] !== "." && bundlePath.indexOf("/") < 0) {
 
       // the name of a bundle in the default "./i18n" sub-module
       bundleMid = "./i18n/" + bundlePath;
     } else {
       // "pentaho/i18n!./nls/information"
       // The path is, directly, a relative module id of a message bundle
+      // Or the path has already been resolved by RequireJS.
       bundleMid = bundlePath;
     }
 
