@@ -15,9 +15,12 @@
  */
 
 /**
- * Creates a type class for a given type context.
+ * The `spec.ITypeMeta` interface represents the metadata used to
+ * define a type.
  *
- * @callback pentaho.type.TypeFactory
- * @param {pentaho.type.IContext} context The context from which to obtain types from.
- * @return {Class.<pentaho.type.ValueType>} The `ValueType` class of the given context.
+ * @name pentaho.type.spec.ITypeMeta
+ *
+ * @interface
+ *
+ * @property {string} [id] The id of the corresponding AMD module, if any.
  */

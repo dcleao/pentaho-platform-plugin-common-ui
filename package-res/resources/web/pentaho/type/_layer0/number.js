@@ -21,7 +21,7 @@ define([
   "use strict";
 
   /**
-   * Creates the `NumberType` class for the given context.
+   * Creates the `Number` class for the given context.
    *
    * ### AMD
    *
@@ -29,33 +29,43 @@ define([
    *
    * @alias numberFactory
    * @memberOf pentaho.type
-   * @type pentaho.type.TypeFactory
+   * @type pentaho.type.Factory
    * @amd pentaho/type/number
-   * @return {Class.<pentaho.type.NumberType>} The `NumberType` class of the given context.
+   * @return {Class.<pentaho.type.Number>} The `Number` class of the given context.
    */
   return function(context) {
 
-    var SimpleType = context.get(simpleFactory);
+    var Simple = context.get(simpleFactory);
 
     /**
-     * @name pentaho.type.NumberType
+     * @name pentaho.type.Number.Meta
      * @class
-     * @extends pentaho.type.SimpleType
+     * @extends pentaho.type.Simple.Meta
      *
-     * @classDesc The base class of numeric types.
-     * @description Creates a numeric type instance.
+     * @classDesc The metadata class of {@link pentaho.type.Number}.
      */
-    return SimpleType.extend("pentaho.type.NumberType", /** @lends pentaho.type.NumberType# */{
-      id: "pentaho/type/number",
 
-      styleClass: "pentaho-type-number",
+    /**
+     * @name pentaho.type.Number
+     * @class
+     * @extends pentaho.type.Simple
+     *
+     * @classDesc The base class of numeric values.
+     * @description Creates a number instance.
+     */
+    return Simple.extend("pentaho.type.Number", {
+      meta: {
+        id: "pentaho/type/number",
 
-      validateNonEmpty: function(value) {
-        return this.base(value) ||
-          (typeof value !== "number"
-            ? [new Error("Value is not of type 'number'.")]
-            : null);
+        styleClass: "pentaho-type-number",
+
+        validateNonEmpty: function(value) {
+          return this.base(value) ||
+            (typeof value !== "number"
+              ? [new Error("Value is not of type 'number'.")]
+              : null);
+        }
       }
-    }).implement(bundle.structured["number"]);
+    }).Meta.implement(bundle.structured["number"]).Value;
   };
 });

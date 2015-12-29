@@ -21,7 +21,7 @@ define([
   "use strict";
 
   /**
-   * Creates the `BooleanType` class for the given context.
+   * Creates the `Boolean` class for the given context.
    *
    * ### AMD
    *
@@ -29,33 +29,43 @@ define([
    *
    * @alias booleanFactory
    * @memberOf pentaho.type
-   * @type pentaho.type.TypeFactory
+   * @type pentaho.type.Factory
    * @amd pentaho/type/boolean
-   * @return {Class.<pentaho.type.BooleanType>} The `BooleanType` class of the given context.
+   * @return {Class.<pentaho.type.Boolean>} The `Boolean` class of the given context.
    */
   return function(context) {
 
-    var SimpleType = context.get(simpleFactory);
+    var Simple = context.get(simpleFactory);
 
     /**
-     * @name pentaho.type.BooleanType
+     * @name pentaho.type.Boolean.Meta
      * @class
-     * @extends pentaho.type.SimpleType
+     * @extends pentaho.type.Simple.Meta
      *
-     * @classDesc The class of the boolean type.
-     * @description Creates a boolean type instance.
+     * @classDesc The metadata class of {@link pentaho.type.Boolean}.
      */
-    return SimpleType.extend("pentaho.type.BooleanType", /** @lends pentaho.type.BooleanType# */{
-      id: "pentaho/type/boolean",
 
-      styleClass: "pentaho-type-boolean",
+    /**
+     * @name pentaho.type.Boolean
+     * @class
+     * @extends pentaho.type.Simple
+     *
+     * @classDesc The class of boolean values.
+     * @description Creates a boolean instance.
+     */
+    return Simple.extend("pentaho.type.Boolean", {
+      meta: {
+        id: "pentaho/type/boolean",
 
-      validateNonEmpty: function(value) {
-        return this.base(value) ||
-          (typeof value !== "boolean"
-            ? [new Error("Value is not of type 'boolean'.")]
-            : null);
+        styleClass: "pentaho-type-boolean",
+
+        validateNonEmpty: function(value) {
+          return this.base(value) ||
+            (typeof value !== "boolean"
+              ? [new Error("Value is not of type 'boolean'.")]
+              : null);
+        }
       }
-    }).implement(bundle.structured["boolean"]);
+    }).Meta.implement(bundle.structured["boolean"]).Value;
   };
 });

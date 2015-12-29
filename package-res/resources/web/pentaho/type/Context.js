@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 define([
+  "./_layer0/Abstract",
   "../lang/Base",
   "../util/promise",
   "../util/arg",
   "../util/error",
-  "../util/object"
-], function(Base, promise, arg, error, O) {
+  "../util/object",
+  "../util/fun"
+], function(Abstract, Base, promise, arg, error, O, F) {
 
   "use strict";
 
@@ -43,14 +45,13 @@ define([
 
   /**
    * @name pentaho.type.Context
-   *
    * @class
    * @implements pentaho.type.IContext
-   * @classDesc The `Context` class contains `ValueType` classes _configured_ for a particular _context_.
+   * @classDesc The `Context` class contains `Value` classes _configured_ for a particular _context_.
    *
    * @constructor
    * @description Creates a `Context` whose variables default to pentaho's thin-client state variables.
-   * @param {object} spec
+   * @param {object} [spec] The context specification.
    * @param {string?} [spec.container] The id of the container application.
    * @param {string?} [spec.user] The id of the user. Defaults to the current user.
    * @param {string?} [spec.theme] The id of the theme. Defaults to the current theme.
@@ -64,8 +65,15 @@ define([
       this._theme     = arg.optional(spec, "theme")     || getCurrentTheme();
       this._locale    = arg.optional(spec, "locale")    || getCurrentLocale();
 
-      // Singleton instance by factory uid
+      // factory uid : Class.<pentaho.type.Value>
       this._byFactoryUid = {};
+
+      // type uid : Class.<pentaho.type.Value>
+      this._byTypeUid = {};
+
+      // non-anonymous types
+      // type id : Class.<pentaho.type.Value>
+      this._byTypeId = {};
     },
 
     //region context variables
@@ -86,86 +94,108 @@ define([
     },
     //endregion
 
-    get: function(typeFactory) {
-      return this._get(typeFactory, true);
+    get: function(typeRef) {
+      return this._get(typeRef, true);
     },
 
-    getAsync: function(typeSpec) {
-      return this._get(typeSpec, false);
+    getAsync: function(typeRef) {
+      return this._get(typeRef, false);
     },
 
-    _get: function(typeSpec, sync) {
+    _get: function(typeRef, sync) {
       // Default property type is "string".
-      if(!typeSpec) typeSpec = _defaultTypeMid;
+      if(!typeRef) typeRef = _defaultTypeMid;
 
-      switch(typeof typeSpec) {
-        case "string":   return this._getById(typeSpec, sync);
-        case "function": return this._getByFun(typeSpec, sync);
-        case "object":   return this._getByObject(typeSpec, sync);
+      switch(typeof typeRef) {
+        case "string":   return this._getById(typeRef, sync);
+        case "function": return this._getByFun(typeRef, sync);
+        case "object":   return this._getBySpec(typeRef, sync);
       }
 
-      throw error.argInvalid("typeSpec");
+      throw error.argInvalid("typeRef");
     },
 
     _getById: function(id, sync) {
       id = toAbsTypeId(id);
 
+      // Check if id is already present.
+      var Type = O.getOwn(this._byTypeId, id);
+      if(Type) return this._return(Type, sync);
+
       return sync
-          // This fails if a module with the id in the `typeSpec` var
+          // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
           ? this._get(require(id), true)
           : promise.require([id]).then(this._get.bind(this));
     },
 
     _getByFun: function(fun, sync) {
-      // Is it a ValueType directly?
-      var context = fun.prototype.context;
-      if(context && context instanceof Context) {
-        // Weak test. Assume it's a ValueType.
-        if(context !== this)
-          throw error.argInvalid("typeSpec", "'Value type' is from a different context.");
+      var proto = fun.prototype;
 
-        fun = this._linkType(fun);
-        return sync ? fun : Promise.resolve(fun);
-      }
+      if(proto instanceof Abstract     ) return this._getByType(fun, sync);
+      if(proto instanceof Abstract.Meta) return this._getByType(fun.Value, sync);
 
       // Assume it's a factory function.
       return this._getByFactory(fun, sync);
     },
 
-    _getByFactory: function(typeFactory, sync) {
-      var uid = getUid(typeFactory),
-          Type = O.getOwn(this._byFactoryUid, uid);
+    _getByType: function(Type, sync) {
+      // Don't use Value.meta, to not invoke the Meta constructor before configuration is performed, below.
+      var meta = Type.Meta.prototype;
+      if(meta.context !== this)
+        throw error.argInvalid("typeRef", "Type is from a different context.");
 
-      if(!Type) {
-        // TODO: validate the type of what the factory returns.
-        this._byFactoryUid[uid] = Type = this._linkType(typeFactory(this));
+      // Check if already present, by uid.
+      var TypeExisting = O.getOwn(this._byTypeUid, meta.uid);
+      if(!TypeExisting) {
+        // Not present yet.
+        var id = meta.id;
+        if(id) {
+          var config = this._getConfig(id);
+          if(config) Type.Meta.implement(config);
+
+          this._byTypeId[id] = Type;
+        }
+
+        this._byTypeUid[meta.uid] = Type;
+
+      } else if(Type !== TypeExisting) {
+        throw error.argInvalid("typeRef", "Duplicate type class uid.");
       }
 
-      return sync ? Type : Promise.resolve(Type);
+      return this._return(Type, sync);
     },
 
-    _linkType: function(Type) {
-      if(Type.id) {
-        // TODO: ensure a type is not configured twice.
-        var extendConfig = this._getConfig(Type.id);
-        if(extendConfig) Type.implement(extendConfig);
-      }
-      return Type;
+    _getByFactory: function(typeFactory, sync) {
+      var factoryUid = getFactoryUid(typeFactory),
+          Type = O.getOwn(this._byFactoryUid, factoryUid);
+
+      if(Type) return this._return(Type, sync);
+
+      Type = typeFactory(this);
+
+      if(!F.is(Type) || !(Type.prototype instanceof Abstract))
+        throw error.operInvalid("Type factory must return a sub-class of 'pentaho/type/value'.");
+
+      // Errors are thrown synchronously.
+      var result = this._getByType(Type, sync);
+
+      this._byFactoryUid[factoryUid] = Type;
+
+      return result;
     },
 
     // Properties only: [string||{}, ...] or
     // Inline type spec: {[base: "complex", ] ... }
-    _getByObject: function(typeSpec, sync) {
+    _getBySpec: function(typeSpec, sync) {
 
       if(typeSpec instanceof Array) typeSpec = {props: typeSpec};
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
           resolveSync = function() {
-              var BaseType = this._get(baseTypeSpec, /*sync:*/true);
-              var Type = BaseType.extend(typeSpec);
-              // TODO: analyze impact of id being supplied here (without a factory).
-              return this._linkType(Type);
+              var BaseType = this._get(baseTypeSpec, /*sync:*/true),
+                  Type = BaseType.extend(typeSpec);
+              return this._getByType(Type, /*sync:*/true);
             }.bind(this);
 
       // When sync, it should be the case that every referenced id is already loaded,
@@ -173,21 +203,22 @@ define([
       if(sync) return resolveSync();
 
       // Collect the module ids of all custom types used within typeSpec.
-      var customTypeIds = [];
-      collectTypeIds(typeSpec, customTypeIds);
-
-      // Require them all and only then invoke the synchronous BaseType.extend method.
-      if(customTypeIds.length)
-        return promise.require(customTypeIds).then(resolveSync);
-
-      // All types are standard and can be assumed to be already loaded.
-      // However, we should behave async as requested.
-      return promise.call(resolveSync);
+      var customTypeIds = collectTypeIds(typeSpec);
+      return customTypeIds.length
+          // Require them all and only then invoke the synchronous BaseMeta.extend method.
+          ? promise.require(customTypeIds).then(resolveSync)
+          // All types are standard and can be assumed to be already loaded.
+          // However, we should behave asynchronously as requested.
+          : promise.call(resolveSync);
     },
 
     _getConfig: function(id) {
       // TODO: link to configuration service
       return null;
+    },
+
+    _return: function(Type, sync) {
+      return sync ? Type : Promise.resolve(Type);
     }
   });
 
@@ -210,7 +241,7 @@ define([
     return typeof SESSION_LOCALE !== "undefined" ? SESSION_LOCALE : null;
   }
 
-  function getUid(factory) {
+  function getFactoryUid(factory) {
     return factory.uid || (factory.uid = _nextUid++);
   }
 
@@ -221,7 +252,13 @@ define([
   }
 
   // Recursively collect the module ids of all custom types used within typeSpec.
-  function collectTypeIds(typeSpec, outIds) {
+  function collectTypeIds(typeSpec) {
+    var customTypeIds = [];
+    collectTypeIdsRecursive(typeSpec, customTypeIds);
+    return typeSpec;
+  }
+
+  function collectTypeIdsRecursive(typeSpec, outIds) {
     if(!typeSpec) return;
 
     switch(typeof typeSpec) {
@@ -241,10 +278,10 @@ define([
         // Inline type spec: {[base: "complex", ] ... }
         if(typeSpec instanceof Array) typeSpec = {props: typeSpec};
 
-        collectTypeIds(typeSpec.base, outIds);
+        collectTypeIdsRecursive(typeSpec.base, outIds);
 
         if(typeSpec.props) typeSpec.props.forEach(function(propSpec) {
-          collectTypeIds(propSpec && propSpec.type, outIds);
+          collectTypeIdsRecursive(propSpec && propSpec.type, outIds);
         });
         return;
     }

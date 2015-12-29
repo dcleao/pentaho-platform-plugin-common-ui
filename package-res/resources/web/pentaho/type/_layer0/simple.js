@@ -21,7 +21,7 @@ define([
   "use strict";
 
   /**
-   * Creates the `SimpleType` class for the given context.
+   * Creates the `Simple` class for the given context.
    *
    * ### AMD
    *
@@ -29,20 +29,28 @@ define([
    *
    * @alias simpleFactory
    * @memberOf pentaho.type
-   * @type pentaho.type.TypeFactory
+   * @type pentaho.type.Factory
    * @amd pentaho/type/simple
-   * @return {Class.<pentaho.type.SimpleType>} The `SimpleType` class of the given context.
+   * @return {Class.<pentaho.type.Simple>} The `Simple` class of the given context.
    */
   return function(context) {
 
-    var ValueType = context.get(valueFactory);
+    var Value = context.get(valueFactory);
 
     /**
-     * @name pentaho.type.SimpleType
+     * @name pentaho.type.Simple.Meta
+     * @class
+     * @extends pentaho.type.Value.Meta
+     *
+     * @classDesc The metadata class of {@link pentaho.type.Simple}.
+     */
+
+    /**
+     * @name pentaho.type.Simple
      * @class
      * @extends pentaho.type.Value
      *
-     * @classDesc The base abstract class of un-structured, indivisible types.
+     * @classDesc The base abstract class of un-structured, indivisible values.
      *
      * Simple type example:
      * ```javascript
@@ -50,21 +58,23 @@ define([
      *
      *   return function(context) {
      *
-     *     var SimpleType = context.get(simpleFactory);
+     *     var Simple = context.get(simpleFactory);
      *
-     *     return SimpleType.extend({
+     *     return Simple.extend({
      *
      *     });
      *   };
      * });
      * ```
      *
-     * @description Creates a simple type instance.
+     * @description Creates a simple instance.
      */
-    return ValueType.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
-      id: "pentaho/type/simple",
-      "abstract": true,
-      styleClass: "pentaho-type-simple"
-    }).implement(bundle.structured.simple);
+    return Value.extend("pentaho.type.Simple", {
+      meta: {
+        id: "pentaho/type/simple",
+        "abstract": true,
+        styleClass: "pentaho-type-simple"
+      }
+    }).Meta.implement(bundle.structured.simple).Value;
   };
 });

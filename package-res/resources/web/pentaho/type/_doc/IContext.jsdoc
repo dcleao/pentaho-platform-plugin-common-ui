@@ -16,8 +16,8 @@
 
 /**
  * The `IContext` interface represents an application context
- * associated with certain variables and for which
- * own versions of type classes are kept.
+ * which is characterized by certain variables and
+ * for which own versions of type classes are kept.
  *
  * @name pentaho.type.IContext
  * @interface
@@ -29,23 +29,24 @@
  */
 
 /**
- * Obtains the contextualized type class for a given type specification.
+ * Obtains the contextualized class of a given type.
  *
- * An error is thrown if the type specification contains ids of not yet loaded AMD modules.
+ * An error is thrown if the given type reference contains ids of AMD modules
+ * which are not yet loaded.
  *
  * @name get
  * @memberOf pentaho.type.IContext
  * @type function
- * @param {pentaho.type.spec.UType} typeSpec The factory, the id or the specification of the desired type.
- * @return {Class.<pentaho.type.ValueType>} The corresponding type class.
+ * @param {pentaho.type.spec.UTypeRef} typeRef A reference of the desired type.
+ * @return {Class.<pentaho.type.Value>} The corresponding type class.
  */
 
 /**
- * Obtains a promise for the contextualized type class of a given type specification.
+ * Obtains a promise for the contextualized class of a given type.
  *
  * @name getAsync
  * @memberOf pentaho.type.IContext
  * @type function
- * @param {pentaho.type.spec.UType} typeSpec The factory, the id or the specification of the desired type.
- * @return {Promise.<Class.<pentaho.type.ValueType>>} A promise for the corresponding type class.
+ * @param {pentaho.type.spec.UTypeRef} typeRef typeRef A reference of the desired type.
+ * @return {Promise.<Class.<pentaho.type.Value>>} A promise for the corresponding type class.
  */

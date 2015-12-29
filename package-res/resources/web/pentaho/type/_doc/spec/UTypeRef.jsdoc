@@ -13,32 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./Abstract",
-  "./value",
-  "./simple",
-  "./complex",
-  "./string",
-  "./number",
-  "./boolean",
-  "./date"
-], function(Abstract, Value, Simple, Complex, String, Number, Boolean, Date) {
 
-  "use strict";
-  
-  // The layer0 module defines:
-  // * all classes at a basic level
-  // * all standard simple types (from which complex properties build complex types...)
-  return {
-    "Abstract": Abstract,
+/**
+ * The `spec.UTypeRef` union represents the set of JS types that can be used
+ * to reference a type.
+ *
+ * When a string, it is the type's {@link pentaho.type.Value.Meta#id}.
+ *
+ * When a function, it can be:
+ *
+ * 1. a `Value` class,
+ * 1. a `Value.Meta` class, or, else
+ * 1. a function which is assumed to be the type's module factory function.
+ *
+ * When an object, it is a type's metadata specification.
+ *
+ * @typedef {string|
+ *           pentaho.type.Factory|
+ *           pentaho.type.Value|
+ *           pentaho.type.Value.Meta|
+ *           pentaho.type.spec.ITypeMeta} pentaho.type.spec.UTypeRef
+ */
 
-    // types
-    "value":    Value,
-    "simple":   Simple,
-    "string":   String,
-    "number":   Number,
-    "boolean":  Boolean,
-    "date":     Date,
-    "complex":  Complex
-  };
-});
+

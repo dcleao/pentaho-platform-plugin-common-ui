@@ -16,13 +16,13 @@
 define([
   "./value",
   "../../i18n!../i18n/types",
-  "./PropertyDefCollection"
-], function(valueFactory, bundle, PropertyDefCollection) {
+  "./PropertyMetaCollection"
+], function(valueFactory, bundle, PropertyMetaCollection) {
 
   "use strict";
 
   /**
-   * Creates the `ComplexType` class for the given context.
+   * Creates the `Complex` class for the given context.
    *
    * ### AMD
    *
@@ -30,19 +30,26 @@ define([
    *
    * @alias complexFactory
    * @memberOf pentaho.type
-   * @type pentaho.type.TypeFactory
+   * @type pentaho.type.Factory
    * @amd pentaho/type/complex
-   * @return {Class.<pentaho.type.ComplexType>} The `ComplexType` class of the given context.
+   * @return {Class.<pentaho.type.Complex>} The `Complex` class of the given context.
    */
   return function(context) {
 
-    var ValueType = context.get(valueFactory);
+    var Value = context.get(valueFactory);
 
     /**
-     * @name pentaho.type.ComplexType
+     * @name pentaho.type.Complex.Meta
      * @class
-     * @extends pentaho.type.ValueType
-     * @implements pentaho.lang.IConfigurable
+     * @extends pentaho.type.Value.Meta
+     *
+     * @classDesc The metadata class of {@link pentaho.type.Complex}.
+     */
+
+    /**
+     * @name pentaho.type.Complex
+     * @class
+     * @extends pentaho.type.Value
      *
      * @classDesc The base class of complex types.
      *
@@ -52,82 +59,90 @@ define([
      *
      *   return function(context) {
      *
-     *     var ComplexType = context.get(complexFactory);
+     *     var Complex = context.get(complexFactory);
      *
-     *     return ComplexType.extend({
-     *       // Properties
-     *       props: [
-     *         {name: "name", type: "string", label: "Name"},
-     *         {name: "category", type: "string", label: "Category", list: true},
-     *         {name: "price", type: "number", label: "Price"}
-     *       ]
+     *     return Complex.extend({
+     *       meta: {
+     *         // Properties
+     *         props: [
+     *           {name: "name", type: "string", label: "Name"},
+     *           {name: "category", type: "string", label: "Category", list: true},
+     *           {name: "price", type: "number", label: "Price"}
+     *         ]
+     *       }
      *     });
      *   };
      *
      * });
      * ```
      *
-     * @description Creates a complex type instance.
+     * @description Creates a complex instance.
      */
-    var ComplexType = ValueType.extend("pentaho.type.ComplexType", /** @lends pentaho.type.ComplexType# */{
-      id: "pentaho/type/complex",
+    var Complex = Value.extend("pentaho.type.Complex", {
+      meta: /** @lends pentaho.type.Complex.Meta# */{
+        id: "pentaho/type/complex",
 
-      "abstract": true,
+        "abstract": true,
 
-      styleClass: "pentaho-type-complex",
+        styleClass: "pentaho-type-complex",
 
-      //region properties property
-      _props: null,
+        //region properties property
+        _props: null,
 
-      /**
-       * Gets the `Property` collection of the complex type.
-       *
-       * @type pentaho.type.PropertyCollection
-       * @readonly
-       */
-      get props() {
-        return this._props;
-      } //endregion
-    }, /** @lends pentaho.type.ComplexType */{
-      /**
-       * Creates a sub-type of this one.
-       *
-       * @name pentaho.type.ComplexType.extend
-       *
-       * @param {string} [name] The name of the complex type sub-class.
-       *   This is used mostly for debugging and is otherwise unrelated to {@link pentaho.type.Value#id}.
-       *
-       * @param {pentaho.type.spec.IComplexType} instSpec The complex type specification.
-       * @param {Object} [classSpec] Class-level members of the class.
-       *
-       * @return {Class.<pentaho.type.ComplexType>} The created sub-class.
-       */
-
-      _extend: function(name, instSpec) {
-        // Prevent property "props" being added to the prototype.
-        var propSpecs = removeProp(instSpec, "props");
-
-        var Derived = this.base.apply(this, arguments);
-
-        // Not using Class.init, cause there would be no way to pass propSpecs to it
-        // (unless an alternate instSpec prop was used...)
-        initType(Derived, propSpecs);
-
-        return Derived;
+        /**
+         * Gets the `PropertyMeta` collection of the complex type.
+         *
+         * @type pentaho.type.PropertyMetaCollection
+         * @readonly
+         */
+        get props() {
+          return this._props;
+        } //endregion
       }
-    }).implement(bundle.structured.complex);
+    }, {
+      meta: /** @lends pentaho.type.Complex.Meta */{
+
+        // Documentation override
+        /**
+         * Creates a sub-type of this one.
+         *
+         * @name pentaho.type.Complex.Meta.extend
+         *
+         * @param {string} [name] The name of the complex sub-type.
+         *   This is used mostly for debugging and is otherwise unrelated to {@link pentaho.type.Value.Meta#id}.
+         *
+         * @param {pentaho.type.spec.IComplexMeta} instSpec The complex type metadata specification.
+         * @param {Object} [classSpec] Class-level members of the class.
+         *
+         * @return {Class.<pentaho.type.Complex.Meta>} The created sub-class.
+         */
+
+        _extend: function(name, instSpec) {
+          // Prevent property "props" being added to the prototype.
+          var propSpecs = consumeProp(instSpec, "props");
+
+          var DerivedMeta = this.base.apply(this, arguments);
+
+          // Not using Class.init, cause there would be no way to pass propSpecs to it
+          // (unless an alternate instSpec prop was used...)
+          initMeta(DerivedMeta, propSpecs);
+
+          return DerivedMeta;
+        }
+      }
+    }).Meta.implement(bundle.structured.complex).Value;
 
     // Create root properties collection.
-    initType(ComplexType);
+    initMeta(Complex.Meta);
 
-    return ComplexType;
+    return Complex;
   };
 
-  function initType(ComplexType, propSpecs) {
-    ComplexType.prototype._props = PropertyDefCollection.to(propSpecs, /*declaringTypeCtor:*/ComplexType);
+  function initMeta(ComplexMeta, propSpecs) {
+    ComplexMeta.prototype._props = PropertyMetaCollection.to(propSpecs, /*declaringMetaCtor:*/ComplexMeta);
   }
 
-  function removeProp(o, p) {
+  function consumeProp(o, p) {
     var v;
     if(o && (p in o)) {
       v = o[p];

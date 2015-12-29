@@ -21,7 +21,7 @@ define([
   "use strict";
 
   /**
-   * Creates the `StringType` class for the given context.
+   * Creates the `String` class for the given context.
    *
    * ### AMD
    *
@@ -29,31 +29,42 @@ define([
    *
    * @alias stringFactory
    * @memberOf pentaho.type
-   * @type pentaho.type.TypeFactory
+   * @type pentaho.type.Factory
    * @amd pentaho/type/string
-   * @return {Class.<pentaho.type.StringType>} The `StringType` class of the given context.
+   * @return {Class.<pentaho.type.String>} The `String` class of the given context.
    */
   return function(context) {
 
-    var SimpleType = context.get(simpleFactory);
+    var Simple = context.get(simpleFactory);
 
     /**
-     * @name pentaho.type.StringType
+     * @name pentaho.type.String.Meta
      * @class
-     * @extends pentaho.type.SimpleType
+     * @extends pentaho.type.Simple.Meta
+     *
+     * @classDesc The metadata class of {@link pentaho.type.String}.
+     */
+
+    /**
+     * @name pentaho.type.String
+     * @class
+     * @extends pentaho.type.Simple
      * @classDesc A textual type.
      * @description Creates a string type.
      */
-    return SimpleType.extend("pentaho.type.StringType", /** @lends pentaho.type.StringType# */{
-      id: "pentaho/type/string",
-      styleClass: "pentaho-type-string",
+    return Simple.extend("pentaho.type.String", {
+      meta: {
+        id: "pentaho/type/string",
+        styleClass: "pentaho-type-string",
 
-      validateNonEmpty: function(value) {
-        return this.base(value) ||
-          (typeof value !== "string"
-            ? [new Error("Value is not of type 'string'.")]
-            : null);
+        validateNonEmpty: function(value) {
+          return this.base(value) ||
+            (typeof value !== "string"
+              ? [new Error("Value is not of type 'string'.")]
+              : null);
+        }
       }
-    }).implement(bundle.structured["string"]);
+    })
+    .Meta.implement(bundle.structured["string"]).Value;
   };
 });

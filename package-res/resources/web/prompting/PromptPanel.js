@@ -1066,7 +1066,7 @@ define(['cdf/lib/Base', 'cdf/Logger', 'dojo/number', 'dojo/i18n', 'common-ui/uti
                   this.dashboard.postInit(function() {
                     if (scrollTopValue) {
                       setScroll();
-                      delete scrollValue;
+                      //delete scrollValue;
                     }
                   });
                 } else {

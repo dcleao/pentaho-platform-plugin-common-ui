@@ -21,7 +21,7 @@ define([
   "use strict";
 
   /**
-   * Creates the `DateType` class for the given context.
+   * Creates the `Date` class for the given context.
    *
    * ### AMD
    *
@@ -29,33 +29,43 @@ define([
    *
    * @alias dateFactory
    * @memberOf pentaho.type
-   * @type pentaho.type.TypeFactory
+   * @type pentaho.type.Factory
    * @amd pentaho/type/date
-   * @return {Class.<pentaho.type.DateType>} The `DateType` class of the given context.
+   * @return {Class.<pentaho.type.Date>} The `Date` class of the given context.
    */
   return function(context) {
 
-    var SimpleType = context.get(simpleFactory);
+    var Simple = context.get(simpleFactory);
 
     /**
-     * @name pentaho.type.DateType
+     * @name pentaho.type.Date.Meta
      * @class
-     * @extends pentaho.type.SimpleType
+     * @extends pentaho.type.Simple.Meta
      *
-     * @classDesc The class of the date type.
-     * @description Creates a date type instance.
+     * @classDesc The metadata class of {@link pentaho.type.Date}.
      */
-    return SimpleType.extend("pentaho.type.DateType", /** @lends pentaho.type.DateType# */{
-      id: "pentaho/type/date",
 
-      styleClass: "pentaho-type-date",
+    /**
+     * @name pentaho.type.Date
+     * @class
+     * @extends pentaho.type.Simple
+     *
+     * @classDesc The class of a date value.
+     * @description Creates a date instance.
+     */
+    return Simple.extend("pentaho.type.Date", {
+      meta: {
+        id: "pentaho/type/date",
 
-      validateNonEmpty: function(value) {
-        return this.base(value) ||
-          ((value instanceof Date)
-            ? null
-            : [new Error("Value is not of type 'date'.")]);
+        styleClass: "pentaho-type-date",
+
+        validateNonEmpty: function(value) {
+          return this.base(value) ||
+            ((value instanceof Date)
+              ? null
+              : [new Error("Value is not of type 'date'.")]);
+        }
       }
-    }).implement(bundle.structured["date"]);
+    }).Meta.implement(bundle.structured["date"]).Value;
   };
 });

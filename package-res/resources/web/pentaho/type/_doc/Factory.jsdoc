@@ -15,10 +15,9 @@
  */
 
 /**
- * The `spec.UType` union represents the set of types that can be used
- * to reference or describe a `ValueType`.
+ * Creates the class of a type for a given context.
  *
- * @typedef {string|pentaho.type.TypeFactory|pentaho.type.spec.IType} pentaho.type.spec.UType
+ * @callback pentaho.type.Factory
+ * @param {pentaho.type.IContext} context The context for which the type's class is being created.
+ * @return {Class.<pentaho.type.Value>} The new type class.
  */
-
-

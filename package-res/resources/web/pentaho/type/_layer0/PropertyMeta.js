@@ -34,7 +34,7 @@ define([
     };
 
   /**
-   * @name pentaho.type.PropertyDef
+   * @name pentaho.type.PropertyMeta
    *
    * @class
    * @sealed
@@ -42,13 +42,13 @@ define([
    * @implements pentaho.lang.IListElement
    * @implements pentaho.lang.ICollectionElement
    *
-   * @classdesc A property of a complex type.
+   * @classdesc The metadata of a property of a complex type.
    *
    * Example property:
    * ```javascript
-   * require(["pentaho/type/PropertyDef"], function(PropertyDef) {
+   * require(["pentaho/type/PropertyMeta"], function(PropertyMeta) {
    *
-   *   return new PropertyDef({ // spec
+   *   return new PropertyMeta({ // spec
    *     type: "string",
    *     name: "name",
    *     list: false,
@@ -85,29 +85,29 @@ define([
    * });
    * ```
    * @see pentaho.type.Complex
-   * @description Creates a `PropertyDef`.
+   * @description Creates a `PropertyMeta`.
    *
    * This constructor is used internally by the type package and should not be used directly.
    */
-  var PropertyDef = Base.extend("pentaho.type.PropertyDef", /** @lends pentaho.type.PropertyDef# */{
+  var PropertyMeta = Base.extend("pentaho.type.PropertyMeta", /** @lends pentaho.type.PropertyMeta# */{
 
     // TODO: countMin, countMax, required, applicable, readonly, visible, value, members?, p
 
     /**
-     * Creates a _root_ `PropertyDef` instance, given a property specification.
+     * Creates a _root_ `PropertyMeta` instance, given a property specification.
      *
-     * Non-root properties are created by calling {@link pentaho.type.PropertyDef#extend}
+     * Non-root properties are created by calling {@link pentaho.type.PropertyMeta#extend}
      * on the base property.
      *
-     * @param {pentaho.type.spec.UPropertyDef} spec A property name or specification object.
-     * @param {Class.<pentaho.type.ComplexType>} declaringTypeCtor The complex type class that
+     * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
+     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type that
      *    declares the property.
      * @param {number} ordinal The index of the property within its complex type.
      * @ignore
      */
-    constructor: function(spec, declaringTypeCtor, ordinal) {
+    constructor: function(spec, declaringMetaCtor, ordinal) {
       if(!spec) throw error.argRequired("spec");
-      if(!declaringTypeCtor) throw error.argRequired("declaringTypeCtor");
+      if(!declaringMetaCtor) throw error.argRequired("declaringMetaCtor");
 
       // A singular string property with the specified name.
       if(typeof spec === "string") spec = {name: spec};
@@ -121,11 +121,11 @@ define([
       this._root = this;
 
       // Others
-      this._declaringTypeCtor = declaringTypeCtor;
+      this._declaringMetaCtor = declaringMetaCtor;
       this._ordinal = ordinal;
 
       // Resolve value type synchronously.
-      this._typeCtor = declaringTypeCtor.prototype.context.get(spec.type);
+      this._typeMetaCtor = declaringMetaCtor.prototype.context.get(spec.type).Meta;
 
       if(!("label" in spec)) this._label = text.titleFromName(this._name);
 
@@ -141,28 +141,29 @@ define([
     /**
      * Creates a sub-property of this one given its specification.
      *
-     * @param {pentaho.type.spec.UPropertyDef} spec A property name or specification object.
-     * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares the sub-property.
-     * @return {pentaho.type.PropertyDef} The created `PropertyDef`.
+     * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
+     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type
+     *   that declares the sub-property.
+     * @return {pentaho.type.PropertyMeta} The created `PropertyMeta`.
      * @ignore
      */
-    extend: function(spec, declaringTypeCtor) {
+    extend: function(spec, declaringMetaCtor) {
       if(!spec) throw error.argRequired("spec");
-      if(!declaringTypeCtor) throw error.argRequired("declaringTypeCtor");
+      if(!declaringMetaCtor) throw error.argRequired("declaringMetaCtor");
 
       var subProp = Object.create(this);
 
-      subProp._declaringTypeCtor = declaringTypeCtor;
+      subProp._declaringMetaCtor = declaringMetaCtor;
 
       // Resolve value type synchronously.
-      var ValueTypeCtor = spec.type != null ? declaringTypeCtor.prototype.context.get(spec.type) : null;
+      var ValueTypeMeta = spec.type != null ? declaringMetaCtor.prototype.context.get(spec.type).Meta : null;
 
       // Validate that it is a sub-type of the base property's type.
-      if(ValueTypeCtor && ValueTypeCtor !== this._typeCtor) {
-        if(!(ValueTypeCtor.prototype instanceof this._typeCtor))
+      if(ValueTypeMeta && ValueTypeMeta !== this._typeMetaCtor) {
+        if(!(ValueTypeMeta.prototype instanceof this._typeMetaCtor))
           throw error.argInvalid("spec.type", "Sub-property's 'type' does not derive from the base property's 'type'.");
 
-        subProp._typeCtor = ValueTypeCtor;
+        subProp._typeMetaCtor = ValueTypeMeta;
       }
 
       // Hierarchy consistency of the special properties `name` and `list`.
@@ -184,7 +185,7 @@ define([
     /**
      * Configures a property.
      *
-     * @param {!pentaho.type.spec.IPropertyDefConfig} config A property configuration.
+     * @param {!pentaho.type.spec.IPropertyMetaConfig} config A property configuration.
      * @ignore
      */
     _configure: function(config) {
@@ -202,7 +203,7 @@ define([
 
     //region IListElement
     /**
-     * Gets the singular name of `PropertyDef` list-elements.
+     * Gets the singular name of `PropertyMeta` list-elements.
      * @type string
      * @readonly
      * @default "property"
@@ -212,7 +213,7 @@ define([
 
     //region IWithKey implementation
     /**
-     * Gets the singular name of `PropertyDef` keys.
+     * Gets the singular name of `PropertyMeta` keys.
      * @type string
      * @readonly
      * @default "name"
@@ -233,13 +234,13 @@ define([
     //endregion
 
     /**
-     * The complex type that declares this property.
+     * The metadata of the complex type that declares this property.
      *
-     * @type pentaho.type.Complex
+     * @type pentaho.type.Complex.Meta
      * @readonly
      */
     get declaringType() {
-      return this._declaringTypeCtor.the;
+      return this._declaringMetaCtor.the;
     },
 
     /**
@@ -255,7 +256,7 @@ define([
     /**
      * The root property.
      *
-     * @type !pentaho.type.PropertyDef
+     * @type !pentaho.type.PropertyMeta
      * @readonly
      */
     get root() {
@@ -273,7 +274,7 @@ define([
     /**
      * The base property, if any.
      *
-     * @type ?pentaho.type.PropertyDef
+     * @type ?pentaho.type.PropertyMeta
      * @readonly
      */
     get ancestor() {
@@ -283,11 +284,11 @@ define([
     /**
      * The type of the _single_ values that the property can hold.
      *
-     * @type !pentaho.type.ValueType
+     * @type !pentaho.type.Value.Meta
      * @readonly
      */
     get type() {
-      return this._typeCtor.the;
+      return this._typeMetaCtor.the;
     },
 
     /**
@@ -355,7 +356,7 @@ define([
 
     set description(value) {
       if(value === undefined) {
-        if(this !== PropertyDef.prototype) {
+        if(this !== PropertyMeta.prototype) {
           delete this._description;
         }
       } else {
@@ -377,7 +378,7 @@ define([
 
     set category(value) {
       if(value === undefined) {
-        if(this !== PropertyDef.prototype) {
+        if(this !== PropertyMeta.prototype) {
           delete this._category;
         }
       } else {
@@ -399,7 +400,7 @@ define([
 
     set helpUrl(value) {
       if(value === undefined) {
-        if(this !== PropertyDef.prototype) {
+        if(this !== PropertyMeta.prototype) {
           delete this._helpUrl;
         }
       } else {
@@ -421,7 +422,7 @@ define([
 
     set browsable(value) {
       if(value == null) {
-        if(this !== PropertyDef.prototype) {
+        if(this !== PropertyMeta.prototype) {
           delete this._browsable;
         }
       } else {
@@ -442,7 +443,7 @@ define([
 
     set advanced(value) {
       if(value == null) {
-        if(this !== PropertyDef.prototype) {
+        if(this !== PropertyMeta.prototype) {
           delete this._advanced;
         }
       } else {
@@ -451,17 +452,18 @@ define([
     }
     //endregion
 
-  }, /** @lends pentaho.type.PropertyDef */{
+  }, /** @lends pentaho.type.PropertyMeta */{
     /**
-     * Converts a property specification to a `PropertyDef` instance.
+     * Converts a property specification to a `PropertyMeta` instance.
      *
-     * @param {pentaho.type.spec.UPropertyDef} spec A property name or specification object.
-     * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares the property.
+     * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
+     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type
+     *   that declares the property.
      * @param {number} ordinal The index of the property within its complex type.
-     * @return {pentaho.type.PropertyDef} The created `PropertyDef` instance.
+     * @return {pentaho.type.PropertyMeta} The created `PropertyMeta` instance.
      */
-    to: function(spec, declaringTypeCtor, ordinal) {
-      return new PropertyDef(spec, declaringTypeCtor, ordinal);
+    to: function(spec, declaringMetaCtor, ordinal) {
+      return new PropertyMeta(spec, declaringMetaCtor, ordinal);
     }
   });
 
@@ -469,5 +471,5 @@ define([
     return value == null ? null : (String(value) || null);
   }
 
-  return PropertyDef;
+  return PropertyMeta;
 });

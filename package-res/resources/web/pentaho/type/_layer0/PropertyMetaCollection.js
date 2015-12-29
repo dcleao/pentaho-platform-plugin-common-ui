@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 define([
-  "./PropertyDef",
+  "./PropertyMeta",
   "../../lang/Collection",
   "../../util/arg",
   "../../util/error"
-], function(PropertyDef, Collection, arg, error) {
+], function(PropertyMeta, Collection, arg, error) {
 
   "use strict";
 
   /**
-   * @name PropertyDefCollection
+   * @name PropertyMetaCollection
    * @memberOf pentaho.type
    * @class
    * @extends pentaho.lang.Collection
@@ -31,30 +31,32 @@ define([
    * @classDesc A collection of properties.
    *
    * @description Initializes a property collection.
-   * This constructor is used internally by the type package and should not be used directly.
+   * This constructor is used internally by the `pentaho/type` package and should not be used directly.
    *
-   * @see pentaho.type.PropertyDef
+   * @see pentaho.type.PropertyMeta
    */
-  return Collection.extend("pentaho.type.PropertyDefCollection", /** @lends pentaho.type.PropertyDefCollection# */{
+  return Collection.extend("pentaho.type.PropertyMetaCollection",
+      /** @lends pentaho.type.PropertyMetaCollection# */{
 
     /**
      * Initializes a property collection.
      *
-     * @param {Class.<pentaho.type.Complex>} declaringTypeCtor The complex type class that declares non-inherited properties.
+     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type
+     *   that declares non-inherited properties.
      * @ignore
      */
-    constructor: function(declaringTypeCtor) {
-      if(!declaringTypeCtor) throw error.argRequired("declaringTypeCtor");
+    constructor: function(declaringMetaCtor) {
+      if(!declaringMetaCtor) throw error.argRequired("declaringMetaCtor");
 
       /**
-       * The complex type class that _owns_ this collection.
-       * @type Class.<pentaho.type.Complex>
+       * The metadata class of the complex type that _owns_ this collection.
+       * @type Class.<pentaho.type.Complex.Meta>
        * @ignore
        */
-      this._declaringTypeCtor = declaringTypeCtor;
+      this._declaringMetaCtor = declaringMetaCtor;
 
       // Copy owner's ancestor's properties.
-      var ownerBase = this._declaringTypeCtor.ancestor,
+      var ownerBase = this._declaringMetaCtor.ancestor,
           colBase = ownerBase && ownerBase.properties;
 
       if(colBase) {
@@ -79,7 +81,7 @@ define([
     },
 
     //region List implementation
-    elemClass: PropertyDef,
+    elemClass: PropertyMeta,
 
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
@@ -89,7 +91,7 @@ define([
         // An object spec? Otherwise it's a noop - nothing to configure or override.
         // Configure existing local property or override inherited one.
         if(spec !== name) {
-          if(existing.declaringType === this._declaringTypeCtor.the)
+          if(existing.declaringType === this._declaringMetaCtor.the)
             existing.configure(spec);
           else
             this.replace(spec, this.indexOf(existing));
@@ -109,7 +111,7 @@ define([
       if(name !== existing.name)
         throw error.argInvalid("props[i]", "Incorrect property name.");
 
-      if(existing.declaringType === this._declaringTypeCtor.the) {
+      if(existing.declaringType === this._declaringMetaCtor.the) {
         // Configure existing local property and cancel replace.
         // If spec is not an object, then it's a noop.
         if(spec !== name) existing.configure(spec);
@@ -117,12 +119,12 @@ define([
       }
 
       // Replace with overridden property.
-      return existing.extend(spec, this._declaringTypeCtor);
+      return existing.extend(spec, this._declaringMetaCtor);
     },
 
     _cast: function(spec, index) {
       // For new, root, local properties.
-      return PropertyDef.to(spec, this._declaringTypeCtor, index);
+      return PropertyMeta.to(spec, this._declaringMetaCtor, index);
     }
     //endregion
   });

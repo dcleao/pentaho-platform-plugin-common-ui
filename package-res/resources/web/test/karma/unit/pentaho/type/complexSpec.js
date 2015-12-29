@@ -18,159 +18,206 @@ define([
   "pentaho/type/complex",
   "pentaho/type/value",
   "pentaho/type/string",
-  "pentaho/type/_layer0/PropertyDef",
-  "pentaho/type/_layer0/PropertyDefCollection"
-], function(Context, complexFactory, valueFactory, stringFactory, PropertyDef, PropertyDefCollection) {
+  "pentaho/type/_layer0/PropertyMeta",
+  "pentaho/type/_layer0/PropertyMetaCollection"
+], function(Context, complexFactory, valueFactory, stringFactory, PropertyMeta, PropertyMetaCollection) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
-  var context     = new Context(),
-      ValueType   = context.get(valueFactory),
-      ComplexType = context.get(complexFactory),
-      StringType  = context.get(stringFactory);
+  var context = new Context(),
+      Value   = context.get(valueFactory),
+      Complex = context.get(complexFactory),
+      String  = context.get(stringFactory);
 
   describe("pentaho/type/complex -", function() {
     describe("anatomy -", function() {
       it("is a function", function() {
-        expect(typeof ComplexType).toBe("function");
+        expect(typeof Complex).toBe("function");
       });
 
-      it("is a sub-class of ValueType", function() {
-        expect(ComplexType).not.toBe(ValueType);
-        expect(ComplexType.the instanceof ValueType).toBe(true);
+      it("is a sub-class of Value", function() {
+        expect(Complex).not.toBe(Value);
+        expect(Complex.prototype instanceof Value).toBe(true);
       });
 
-      it("has different 'info' attributes from those of ValueType", function() {
-        expect(ComplexType.the.label).not.toBe(ValueType.the.label);
-
-        expect(ComplexType.the.description).not.toBe(ValueType.the.description);
+      it(".Meta is a function", function() {
+        expect(typeof Complex.Meta).toBe("function");
       });
 
-      describe("the `props` static property", function() {
+      it(".Meta is a sub-class of Value.Meta", function() {
+        expect(Complex.Meta).not.toBe(Value.Meta);
+        expect(Complex.Meta.prototype instanceof Value.Meta).toBe(true);
+      });
+
+      it(".Meta has different 'info' attributes from those of Value.Meta", function() {
+        expect(Complex.Meta.the.label).not.toBe(Value.Meta.the.label);
+
+        expect(Complex.Meta.the.description).not.toBe(Value.Meta.the.description);
+      });
+
+      describe("the `props` property", function() {
         it("should be defined", function() {
-           expect(ComplexType.the.props).toBeTruthy();
+           expect(Complex.Meta.the.props).toBeTruthy();
         });
 
-        it("should contain an instance of PropertyDefCollection", function() {
-           expect(ComplexType.the.props instanceof PropertyDefCollection).toBe(true);
+        it("should contain an instance of PropertyMetaCollection", function() {
+           expect(Complex.Meta.the.props instanceof PropertyMetaCollection).toBe(true);
         });
 
         it("should be an empty collection", function() {
-           expect(ComplexType.the.props.length).toBe(0);
+           expect(Complex.Meta.the.props.length).toBe(0);
         });
       });
     }); // anatomy
 
     describe(".extend({...}) - the returned value -", function() {
       it("should be a function", function() {
-        var Derived = ComplexType.extend({
-          name:  "derived",
-          label: "Derived"
+        var Derived = Complex.extend({
+          meta: {
+            name:  "derived",
+            label: "Derived"
+          }
         });
 
         expect(typeof Derived).toBe("function");
       });
 
-      it("should be a sub-class of ComplexType", function() {
-        var Derived = ComplexType.extend({
-          name:  "derived",
-          label: "Derived"
+      it("should be a sub-class of Complex", function() {
+        var Derived = Complex.extend({
+          meta: {
+            name:  "derived",
+            label: "Derived"
+          }
         });
 
-        expect(Derived).not.toBe(ValueType);
-        expect(Derived).not.toBe(ComplexType);
-        expect(Derived.the instanceof ComplexType).toBe(true);
+        expect(Derived).not.toBe(Value);
+        expect(Derived).not.toBe(Complex);
+        expect(Derived.prototype instanceof Complex).toBe(true);
       });
 
-      describe("#props -", function() {
+      it(".Meta should be a function", function() {
+        var Derived = Complex.extend({
+          meta: {
+            name:  "derived",
+            label: "Derived"
+          }
+        });
+
+        expect(typeof Derived.Meta).toBe("function");
+      });
+
+      it(".Meta should be a sub-class of Complex", function() {
+        var Derived = Complex.extend({
+          meta: {
+            name:  "derived",
+            label: "Derived"
+          }
+        });
+
+        expect(Derived.Meta).not.toBe(Value.Meta);
+        expect(Derived.Meta).not.toBe(Complex.Meta);
+        expect(Derived.Meta.the instanceof Complex.Meta).toBe(true);
+      });
+
+      describe(".Meta#props -", function() {
         describe("when not specified or specified empty -", function() {
           it("should have a `props` collection", function() {
-            var Derived = ComplexType.extend({
-              name:  "derived",
-              label: "Derived"
+            var Derived = Complex.extend({
+              meta: {
+                name:  "derived",
+                label: "Derived"
+              }
             });
 
-            expect(Derived.the.props != null).toBe(true);
-            expect(Derived.the.props instanceof PropertyDefCollection).toBe(true);
+            expect(Derived.Meta.the.props != null).toBe(true);
+            expect(Derived.Meta.the.props instanceof PropertyMetaCollection).toBe(true);
 
-            Derived = ComplexType.extend({
-              name:  "derived",
-              label: "Derived",
-              props: []
+            Derived = Complex.extend({
+              meta: {
+                name:  "derived",
+                label: "Derived",
+                props: []
+              }
             });
 
-            expect(Derived.the.props != null).toBe(true);
-            expect(Derived.the.props instanceof PropertyDefCollection).toBe(true);
+            expect(Derived.Meta.the.props != null).toBe(true);
+            expect(Derived.Meta.the.props instanceof PropertyMetaCollection).toBe(true);
           });
 
           it("should have an empty props collection", function() {
-            var Derived = ComplexType.extend({
-              name:  "derived",
-              label: "Derived"
+            var Derived = Complex.extend({
+              meta: {
+                name:  "derived",
+                label: "Derived"
+              }
             });
 
-            expect(Derived.the.props.length).toBe(0);
+            expect(Derived.Meta.the.props.length).toBe(0);
 
-            Derived = ComplexType.extend({
-              name:  "derived",
-              label: "Derived",
-              props: []
+            Derived = Complex.extend({
+              meta: {
+                name:  "derived",
+                label: "Derived",
+                props: []
+              }
             });
 
-            expect(Derived.the.props.length).toBe(0);
+            expect(Derived.Meta.the.props.length).toBe(0);
           });
         }); // when [#props is] not specified or specified empty
 
-        // Tests UPropertyDef
+        // Tests UPropertyMeta
         describe("when specified non-empty -", function() {
 
           // string
           describe("with a single 'string' entry -", function() {
-            var Derived = ComplexType.extend({
-                  name:  "derived",
-                  label: "Derived",
-                  props: ["fooBar"]
+            var Derived = Complex.extend({
+                  meta: {
+                    name:  "derived",
+                    label: "Derived",
+                    props: ["fooBar"]
+                  }
                 });
 
             it("should result in a props collection with length 1", function() {
-              expect(Derived.the.props.length).toBe(1);
+              expect(Derived.Meta.the.props.length).toBe(1);
             });
 
-            describe("the single property def -", function() {
-              var propDef = Derived.the.props[0];
+            describe("the single property meta -", function() {
+              var propMeta = Derived.Meta.the.props[0];
 
-              it("should be a property def instance", function() {
-                expect(propDef instanceof PropertyDef).toBe(true);
+              it("should be a property meta instance", function() {
+                expect(propMeta instanceof PropertyMeta).toBe(true);
               });
 
               it("should have `name` equal to the specified string", function() {
-                expect(propDef.name).toBe("fooBar");
+                expect(propMeta.name).toBe("fooBar");
               });
 
               it("should have `label` derived by 'capitalization' of name", function() {
-                expect(propDef.label).toBe("Foo Bar");
+                expect(propMeta.label).toBe("Foo Bar");
               });
 
               it("should have `type` string", function() {
-                expect(propDef.type).toBe(StringType.the);
+                expect(propMeta.type).toBe(String.Meta.the);
               });
 
-              it("should have `declaringType` equal to containing ComplexType class", function() {
-                expect(propDef.declaringType).toBe(Derived.the);
+              it("should have `declaringType` equal to containing ComplexMeta class", function() {
+                expect(propMeta.declaringType).toBe(Derived.Meta.the);
               });
 
               it("should have `list=false`", function() {
-                expect(propDef.list).toBe(false);
+                expect(propMeta.list).toBe(false);
               });
 
               it("should have `root` equal to itself", function() {
-                expect(propDef.root).toBe(propDef);
+                expect(propMeta.root).toBe(propMeta);
               });
 
               it("should have `ancestor` equal to `null`", function() {
-                expect(propDef.ancestor).toBe(null);
+                expect(propMeta.ancestor).toBe(null);
               });
             });
           });

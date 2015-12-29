@@ -129,7 +129,7 @@ define([
   // Creates a sub-class of this class.
   // Static method of all "Base" constructors.
   function class_extend(name, instSpec, classSpec) {
-    if(typeof name !== "string") {
+    if(arguments.length < 3 && typeof name !== "string") {
       classSpec = instSpec;
       instSpec = name;
       name = null;

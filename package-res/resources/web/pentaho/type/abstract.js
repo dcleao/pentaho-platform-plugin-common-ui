@@ -13,16 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * The `spec.UPropertyDef` type definition is the union of the types that can be used to
- * define a property of a complex type.
- *
- * When the value is a string,
- * it's taken to represent a property
- * whose {@link pentaho.type.spec.IPropertyDef#name} is that string
- * and
- * whose {@link pentaho.type.spec.IPropertyDef#type} is {@link pentaho.type.string}.
- *
- * @typedef {string|pentaho.type.spec.IPropertyDef} pentaho.type.spec.UPropertyDef
- */
+define(["./_layer1/main"], function(types) { "use strict"; return types.Abstract; });
