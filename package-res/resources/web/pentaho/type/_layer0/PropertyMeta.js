@@ -100,8 +100,8 @@ define([
      * on the base property.
      *
      * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
-     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type that
-     *    declares the property.
+     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type
+     *    that declares the property.
      * @param {number} ordinal The index of the property within its complex type.
      * @ignore
      */
@@ -156,12 +156,16 @@ define([
       subProp._declaringMetaCtor = declaringMetaCtor;
 
       // Resolve value type synchronously.
-      var ValueTypeMeta = spec.type != null ? declaringMetaCtor.prototype.context.get(spec.type).Meta : null;
+      var ValueTypeMeta = spec.type != null
+            ? declaringMetaCtor.prototype.context.get(spec.type).Meta
+            : null;
 
       // Validate that it is a sub-type of the base property's type.
       if(ValueTypeMeta && ValueTypeMeta !== this._typeMetaCtor) {
         if(!(ValueTypeMeta.prototype instanceof this._typeMetaCtor))
-          throw error.argInvalid("spec.type", "Sub-property's 'type' does not derive from the base property's 'type'.");
+          throw error.argInvalid(
+              "spec.type",
+              "Sub-property's 'type' does not derive from the base property's 'type'.");
 
         subProp._typeMetaCtor = ValueTypeMeta;
       }

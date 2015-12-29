@@ -15,9 +15,10 @@
  */
 define([
   "./value",
+  "./PropertyMetaCollection",
   "../../i18n!../i18n/types",
-  "./PropertyMetaCollection"
-], function(valueFactory, bundle, PropertyMetaCollection) {
+  "../../util/object"
+], function(valueFactory, PropertyMetaCollection, bundle, O) {
 
   "use strict";
 
@@ -119,7 +120,7 @@ define([
 
         _extend: function(name, instSpec) {
           // Prevent property "props" being added to the prototype.
-          var propSpecs = consumeProp(instSpec, "props");
+          var propSpecs = O["delete"](instSpec, "props");
 
           var DerivedMeta = this.base.apply(this, arguments);
 
@@ -129,6 +130,11 @@ define([
 
           return DerivedMeta;
         }
+      },
+
+      // @override
+      _extendValue: function(DerivedMeta, baseExtend, name, instSpec, classSpec) {
+        return baseExtend.call(this, name, instSpec, classSpec);
       }
     }).Meta.implement(bundle.structured.complex).Value;
 
@@ -140,14 +146,5 @@ define([
 
   function initMeta(ComplexMeta, propSpecs) {
     ComplexMeta.prototype._props = PropertyMetaCollection.to(propSpecs, /*declaringMetaCtor:*/ComplexMeta);
-  }
-
-  function consumeProp(o, p) {
-    var v;
-    if(o && (p in o)) {
-      v = o[p];
-      delete o[p];
-    }
-    return v;
   }
 });

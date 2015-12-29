@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "./_layer0/Abstract",
+  "./Abstract",
   "../lang/Base",
   "../util/promise",
   "../util/arg",
@@ -50,7 +50,7 @@ define([
    * @classDesc The `Context` class contains `Value` classes _configured_ for a particular _context_.
    *
    * @constructor
-   * @description Creates a `Context` whose variables default to pentaho's thin-client state variables.
+   * @description Creates a `Context` whose variables default to the Pentaho thin-client state variables.
    * @param {object} [spec] The context specification.
    * @param {string?} [spec.container] The id of the container application.
    * @param {string?} [spec.user] The id of the user. Defaults to the current user.

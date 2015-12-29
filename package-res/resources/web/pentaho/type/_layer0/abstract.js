@@ -54,7 +54,7 @@ define([
     Meta: null,
 
     /**
-     * Gets the associated singleton `Meta` instance.
+     * Gets the metadata of this type.
      *
      * @type pentaho.type.Value.Meta
      * @readonly
@@ -71,12 +71,12 @@ define([
       // META
       var DerivedMeta = this.Meta.extend(
             name && (name + ".Meta"),
-            consumeProp(instSpec,  "meta"),
-            consumeProp(classSpec, "meta"));
+            O["delete"](instSpec,  "meta"),
+            O["delete"](classSpec, "meta"));
 
       // VALUE
       // Delegate to a virtual method to extend the Value class.
-      // This allows Complex types to define getters and setters.
+      // This allows complex types to define getters and setters.
       var Derived = this._extendValue(DerivedMeta, this.base, name, instSpec, classSpec);
 
       DerivedMeta.Value = Derived;
@@ -85,6 +85,7 @@ define([
       return Derived;
     },
 
+    // @virtual
     _extendValue: function(DerivedMeta, baseExtend, name, instSpec, classSpec) {
       return baseExtend.call(this, name, instSpec, classSpec);
     }
@@ -485,8 +486,8 @@ define([
     _extend: function(name, instSpec) {
       if(!instSpec) instSpec = {};
 
-      var id = consumeProp(instSpec, "id"),
-          p  = consumeProp(instSpec,  "p");
+      var id = O["delete"](instSpec, "id"),
+          p  = O["delete"](instSpec,  "p");
 
       var DerivedMeta = this.base.apply(this, arguments);
 
@@ -528,15 +529,6 @@ define([
   AbstractMeta.Value = Abstract;
 
   return Abstract;
-
-  function consumeProp(o, p) {
-    var v;
-    if(o && (p in o)) {
-      v = o[p];
-      delete o[p];
-    }
-    return v;
-  }
 
   function isSubsetOf(sub, sup, key) {
     if(!key) key = fun.identity;
