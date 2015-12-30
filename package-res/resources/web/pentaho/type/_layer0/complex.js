@@ -80,6 +80,25 @@ define([
      * @description Creates a complex instance.
      */
     var Complex = Value.extend("pentaho.type.Complex", {
+
+      constructor: function(spec) {
+        // Note: neither `Value` or `Abstract` do anything in their constructor,
+        // so, in the name of performance, we're purposely not calling base.
+
+        // Create `Property` instances.
+        var pMetas = this.meta.props,
+            i = pMetas.length,
+            hasSpec = !!spec,
+            isArray = hasSpec && (spec instanceof Array),
+            pMeta, v;
+
+        while(i--) {
+          pMeta = pMetas[i];
+          v = hasSpec ? spec[isArray ? pMeta.ordinal : pMeta.name] : undefined;
+          this[pMeta._namePriv] = null; // new Property(pMeta, this, v);
+        }
+      },
+
       meta: /** @lends pentaho.type.Complex.Meta# */{
         id: "pentaho/type/complex",
 
@@ -100,7 +119,8 @@ define([
          * @readonly
          */
         get props() {
-          // Always get/create from/on the class' prototype
+          // Always get/create from/on the class' prototype.
+          // Lazy creation.
           var proto = this.constructor.prototype;
           return O.getOwn(proto, "_props") ||
               (proto._props = PropertyMetaCollection.to([], /*declaringMetaCtor:*/this.constructor));

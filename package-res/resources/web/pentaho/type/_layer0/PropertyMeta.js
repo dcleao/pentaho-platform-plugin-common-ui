@@ -117,6 +117,8 @@ define([
       this._name = spec.name;
       if(!this._name) throw error.argRequired("spec.name");
 
+      this._namePriv = "_" + this._name;
+
       this._list = !!spec.list;
 
       this._root = this;
@@ -131,6 +133,8 @@ define([
       if(!("label" in spec)) this._label = text.titleFromName(this._name);
 
       this.configure(spec);
+
+      this._createValueAccessor();
     },
 
     // TODO: self-recursive complexes won't work if we don't handle them specially:
@@ -238,6 +242,7 @@ define([
     },
     //endregion
 
+    //region property attributes
     /**
      * The metadata of the complex type that declares this property.
      *
@@ -454,22 +459,34 @@ define([
       } else {
         this._advanced = !!value;
       }
-    }
+    },
+    //endregion
     //endregion
 
-  }, /** @lends pentaho.type.PropertyMeta */{
-    /**
-     * Converts a property specification to a `PropertyMeta` instance.
-     *
-     * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
-     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type
-     *   that declares the property.
-     * @param {number} ordinal The index of the property within its complex type.
-     * @return {pentaho.type.PropertyMeta} The created `PropertyMeta` instance.
-     */
-    to: function(spec, declaringMetaCtor, ordinal) {
-      return new PropertyMeta(spec, declaringMetaCtor, ordinal);
+    //region property value accessor
+    _createValueAccessor: function() {
+      var mesa = this._declaringMetaCtor.Mesa.prototype,
+          name = this._name,
+          namePriv = this._namePriv;
+
+      if((name in mesa) || (namePriv in mesa)) return;
+
+      // Receives a `Property` instance (see `Complex#constructor`).
+      //mesa[namePriv] = new Property( ... );
+
+      Object.defineProperty(mesa, name, {
+        configurable: true,
+
+        get: function propertyValueGetter() {
+          return this[namePriv].value;
+        },
+
+        set: function propertyValueSetter(value) {
+          this[namePriv].value = value;
+        }
+      });
     }
+    //endregion
   });
 
   function nonEmptyString(value) {

@@ -21,8 +21,8 @@ define(function() {
       setProtoOf = Object.setPrototypeOf || ({}.__proto__ ? setProtoProp : setProtoCopy);
 
   return /** @lends pentaho.util.object */{
-    "delete": function(o, p) {
-      var v;
+    "delete": function(o, p, dv) {
+      var v = dv;
       if(o && (p in o)) {
         v = o[p];
         delete o[p];

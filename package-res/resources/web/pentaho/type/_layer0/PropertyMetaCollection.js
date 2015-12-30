@@ -126,7 +126,7 @@ define([
 
     _cast: function(spec, index) {
       // For new, root, local properties.
-      return PropertyMeta.to(spec, this._declaringMetaCtor, index);
+      return new PropertyMeta(spec, this._declaringMetaCtor, index);
     },
     //endregion
 
