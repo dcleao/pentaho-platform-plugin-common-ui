@@ -76,7 +76,6 @@ define([
       it("should be a function", function() {
         var Derived = Complex.extend({
           meta: {
-            name:  "derived",
             label: "Derived"
           }
         });
@@ -87,7 +86,6 @@ define([
       it("should be a sub-class of Complex", function() {
         var Derived = Complex.extend({
           meta: {
-            name:  "derived",
             label: "Derived"
           }
         });
@@ -100,7 +98,6 @@ define([
       it(".Meta should be a function", function() {
         var Derived = Complex.extend({
           meta: {
-            name:  "derived",
             label: "Derived"
           }
         });
@@ -111,7 +108,6 @@ define([
       it(".Meta should be a sub-class of Complex", function() {
         var Derived = Complex.extend({
           meta: {
-            name:  "derived",
             label: "Derived"
           }
         });
@@ -166,9 +162,31 @@ define([
 
             expect(Derived.meta.props.length).toBe(0);
           });
+
+          it("should inherit the base class' properties", function() {
+            var A = Complex.extend({
+              meta: {
+                label: "A",
+                props: ["fooBar", "guru"]
+              }
+            });
+
+            var B = A.extend({
+              meta: {
+                label: "B"
+              }
+            });
+
+            expect(A.meta.props.length).toBe(2);
+            expect(B.meta.props.length).toBe(2);
+
+            expect(A.meta.props[0]).toBe(B.meta.props[0]);
+            expect(A.meta.props[1]).toBe(B.meta.props[1]);
+          });
         }); // when [#props is] not specified or specified empty
 
-        // Tests UPropertyMeta
+        // Tests PropertyMetaCollection
+
         describe("when specified non-empty -", function() {
 
           // string
@@ -219,6 +237,55 @@ define([
               it("should have `ancestor` equal to `null`", function() {
                 expect(propMeta.ancestor).toBe(null);
               });
+            });
+          });
+
+          describe("with two entries -", function() {
+            var Derived = Complex.extend({
+              meta: {
+                label: "Derived",
+                props: ["fooBar", "guru"]
+              }
+            });
+
+            it("should result in a props collection with length 2", function() {
+              expect(Derived.meta.props.length).toBe(2);
+              expect(Derived.meta.props[0].name).toBe("fooBar");
+              expect(Derived.meta.props[1].name).toBe("guru");
+            });
+          });
+
+          describe("with an entry that overrides a base type property -", function() {
+            var A = Complex.extend({
+              meta: {
+                label: "A",
+                props: ["fooBar", "guru"]
+              }
+            });
+
+            var B = A.extend({
+              meta: {
+                label: "B",
+                props: [{name: "guru", label: "HELLO"}]
+              }
+            });
+
+            it("should create a sub-property", function() {
+              expect(A.meta.props.length).toBe(2);
+              expect(B.meta.props.length).toBe(2);
+
+              var baseProp = A.meta.props[1];
+              var subProp  = B.meta.props[1];
+
+              expect(subProp).not.toBe(baseProp);
+
+              expect(baseProp.name).toBe("guru");
+              expect(baseProp.label).toBe("Guru");
+
+              expect(subProp.name).toBe("guru");
+              expect(subProp.label).toBe("HELLO");
+
+              expect(subProp.ancestor).toBe(baseProp);
             });
           });
 

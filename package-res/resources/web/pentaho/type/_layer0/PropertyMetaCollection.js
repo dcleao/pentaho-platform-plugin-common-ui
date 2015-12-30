@@ -57,9 +57,9 @@ define([
        */
       this._declaringMetaCtor = declaringMetaCtor;
 
-      // Copy owner's ancestor's properties.
-      var ownerBase = this._declaringMetaCtor.ancestor,
-          colBase = ownerBase && ownerBase.properties;
+      // Copy the declaring complex type's ancestor's properties.
+      var ancestorMetaCtor = declaringMetaCtor.ancestor,
+          colBase = ancestorMetaCtor && ancestorMetaCtor.prototype.props;
 
       if(colBase) {
         // Backup any provided specs.

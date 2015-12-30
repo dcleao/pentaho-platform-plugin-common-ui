@@ -207,6 +207,7 @@ define([
             // Remove from `at`
             this.splice(at, 1);
             LE--;
+            continue;
           }
         } else {
           if(isReplay) {
@@ -215,9 +216,9 @@ define([
             baseProto.push.call(this, elem2);
           }
           if(added) added.call(this, elem2, at, keyArgs);
-          at++;
-          i++;
         }
+        at++;
+        i++;
       }
 
       return at;
