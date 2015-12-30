@@ -43,6 +43,7 @@ define([
      * @extends pentaho.type.Simple.Meta
      *
      * @classDesc The metadata class of {@link pentaho.type.Number}.
+     * @ignore
      */
 
     /**
@@ -66,6 +67,8 @@ define([
               : null);
         }
       }
-    }).Meta.implement(bundle.structured["number"]).Value;
+    }).implement({
+      meta: bundle.structured["number"]
+    });
   };
 });

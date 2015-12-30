@@ -94,12 +94,15 @@ define([
     // Static interface that is inherited by all Base classes.
     BaseBoot.extend    = class_extend;
     BaseBoot._extend   = class_extend_core;
+    BaseBoot.mix       = class_mix;
     BaseBoot.implement = class_implement;
     BaseBoot.implementStatic = class_implementStatic;
     BaseBoot.toString  = properFunToString;
     BaseBoot.to        = class_to;
     BaseBoot.init      = null;
 
+    // Used by BaseBoot.extend, just below
+    BaseBoot.prototype.extend = inst_extend;
     // ---
 
     var BaseRoot = BaseBoot.extend({
@@ -107,8 +110,7 @@ define([
       constructor: function() {
         this.extend(arguments[0]);
       },
-      extend: inst_extend,
-      base:   inst_base
+      base: inst_base
     }, {
       ancestor: NativeBase // Replaces BaseBoot by NativeBase
     });
@@ -140,36 +142,37 @@ define([
 
   function class_extend_core(name, instSpec, classSpec) {
 
+    var SubClass = class_extend_subclass.call(this, name, instSpec);
+
+    // Mix
+    SubClass.mix(instSpec, classSpec);
+
+    // Init
+    if(fun.is(SubClass.init)) SubClass.init();
+
+    return SubClass;
+  }
+
+  function class_extend_subclass(name, instSpec) {
     // Create PROTOTYPE and CONSTRUCTOR
-    var proto = Object.create(this.prototype),
-        Class = class_extend_createCtor(proto, instSpec);
+    var subProto = Object.create(this.prototype),
+        SubClass = class_extend_createCtor(subProto, instSpec);
 
-    if(name) setFunName(Class, name);
-
-    // Extend prototype with `instSpec`.
-    // (doesn't copy the `constructor` property)
-    if(instSpec) inst_extend.call(proto, instSpec);
+    if(name) setFunName(SubClass, name);
 
     // Wire proto and constructor, so that the `instanceof` operator works.
-    Object.defineProperty(proto, "constructor", {
+    Object.defineProperty(subProto, "constructor", {
       configurable: true,
       writable: true,
-      value: Class
+      value: SubClass
     });
-    Class.prototype = proto;
-    Class.ancestor  = this;
+    SubClass.prototype = subProto;
+    SubClass.ancestor  = this;
 
-    // Inherit _any_ static _methods_ or getter/setters
-    class_inherit_static.call(Class, this);
+    // Inherit static _methods_ or getter/setters
+    class_inherit_static.call(SubClass, this);
 
-    // Extend the constructor with `classSpec`.
-    // (overriding static methods sets the `base` property on the constructor)
-    Class.implementStatic(classSpec);
-
-    // Class initialization.
-    if(fun.is(Class.init)) Class.init();
-
-    return Class;
+    return SubClass;
   }
 
   function class_extend_createCtor(proto, instSpec) {
@@ -222,8 +225,8 @@ define([
     return (v instanceof this) ? v : O.make(this, arguments);
   }
 
-  // Note that arrays of a certain sub-class can be newed up (in ES5, at least).
-  // As such, a normal array must be created and then "switched" to
+  // Note that arrays of a certain sub-class cannot be newed up (in ES5, at least).
+  // As such, a normal array must be created first and then "switched" to
   // inheriting from this class: var baseArray = BaseArray.to([]);
   function class_array_to(a) {
     // First, convert to an array.
@@ -235,6 +238,21 @@ define([
       throw new Error("Cannot convert value to Base.Array.");
 
     return O.applyClass(a, this, A_slice.call(arguments, 1));
+  }
+
+  function class_mix(instSpec, classSpec) {
+    if(fun.is(instSpec)) {
+      if(arguments.length === 1) classSpec = instSpec;
+      instSpec  = instSpec.prototype;
+    }
+
+    // Note: #extend implementations *must not* copy the `constructor` property!
+    if(instSpec ) this.implement(instSpec);
+
+    // Note: overriding static methods sets the special `.base()` property on the constructor...
+    if(classSpec) this.implementStatic(classSpec);
+
+    return this;
   }
 
   function class_implement() {

@@ -33,8 +33,7 @@ define([
    * @class
    * @abstract
    *
-   * @classDesc The base abstract class of type classes,
-   * _independently of their context_.
+   * @classDesc The base abstract class of type classes, whatever their context.
    *
    * The metadata about this class can be accessed through
    * {@link pentaho.type.Abstract.meta}.
@@ -46,7 +45,34 @@ define([
   var Abstract = Base.extend("pentaho.type.Abstract", /** @lends pentaho.type.Abstract# */{
     // NOTE: not calling base to block default Base.js from copying 1st argument into `this`.
     constructor: function() {
+    },
+
+    //region meta property
+    /**
+     * Gets the metadata of this instance's type.
+     *
+     * @type pentaho.type.Value.Meta
+     * @readonly
+     */
+    get meta() {
+      return this.constructor.meta;
+    },
+
+    // Supports Meta instance-level configuration only. Can only be called on the prototype, through Type#implement!
+    // Not documented on purpose, to avoid users trying to configure a type
+    //  when they already have an instance of it, which is not supported...
+    // However, this is the simplest and cleanest way to implement:
+    //   Type.implement({meta: .})
+    // to mean
+    //   Type.Meta.implement(.).Value
+    set meta(config) {
+      var Type = this.constructor;
+      if(this !== Type.prototype)
+        throw error.operInvalid("Use `Type.implement({meta: ...})` instead.");
+
+      if(config) Type.Meta.implement(config);
     }
+    //endregion
   }, /** @lends pentaho.type.Abstract */{
 
     //region meta property
@@ -61,6 +87,16 @@ define([
      */
     get meta() {
       return this.Meta.the;
+    },
+
+    // Supports Meta class-level configuration only.
+    // Not documented on purpose.
+    // Allows writing;
+    //   Type.implementStatic({meta: .})
+    // to mean:
+    //   Type.Meta#implementStatic(.).Value
+    set meta(config) {
+      if(config) this.Meta.implementStatic(config);
     },
     //endregion
 
@@ -77,17 +113,12 @@ define([
       // VALUE
       // Delegate to a virtual method to extend the Value class.
       // This allows complex types to define getters and setters.
-      var Derived = this._extendValue(DerivedMeta, this.base, name, instSpec, classSpec);
+      var DerivedMesa = this.base(name, instSpec, classSpec);
 
-      DerivedMeta.Value = Derived;
-      Derived.Meta = DerivedMeta;
+      DerivedMeta.Mesa = DerivedMesa;
+      DerivedMesa.Meta = DerivedMeta;
 
-      return Derived;
-    },
-
-    // @virtual
-    _extendValue: function(DerivedMeta, baseExtend, name, instSpec, classSpec) {
-      return baseExtend.call(this, name, instSpec, classSpec);
+      return DerivedMesa;
     }
   });
 
@@ -96,15 +127,11 @@ define([
    * @class
    * @abstract
    *
-   * @classDesc The base abstract _metadata_ class of types,
-   * independently of their context.
+   * @classDesc The base abstract _metadata_ class of types, , whatever their context.
    *
-   * A metadata class is a _singleton_ class.
-   * Each class' single instance is accessible through its `the` property,
-   * {@link pentaho.type.Abstract.Meta.the}.
-   * Alternatively,
-   * the singleton metadata instance can also be accessed through
-   * {@link pentaho.type.Abstract.meta}.
+   * Unlike _mesa_ classes, _meta_ classes are _singleton_ classes.
+   * Their singleton instance is exposed through {@link pentaho.type.Abstract.Meta.the}.
+   * Equivalently, it can also be accessed through {@link pentaho.type.Abstract.meta}.
    *
    * @see pentaho.type.Value.Meta
    *
@@ -132,9 +159,7 @@ define([
     /**
      * Gets the unique type id.
      *
-     * The unique type id is auto-generated when creating a new class through
-     * {@link pentaho.type.Abstract.Meta.extend}.
-     * All instances of the type have the same unique id.
+     * The unique type id is auto-generated.
      *
      * Note that anonymous types do not have a {@link pentaho.type.Value.Meta#id}.
      * However, all types have an unique id.
@@ -154,7 +179,7 @@ define([
      * Gets the context where this type class is defined.
      *
      * @name context
-     * @memberOf pentaho.type.Abstract.Meta
+     * @memberOf pentaho.type.Abstract.Meta#
      * @type pentaho.type.IContext
      * @readonly
      * @abstract
@@ -164,13 +189,17 @@ define([
 
     //region root property
     /**
-     * Gets the (singleton) `Value.Meta` instance of the class' context.
+     * Gets the metadata of the root type.
+     *
+     * The root type is the `Value` type of this class' context.
+     *
      * @name root
-     * @memberOf pentaho.type.Abstract.Meta
+     * @memberOf pentaho.type.Abstract.Meta#
      * @type pentaho.type.Value.Meta
      * @readonly
-     * @see pentaho.type.Abstract.Meta#ancestor
      * @abstract
+     *
+     * @see pentaho.type.Abstract.Meta#ancestor
      */
 
     /** @ignore */
@@ -482,7 +511,23 @@ define([
     }
   }, /** @lends pentaho.type.Abstract.Meta */{
 
-    // @override
+    /**
+     * Gets the class of which this one is the metadata class.
+     *
+     * If you're wondering were this name comes from,
+     * "Mesa" is a Greek word which is opposite to "Meta".
+     * See {@link http://www.gwiznlp.com/wp-content/uploads/2014/08/Whats-the-opposite-of-meta.pdf}.
+     *
+     * @name Mesa
+     * @memberOf pentaho.type.Abstract.Meta
+     * @type Class.<pentaho.type.Abstract>
+     * @readonly
+     */
+
+    /**
+     * @override
+     * @ignore
+     */
     _extend: function(name, instSpec) {
       if(!instSpec) instSpec = {};
 
@@ -511,7 +556,7 @@ define([
     _the: null,
 
     /**
-     * Gets the singleton metadata instance.
+     * Gets the type's singleton metadata instance.
      * @type pentaho.type.Value.Meta
      */
     get the() {
@@ -526,7 +571,7 @@ define([
   .implement(AnnotatableLinked);
 
   Abstract.Meta = AbstractMeta;
-  AbstractMeta.Value = Abstract;
+  AbstractMeta.Mesa = Abstract;
 
   return Abstract;
 

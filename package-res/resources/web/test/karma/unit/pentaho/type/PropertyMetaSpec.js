@@ -376,7 +376,7 @@ define([
 
           beforeEach(function() {
             basePropMeta = Base.Meta.the.props.get("baseStr");
-            propMeta = basePropMeta.extend({name: "baseStr"}, Derived.Meta);
+            propMeta = basePropMeta.createSub({name: "baseStr"}, Derived.Meta);
           });
 
           // basic fields
@@ -445,7 +445,7 @@ define([
           });
 
           it("should accept it", function() {
-            var propMeta = basePropMeta.extend({name: "baseStr", type: PostalCode.Meta}, Derived.Meta);
+            var propMeta = basePropMeta.createSub({name: "baseStr", type: PostalCode.Meta}, Derived.Meta);
 
             expect(propMeta instanceof PropertyMeta).toBe(true);
             expect(propMeta.ancestor).toBe(basePropMeta);
@@ -464,8 +464,9 @@ define([
 
           it("should throw", function() {
             expect(function() {
-              basePropMeta.extend({name: "baseStr", type: Integer.Meta}, Derived.Meta);
-            }).toThrowError(error.argInvalid("spec.type", "Sub-property's 'type' does not derive from the base property's 'type'.").message);
+              basePropMeta.createSub({name: "baseStr", type: Integer.Meta}, Derived.Meta);
+            }).toThrowError(error.argInvalid("spec.type",
+                "Sub-properties must have a 'type' that derives from their base property's 'type'.").message);
           });
         });
 
@@ -473,21 +474,23 @@ define([
           it("should throw when base is list and derived isn't", function() {
             var basePropMeta = Base.Meta.the.props.get("baseNumLst");
             expect(function() {
-              basePropMeta.extend({name: "baseNumLst", list: false}, Derived.Meta);
-            }).toThrowError(error.argInvalid("spec.list", "Sub-property has a different 'list' value.").message);
+              basePropMeta.createSub({name: "baseNumLst", list: false}, Derived.Meta);
+            }).toThrowError(
+                error.argInvalid("spec.list", "Sub-properties cannot change the 'list' attribute.").message);
           });
 
           it("should throw when base is not list and derived is", function() {
             var basePropMeta = Base.Meta.the.props.get("baseNum");
             expect(function() {
-              basePropMeta.extend({name: "baseNum", list: true}, Derived.Meta);
-            }).toThrowError(error.argInvalid("spec.list", "Sub-property has a different 'list' value.").message);
+              basePropMeta.createSub({name: "baseNum", list: true}, Derived.Meta);
+            }).toThrowError(
+                error.argInvalid("spec.list", "Sub-properties cannot change the 'list' attribute.").message);
           });
         });
 
         it("should respect other overridden attributes", function() {
           var basePropMeta = Base.Meta.the.props.get("baseNum");
-          var propMeta = basePropMeta.extend({
+          var propMeta = basePropMeta.createSub({
                 name: "baseNum",
                 label: "A",
                 description: "B",
@@ -508,8 +511,8 @@ define([
         it("should throw", function() {
           var basePropMeta = Base.Meta.the.props.get("baseStr");
           expect(function() {
-            basePropMeta.extend({name: "baseStr2"}, Derived.Meta);
-          }).toThrowError(error.argInvalid("spec.name", "Sub-property has a different 'name' value.").message);
+            basePropMeta.createSub({name: "baseStr2"}, Derived.Meta);
+          }).toThrowError(error.argInvalid("spec.name", "Sub-properties cannot change the 'name' attribute.").message);
         });
       });
     }); // #extend(spec, declaringType)...

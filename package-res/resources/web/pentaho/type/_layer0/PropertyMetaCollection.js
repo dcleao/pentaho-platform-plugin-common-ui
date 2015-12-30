@@ -17,8 +17,9 @@ define([
   "./PropertyMeta",
   "../../lang/Collection",
   "../../util/arg",
-  "../../util/error"
-], function(PropertyMeta, Collection, arg, error) {
+  "../../util/error",
+  "../../util/object"
+], function(PropertyMeta, Collection, arg, error, O) {
 
   "use strict";
 
@@ -27,6 +28,7 @@ define([
    * @memberOf pentaho.type
    * @class
    * @extends pentaho.lang.Collection
+   * @implements pentaho.lang.IConfigurable
    *
    * @classDesc A collection of properties.
    *
@@ -119,12 +121,45 @@ define([
       }
 
       // Replace with overridden property.
-      return existing.extend(spec, this._declaringMetaCtor);
+      return existing.createSub(spec, this._declaringMetaCtor);
     },
 
     _cast: function(spec, index) {
       // For new, root, local properties.
       return PropertyMeta.to(spec, this._declaringMetaCtor, index);
+    },
+    //endregion
+
+    //region IConfigurable implementation
+    /**
+     * Configures the properties collection.
+     *
+     * The configuration can be:
+     * 1. an array of {@link pentaho.type.UPropertyMeta}, or
+     * 2. an object whose keys are the property names and the values are {@link pentaho.type.UPropertyMeta},
+     *    having no name or a name equal to the key.
+     *
+     * @param {Object} config The properties configuration.
+     */
+    configure: function(config) {
+      if(!config) throw error.argRequired("config");
+
+      if(config instanceof Array) {
+        this.addMany(config);
+      } else {
+        O.eachOwnDefined(config, function(propConfig, name) {
+          if(propConfig && typeof propConfig === "object") {
+            var name2 = propConfig.name;
+            if(name2) {
+              if(name2 !== name) throw error.argInvalid("config", "Property name does not match object key.");
+            } else {
+              propConfig.name = name;
+            }
+
+            this.add(propConfig);
+          }
+        }, this);
+      }
     }
     //endregion
   });

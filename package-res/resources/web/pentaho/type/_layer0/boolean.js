@@ -43,6 +43,7 @@ define([
      * @extends pentaho.type.Simple.Meta
      *
      * @classDesc The metadata class of {@link pentaho.type.Boolean}.
+     * @ignore
      */
 
     /**
@@ -66,6 +67,8 @@ define([
               : null);
         }
       }
-    }).Meta.implement(bundle.structured["boolean"]).Value;
+    }).implement({
+      meta: bundle.structured["boolean"]
+    });
   };
 });

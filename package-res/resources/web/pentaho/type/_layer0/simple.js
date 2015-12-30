@@ -43,6 +43,7 @@ define([
      * @extends pentaho.type.Value.Meta
      *
      * @classDesc The metadata class of {@link pentaho.type.Simple}.
+     * @ignore
      */
 
     /**
@@ -75,6 +76,8 @@ define([
         "abstract": true,
         styleClass: "pentaho-type-simple"
       }
-    }).Meta.implement(bundle.structured.simple).Value;
+    }).implement({
+      meta: bundle.structured.simple
+    });
   };
 });

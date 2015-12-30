@@ -43,6 +43,7 @@ define([
      * @extends pentaho.type.Simple.Meta
      *
      * @classDesc The metadata class of {@link pentaho.type.String}.
+     * @ignore
      */
 
     /**
@@ -64,7 +65,8 @@ define([
               : null);
         }
       }
-    })
-    .Meta.implement(bundle.structured["string"]).Value;
+    }).implement({
+      meta: bundle.structured["string"]
+    });
   };
 });

@@ -43,6 +43,7 @@ define([
      * @extends pentaho.type.Simple.Meta
      *
      * @classDesc The metadata class of {@link pentaho.type.Date}.
+     * @ignore
      */
 
     /**
@@ -66,6 +67,8 @@ define([
               : [new Error("Value is not of type 'date'.")]);
         }
       }
-    }).Meta.implement(bundle.structured["date"]).Value;
+    }).implement({
+      meta: bundle.structured["date"]
+    });
   };
 });

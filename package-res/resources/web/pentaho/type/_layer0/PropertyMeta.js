@@ -41,6 +41,7 @@ define([
    * @implements pentaho.lang.IWithKey
    * @implements pentaho.lang.IListElement
    * @implements pentaho.lang.ICollectionElement
+   * @implements pentaho.lang.IConfigurable
    *
    * @classdesc The metadata of a property of a complex type.
    *
@@ -96,7 +97,7 @@ define([
     /**
      * Creates a _root_ `PropertyMeta` instance, given a property specification.
      *
-     * Non-root properties are created by calling {@link pentaho.type.PropertyMeta#extend}
+     * Non-root properties are created by calling {@link pentaho.type.PropertyMeta#createSub}
      * on the base property.
      *
      * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
@@ -129,7 +130,7 @@ define([
 
       if(!("label" in spec)) this._label = text.titleFromName(this._name);
 
-      this._configure(spec);
+      this.configure(spec);
     },
 
     // TODO: self-recursive complexes won't work if we don't handle them specially:
@@ -147,7 +148,7 @@ define([
      * @return {pentaho.type.PropertyMeta} The created `PropertyMeta`.
      * @ignore
      */
-    extend: function(spec, declaringMetaCtor) {
+    createSub: function(spec, declaringMetaCtor) {
       if(!spec) throw error.argRequired("spec");
       if(!declaringMetaCtor) throw error.argRequired("declaringMetaCtor");
 
@@ -165,26 +166,26 @@ define([
         if(!(ValueTypeMeta.prototype instanceof this._typeMetaCtor))
           throw error.argInvalid(
               "spec.type",
-              "Sub-property's 'type' does not derive from the base property's 'type'.");
+              "Sub-properties must have a 'type' that derives from their base property's 'type'.");
 
         subProp._typeMetaCtor = ValueTypeMeta;
       }
 
       // Hierarchy consistency of the special properties `name` and `list`.
       if(spec.name && spec.name !== this.name)
-        throw error.argInvalid("spec.name", "Sub-property has a different 'name' value.");
+        throw error.argInvalid("spec.name", "Sub-properties cannot change the 'name' attribute.");
 
       if(spec.list != null && (!!spec.list) !== this.list)
-        throw error.argInvalid("spec.list", "Sub-property has a different 'list' value.");
+        throw error.argInvalid("spec.list", "Sub-properties cannot change the 'list' attribute.");
 
-      subProp._configure(spec);
+      subProp.configure(spec);
 
       return subProp;
     },
 
-    //region Private IConfigurable implementation
+    //region IConfigurable implementation
 
-    // Only used by constructor and extend.
+    // Used by constructor, createSub and PropertyMetaCollection._replace
 
     /**
      * Configures a property.
@@ -192,7 +193,7 @@ define([
      * @param {!pentaho.type.spec.IPropertyMetaConfig} config A property configuration.
      * @ignore
      */
-    _configure: function(config) {
+    configure: function(config) {
       if(!config) throw error.argRequired("config");
 
       // undefined passes through.

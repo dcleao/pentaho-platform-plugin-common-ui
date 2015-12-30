@@ -134,8 +134,9 @@ define([
         "abstract": true,
         styleClass: "pentaho-type-value"
       }
-    })
-    .Meta.implement(bundle.structured.value).Value;
+    }).implement({
+      meta: bundle.structured.value
+    });
 
     return Value;
   };

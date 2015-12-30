@@ -133,7 +133,7 @@ define([
       var proto = fun.prototype;
 
       if(proto instanceof Abstract     ) return this._getByType(fun, sync);
-      if(proto instanceof Abstract.Meta) return this._getByType(fun.Value, sync);
+      if(proto instanceof Abstract.Meta) return this._getByType(fun.Mesa, sync);
 
       // Assume it's a factory function.
       return this._getByFactory(fun, sync);

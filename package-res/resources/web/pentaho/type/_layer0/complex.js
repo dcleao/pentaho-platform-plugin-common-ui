@@ -91,60 +91,30 @@ define([
         _props: null,
 
         /**
-         * Gets the `PropertyMeta` collection of the complex type.
+         * Gets or configures (when set) the `PropertyMeta` collection of the complex type.
+         *
+         * To _configure_ the properties _set_ `props` with
+         * any value accepted by {@link pentaho.type.PropertyMetaCollection#configure}.
          *
          * @type pentaho.type.PropertyMetaCollection
          * @readonly
          */
         get props() {
-          return this._props;
-        } //endregion
-      }
-    }, {
-      meta: /** @lends pentaho.type.Complex.Meta */{
+          // Always get/create from/on the class' prototype
+          var proto = this.constructor.prototype;
+          return O.getOwn(proto, "_props") ||
+              (proto._props = PropertyMetaCollection.to([], /*declaringMetaCtor:*/this.constructor));
+        },
 
-        // Documentation override
-        /**
-         * Creates a sub-type of this one.
-         *
-         * @name pentaho.type.Complex.Meta.extend
-         *
-         * @param {string} [name] The name of the complex sub-type.
-         *   This is used mostly for debugging and is otherwise unrelated to {@link pentaho.type.Value.Meta#id}.
-         *
-         * @param {pentaho.type.spec.IComplexMeta} instSpec The complex type metadata specification.
-         * @param {Object} [classSpec] Class-level members of the class.
-         *
-         * @return {Class.<pentaho.type.Complex.Meta>} The created sub-class.
-         */
-
-        _extend: function(name, instSpec) {
-          // Prevent property "props" being added to the prototype.
-          var propSpecs = O["delete"](instSpec, "props");
-
-          var DerivedMeta = this.base.apply(this, arguments);
-
-          // Not using Class.init, cause there would be no way to pass propSpecs to it
-          // (unless an alternate instSpec prop was used...)
-          initMeta(DerivedMeta, propSpecs);
-
-          return DerivedMeta;
+        set props(propSpecs) {
+          this.props.configure(propSpecs);
         }
-      },
-
-      // @override
-      _extendValue: function(DerivedMeta, baseExtend, name, instSpec, classSpec) {
-        return baseExtend.call(this, name, instSpec, classSpec);
+        //endregion
       }
-    }).Meta.implement(bundle.structured.complex).Value;
-
-    // Create root properties collection.
-    initMeta(Complex.Meta);
+    }).implement({
+      meta: bundle.structured.complex
+    });
 
     return Complex;
   };
-
-  function initMeta(ComplexMeta, propSpecs) {
-    ComplexMeta.prototype._props = PropertyMetaCollection.to(propSpecs, /*declaringMetaCtor:*/ComplexMeta);
-  }
 });
