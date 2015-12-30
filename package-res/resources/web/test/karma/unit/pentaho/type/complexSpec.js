@@ -52,22 +52,22 @@ define([
       });
 
       it(".Meta has different 'info' attributes from those of Value.Meta", function() {
-        expect(Complex.Meta.the.label).not.toBe(Value.Meta.the.label);
+        expect(Complex.meta.label).not.toBe(Value.meta.label);
 
-        expect(Complex.Meta.the.description).not.toBe(Value.Meta.the.description);
+        expect(Complex.meta.description).not.toBe(Value.meta.description);
       });
 
       describe("the `props` property", function() {
         it("should be defined", function() {
-           expect(Complex.Meta.the.props).toBeTruthy();
+           expect(Complex.meta.props).toBeTruthy();
         });
 
         it("should contain an instance of PropertyMetaCollection", function() {
-           expect(Complex.Meta.the.props instanceof PropertyMetaCollection).toBe(true);
+           expect(Complex.meta.props instanceof PropertyMetaCollection).toBe(true);
         });
 
         it("should be an empty collection", function() {
-           expect(Complex.Meta.the.props.length).toBe(0);
+           expect(Complex.meta.props.length).toBe(0);
         });
       });
     }); // anatomy
@@ -118,7 +118,7 @@ define([
 
         expect(Derived.Meta).not.toBe(Value.Meta);
         expect(Derived.Meta).not.toBe(Complex.Meta);
-        expect(Derived.Meta.the instanceof Complex.Meta).toBe(true);
+        expect(Derived.meta instanceof Complex.Meta).toBe(true);
       });
 
       describe(".Meta#props -", function() {
@@ -131,8 +131,8 @@ define([
               }
             });
 
-            expect(Derived.Meta.the.props != null).toBe(true);
-            expect(Derived.Meta.the.props instanceof PropertyMetaCollection).toBe(true);
+            expect(Derived.meta.props != null).toBe(true);
+            expect(Derived.meta.props instanceof PropertyMetaCollection).toBe(true);
 
             Derived = Complex.extend({
               meta: {
@@ -142,8 +142,8 @@ define([
               }
             });
 
-            expect(Derived.Meta.the.props != null).toBe(true);
-            expect(Derived.Meta.the.props instanceof PropertyMetaCollection).toBe(true);
+            expect(Derived.meta.props != null).toBe(true);
+            expect(Derived.meta.props instanceof PropertyMetaCollection).toBe(true);
           });
 
           it("should have an empty props collection", function() {
@@ -154,7 +154,7 @@ define([
               }
             });
 
-            expect(Derived.Meta.the.props.length).toBe(0);
+            expect(Derived.meta.props.length).toBe(0);
 
             Derived = Complex.extend({
               meta: {
@@ -164,7 +164,7 @@ define([
               }
             });
 
-            expect(Derived.Meta.the.props.length).toBe(0);
+            expect(Derived.meta.props.length).toBe(0);
           });
         }); // when [#props is] not specified or specified empty
 
@@ -182,11 +182,11 @@ define([
                 });
 
             it("should result in a props collection with length 1", function() {
-              expect(Derived.Meta.the.props.length).toBe(1);
+              expect(Derived.meta.props.length).toBe(1);
             });
 
             describe("the single property meta -", function() {
-              var propMeta = Derived.Meta.the.props[0];
+              var propMeta = Derived.meta.props[0];
 
               it("should be a property meta instance", function() {
                 expect(propMeta instanceof PropertyMeta).toBe(true);
@@ -201,11 +201,11 @@ define([
               });
 
               it("should have `type` string", function() {
-                expect(propMeta.type).toBe(String.Meta.the);
+                expect(propMeta.type).toBe(String.meta);
               });
 
               it("should have `declaringType` equal to containing ComplexMeta class", function() {
-                expect(propMeta.declaringType).toBe(Derived.Meta.the);
+                expect(propMeta.declaringType).toBe(Derived.meta);
               });
 
               it("should have `list=false`", function() {
