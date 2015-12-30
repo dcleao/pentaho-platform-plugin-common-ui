@@ -147,7 +147,7 @@ define([
       if(config instanceof Array) {
         this.addMany(config);
       } else {
-        O.eachOwnDefined(config, function(propConfig, name) {
+        O.eachOwn(config, function(propConfig, name) {
           if(propConfig && typeof propConfig === "object") {
             var name2 = propConfig.name;
             if(name2) {

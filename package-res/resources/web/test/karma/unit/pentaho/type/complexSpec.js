@@ -19,8 +19,9 @@ define([
   "pentaho/type/value",
   "pentaho/type/string",
   "pentaho/type/_layer0/PropertyMeta",
-  "pentaho/type/_layer0/PropertyMetaCollection"
-], function(Context, complexFactory, valueFactory, stringFactory, PropertyMeta, PropertyMetaCollection) {
+  "pentaho/type/_layer0/PropertyMetaCollection",
+  "pentaho/util/error",
+], function(Context, complexFactory, valueFactory, stringFactory, PropertyMeta, PropertyMetaCollection, error) {
 
   "use strict";
 
@@ -289,6 +290,99 @@ define([
             });
           });
 
+          describe("with an entry that is not a base type property -", function() {
+            var A = Complex.extend({
+              meta: {
+                label: "A",
+                props: ["fooBar", "guru"]
+              }
+            });
+
+            var B = A.extend({
+              meta: {
+                label: "B",
+                props: [{name: "guru", label: "HELLO"}, {name: "babah"}]
+              }
+            });
+
+            it("should append a new property", function() {
+              expect(A.meta.props.length).toBe(2);
+              expect(B.meta.props.length).toBe(3);
+
+              expect(B.meta.props[0].name).toBe("fooBar");
+              expect(B.meta.props[1].name).toBe("guru");
+              expect(B.meta.props[2].name).toBe("babah");
+            });
+          });
+
+          describe("with a dictionary -", function() {
+            it("should define the defined properties", function() {
+              var A = Complex.extend({
+                meta: {
+                  label: "A",
+                  props: {"fooBar": {}, "guru": {}}
+                }
+              });
+
+              expect(A.meta.props.length).toBe(2);
+              expect(A.meta.props[0]).not.toBe(A.meta.props[1]);
+
+              var iName0 = ["fooBar", "guru"].indexOf(A.meta.props[0].name);
+              var iName1 = ["fooBar", "guru"].indexOf(A.meta.props[1].name);
+
+              expect(iName0).not.toBe(-1);
+              expect(iName1).not.toBe(-1);
+
+              expect(iName0).not.toBe(iName1);
+            });
+
+            it("should ignore undefined properties", function() {
+              var A = Complex.extend({
+                meta: {
+                  label: "A",
+                  props: {"fooBar": {}, "guru": {}, "dada": null, "babah": undefined}
+                }
+              });
+
+              expect(A.meta.props.length).toBe(2);
+              expect(A.meta.props.get("fooBar") instanceof PropertyMeta).toBe(true);
+              expect(A.meta.props.get("guru") instanceof PropertyMeta).toBe(true);
+              expect(A.meta.props.get("dada")).toBe(null);
+              expect(A.meta.props.get("babah")).toBe(null);
+            });
+
+            it("should throw if a property specifies a name different from the key", function() {
+              expect(function() {
+                Complex.extend({
+                  meta: {
+                    label: "A",
+                    props: {"fooBar": {name: "babah"}}
+                  }
+                });
+              }).toThrowError(error.argInvalid("config", "Property name does not match object key.").message);
+            });
+          });
+
+          it("should be possible to configure existing properties using a dictionary and `Type.implement`", function() {
+            var A = Complex.extend({
+              meta: {
+                label: "A",
+                props: ["x", "y"]
+              }
+            });
+
+            A.implement({
+              meta: {
+                props: {
+                  "x": {label: "labelX"},
+                  "y": {label: "labelY"}
+                }
+              }
+            });
+
+            expect(A.meta.props[0].label).toBe("labelX");
+            expect(A.meta.props[1].label).toBe("labelY");
+          });
         }); // when specified non-empty
       }); // #props
 
