@@ -22,7 +22,7 @@ define([
   "./number",
   "./boolean",
   "./date"
-], function(Abstract, Value, Simple, Complex, String, Number, Boolean, Date) {
+], function(Item, Value, Simple, Complex, String, Number, Boolean, Date) {
 
   "use strict";
   
@@ -30,7 +30,7 @@ define([
   // * all classes at a basic level
   // * all standard simple types (from which complex properties build complex types...)
   return {
-    "Abstract": Abstract,
+    "Item": Item,
 
     // types
     "value":    Value,

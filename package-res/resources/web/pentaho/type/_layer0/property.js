@@ -25,16 +25,15 @@ define([
   "use strict";
 
   var configurableProps = {
-      "label": 1,
-      "description": 1,
-      "category": 1,
-      "helpUrl": 1,
-      "defaultValue": 1,
-      "format": 1,
-      "browsable": 1
-    };
-
-  var O_isProtoOf = Object.prototype.isPrototypeOf;
+          "label": 1,
+          "description": 1,
+          "category": 1,
+          "helpUrl": 1,
+          "defaultValue": 1,
+          "format": 1,
+          "browsable": 1
+        },
+      O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
    * @name pentaho.type.Property
