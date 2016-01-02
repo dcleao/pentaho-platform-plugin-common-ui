@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 define([
-  "./PropertyMeta",
+  "./Property",
   "../../lang/Collection",
   "../../util/arg",
   "../../util/error",
   "../../util/object"
-], function(PropertyMeta, Collection, arg, error, O) {
+], function(Property, Collection, arg, error, O) {
 
   "use strict";
 
@@ -35,7 +35,7 @@ define([
    * @description Initializes a property collection.
    * This constructor is used internally by the `pentaho/type` package and should not be used directly.
    *
-   * @see pentaho.type.PropertyMeta
+   * @see pentaho.type.Property
    */
   return Collection.extend("pentaho.type.PropertyMetaCollection",
       /** @lends pentaho.type.PropertyMetaCollection# */{
@@ -43,23 +43,20 @@ define([
     /**
      * Initializes a property collection.
      *
-     * @param {Class.<pentaho.type.Complex.Meta>} declaringMetaCtor The metadata class of the complex type
-     *   that declares non-inherited properties.
+     * @param {pentaho.type.Complex.Meta} declaringMeta The metadata of the declaring complex type.
      * @ignore
      */
-    constructor: function(declaringMetaCtor) {
-      if(!declaringMetaCtor) throw error.argRequired("declaringMetaCtor");
+    constructor: function(declaringMeta) {
+      if(!declaringMeta) throw error.argRequired("declaringMeta");
 
-      /**
-       * The metadata class of the complex type that _owns_ this collection.
-       * @type Class.<pentaho.type.Complex.Meta>
-       * @ignore
-       */
-      this._declaringMetaCtor = declaringMetaCtor;
+      this._cachedKeyArgs = {
+        declaringMeta: declaringMeta,
+        index: -1
+      };
 
       // Copy the declaring complex type's ancestor's properties.
-      var ancestorMetaCtor = declaringMetaCtor.ancestor,
-          colBase = ancestorMetaCtor && ancestorMetaCtor.prototype.props;
+      var ancestorMeta = declaringMeta.ancestor,
+          colBase = ancestorMeta && ancestorMeta.props;
 
       if(colBase) {
         // Backup any provided specs.
@@ -83,7 +80,7 @@ define([
     },
 
     //region List implementation
-    elemClass: PropertyMeta,
+    elemClass: Property.Meta,
 
     _adding: function(spec, index, ka) {
       if(!spec) throw error.argRequired("props[i]");
@@ -93,7 +90,7 @@ define([
         // An object spec? Otherwise it's a noop - nothing to configure or override.
         // Configure existing local property or override inherited one.
         if(spec !== name) {
-          if(existing.declaringType === this._declaringMetaCtor.the)
+          if(existing.declaringType === this._cachedKeyArgs.declaringMeta)
             existing.configure(spec);
           else
             this.replace(spec, this.indexOf(existing));
@@ -113,7 +110,9 @@ define([
       if(name !== existing.name)
         throw error.argInvalid("props[i]", "Incorrect property name.");
 
-      if(existing.declaringType === this._declaringMetaCtor.the) {
+      var ka = this._cachedKeyArgs;
+
+      if(existing.declaringType === ka.declaringMeta) {
         // Configure existing local property and cancel replace.
         // If spec is not an object, then it's a noop.
         if(spec !== name) existing.configure(spec);
@@ -121,12 +120,16 @@ define([
       }
 
       // Replace with overridden property.
-      return existing.createSub(spec, this._declaringMetaCtor);
+      return Property.extendProto(existing, spec, ka).meta;
     },
 
     _cast: function(spec, index) {
       // For new, root, local properties.
-      return new PropertyMeta(spec, this._declaringMetaCtor, index);
+      var ka = this._cachedKeyArgs;
+      ka.index = index;
+      var p = Property.extendProto(null, ka);
+      ka.index = -1;
+      return p;
     },
     //endregion
 

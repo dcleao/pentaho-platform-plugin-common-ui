@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "./Abstract",
+  "./Item",
   "./value",
   "./simple",
   "./complex",

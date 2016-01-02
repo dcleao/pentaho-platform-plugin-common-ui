@@ -94,7 +94,7 @@ define([
 
         while(i--) {
           pMeta = pMetas[i];
-          v = hasSpec ? spec[isArray ? pMeta.ordinal : pMeta.name] : undefined;
+          v = hasSpec ? spec[isArray ? pMeta.index : pMeta.name] : undefined;
           this[pMeta._namePriv] = null; // new Property(pMeta, this, v);
         }
       },
