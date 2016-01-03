@@ -43,6 +43,19 @@ define([
 
       var Derived;
 
+      function createRootPropMeta(metaSpec) {
+        return Property.extendProto(
+            null, {
+              meta: metaSpec
+            },
+            {
+              declaringMeta: Derived.meta,
+              index: 0,
+              mesa: Derived.prototype,
+              isRoot: true
+            }).meta;
+      }
+
       beforeEach(function() {
         Derived = Complex.extend();
       });
@@ -51,7 +64,7 @@ define([
         var propMeta;
 
         beforeEach(function() {
-          propMeta = PropertyMeta.to("fooBarGuru", {declaringMeta: Derived.Meta, index: 0});
+          propMeta = createRootPropMeta("fooBarGuru");
         });
 
         it("should build a property meta instance", function() {
@@ -98,7 +111,7 @@ define([
           var propMeta;
 
           beforeEach(function() {
-            propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo"});
           });
 
           it("should build a property meta instance", function() {
@@ -120,21 +133,21 @@ define([
 
         describe("`spec.list` - ", function() {
           it("should default to `false`", function() {
-            var propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo"});
             expect(propMeta.list).toBe(false);
           });
 
           it("should respect the specified value", function() {
-            var propMeta = PropertyMeta.to({name: "foo", list: true}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo1", list: true});
             expect(propMeta.list).toBe(true);
 
-            propMeta = PropertyMeta.to({name: "foo", list: false}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo2", list: false});
             expect(propMeta.list).toBe(false);
 
-            propMeta = PropertyMeta.to({name: "foo", list: 0}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo3", list: 0});
             expect(propMeta.list).toBe(false);
 
-            propMeta = PropertyMeta.to({name: "foo", list: 1}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo4", list: 1});
             expect(propMeta.list).toBe(true);
           });
         }); // spec.list
@@ -144,21 +157,21 @@ define([
           // NOTE: tests of Context#get test type resolution more thoroughly.
 
           it("should default to String", function() {
-            var propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo"});
             expect(propMeta.type).toBe(String.meta);
           });
 
           it("should resolve the specified value", function() {
-            var propMeta = PropertyMeta.to({name: "foo", type: "string"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo1", type: "string"});
             expect(propMeta.type).toBe(String.meta);
 
-            propMeta = PropertyMeta.to({name: "foo", type: "boolean"}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo2", type: "boolean"});
             expect(propMeta.type).toBe(Boolean.meta);
           });
 
           it("should throw if the specified value is an unloaded module", function() {
             expect(function() {
-              PropertyMeta.to({name: "foo", type: "bar/oof"}, {declaringMeta: Derived.Meta, index: 0});
+              createRootPropMeta({name: "foo", type: "bar/oof"});
             }).toThrowError(/bar\/oof/);
           });
         }); // spec.type
@@ -168,12 +181,12 @@ define([
             it("should throw`", function() {
               function expectIt(name) {
                 expect(function() {
-                  PropertyMeta.to({
+                  createRootPropMeta({
                       name: name,
                       list: false,
                       type: "string"
-                    }, {declaringMeta: Derived.Meta, index: 0});
-                }).toThrowError(error.argRequired("spec.name").message);
+                    });
+                }).toThrowError(error.argRequired("name").message);
               }
 
               expectIt(undefined);
@@ -184,11 +197,11 @@ define([
 
           describe("when truthy -", function() {
             it("should respect it", function() {
-              var propMeta = PropertyMeta.to({
+              var propMeta = createRootPropMeta({
                     name: "fooBar",
                     list: true,
                     type: "string"
-                  }, {declaringMeta: Derived.Meta, index: 0});
+                  });
 
               expect(propMeta.name).toBe("fooBar");
             });
@@ -197,139 +210,139 @@ define([
 
         describe("`spec.label` - ", function() {
           it("should default to the pluralization of `name`", function() {
-            var propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo"});
             expect(propMeta.label).toBe("Foo");
           });
 
           it("should convert empty to default", function() {
-            var propMeta = PropertyMeta.to({name: "foo", label: ""}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", label: ""});
             expect(propMeta.label).toBe("Foo");
           });
 
           it("should convert null to default", function() {
-            var propMeta = PropertyMeta.to({name: "foo", label: null}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", label: null});
             expect(propMeta.label).toBe("Foo");
           });
 
           it("should convert undefined to default", function() {
-            var propMeta = PropertyMeta.to({name: "foo", label: undefined}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", label: undefined});
             expect(propMeta.label).toBe("Foo");
           });
 
           it("should respect the specified value", function() {
-            var propMeta = PropertyMeta.to({name: "foo", label: "MyFoo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", label: "MyFoo"});
             expect(propMeta.label).toBe("MyFoo");
           });
         }); // spec.label
 
         describe("`spec.description` - ", function() {
           it("should default to null", function() {
-            var propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo1"});
             expect(propMeta.description).toBe(null);
 
-            propMeta = PropertyMeta.to({name: "foo", description: undefined}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo2", description: undefined});
             expect(propMeta.description).toBe(null);
           });
 
           it("should convert empty to null", function() {
-            var propMeta = PropertyMeta.to({name: "foo", description: ""}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", description: ""});
             expect(propMeta.description).toBe(null);
           });
 
           it("should respect null", function() {
-            var propMeta = PropertyMeta.to({name: "foo", description: null}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", description: null});
             expect(propMeta.description).toBe(null);
           });
 
           it("should respect the specified value", function() {
-            var propMeta = PropertyMeta.to({name: "foo", description: "MyFoo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", description: "MyFoo"});
             expect(propMeta.description).toBe("MyFoo");
           });
         }); // spec.description
 
         describe("`spec.category` - ", function() {
           it("should default to null", function() {
-            var propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo1"});
             expect(propMeta.category).toBe(null);
 
-            propMeta = PropertyMeta.to({name: "foo", category: undefined}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo2", category: undefined});
             expect(propMeta.category).toBe(null);
           });
 
           it("should convert empty to null", function() {
-            var propMeta = PropertyMeta.to({name: "foo", category: ""}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", category: ""});
             expect(propMeta.category).toBe(null);
           });
 
           it("should respect null", function() {
-            var propMeta = PropertyMeta.to({name: "foo", category: null}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", category: null});
             expect(propMeta.category).toBe(null);
           });
 
           it("should respect the specified value", function() {
-            var propMeta = PropertyMeta.to({name: "foo", category: "MyFoo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", category: "MyFoo"});
             expect(propMeta.category).toBe("MyFoo");
           });
         }); // spec.category
 
         describe("`spec.helpUrl` - ", function() {
           it("should default to null", function() {
-            var propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo1"});
             expect(propMeta.helpUrl).toBe(null);
 
-            propMeta = PropertyMeta.to({name: "foo", helpUrl: undefined}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo2", helpUrl: undefined});
             expect(propMeta.helpUrl).toBe(null);
           });
 
           it("should convert empty to null", function() {
-            var propMeta = PropertyMeta.to({name: "foo", helpUrl: ""}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", helpUrl: ""});
             expect(propMeta.helpUrl).toBe(null);
           });
 
           it("should respect null", function() {
-            var propMeta = PropertyMeta.to({name: "foo", helpUrl: null}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", helpUrl: null});
             expect(propMeta.helpUrl).toBe(null);
           });
 
           it("should respect the specified value", function() {
-            var propMeta = PropertyMeta.to({name: "foo", helpUrl: "MyFoo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", helpUrl: "MyFoo"});
             expect(propMeta.helpUrl).toBe("MyFoo");
           });
         }); // spec.helpUrl
 
         describe("`spec.browsable` - ", function() {
           it("should default to true", function() {
-            var propMeta = PropertyMeta.to({name: "foo"}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo"});
             expect(propMeta.browsable).toBe(true);
           });
 
           it("should convert undefined to default", function() {
-            var propMeta = PropertyMeta.to({name: "foo", browsable: undefined}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", browsable: undefined});
             expect(propMeta.browsable).toBe(true);
           });
 
           it("should convert null to default", function() {
-            var propMeta = PropertyMeta.to({name: "foo", browsable: null}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo", browsable: null});
             expect(propMeta.browsable).toBe(true);
           });
 
           it("should cast other values to boolean", function() {
-            var propMeta = PropertyMeta.to({name: "foo", browsable: 1}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = createRootPropMeta({name: "foo1", browsable: 1});
             expect(propMeta.browsable).toBe(true);
 
-            propMeta = PropertyMeta.to({name: "foo", browsable: 0}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo2", browsable: 0});
             expect(propMeta.browsable).toBe(false);
 
-            propMeta = PropertyMeta.to({name: "foo", browsable: ""}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo3", browsable: ""});
             expect(propMeta.browsable).toBe(false);
 
-            propMeta = PropertyMeta.to({name: "foo", browsable: true}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo4", browsable: true});
             expect(propMeta.browsable).toBe(true);
 
-            propMeta = PropertyMeta.to({name: "foo", browsable: "yes"}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo5", browsable: "yes"});
             expect(propMeta.browsable).toBe(true);
 
-            propMeta = PropertyMeta.to({name: "foo", browsable: "no"}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = createRootPropMeta({name: "foo6", browsable: "no"});
             expect(propMeta.browsable).toBe(true);
           });
         }); // spec.list
@@ -342,6 +355,17 @@ define([
     describe("#extend(spec, declaringType) - extending a base property -", function() {
       var Base,
           Derived;
+
+      function extendPropMeta(baseMeta, subMetaSpec) {
+        return Property.extendProto(
+            baseMeta.mesa, {
+              meta: subMetaSpec
+            },
+            {
+              declaringMeta: Derived.meta,
+              mesa: Derived.prototype
+            }).meta;
+      }
 
       beforeEach(function() {
         Base = Complex.extend({
@@ -377,7 +401,7 @@ define([
 
           beforeEach(function() {
             basePropMeta = Base.meta.props.get("baseStr");
-            propMeta = basePropMeta.createSub({name: "baseStr"}, {declaringMeta: Derived.Meta, index: 0});
+            propMeta = extendPropMeta(basePropMeta, {name: "baseStr"});
           });
 
           // basic fields
@@ -446,7 +470,7 @@ define([
           });
 
           it("should accept it", function() {
-            var propMeta = basePropMeta.createSub({name: "baseStr", type: PostalCode.Meta}, {declaringMeta: Derived.Meta, index: 0});
+            var propMeta = extendPropMeta(basePropMeta, {name: "baseStr", type: PostalCode.Meta});
 
             expect(propMeta instanceof PropertyMeta).toBe(true);
             expect(propMeta.ancestor).toBe(basePropMeta);
@@ -465,8 +489,8 @@ define([
 
           it("should throw", function() {
             expect(function() {
-              basePropMeta.createSub({name: "baseStr", type: Integer.Meta}, {declaringMeta: Derived.Meta, index: 0});
-            }).toThrowError(error.argInvalid("spec.type",
+              extendPropMeta(basePropMeta, {name: "baseStr", type: Integer.Meta});
+            }).toThrowError(error.argInvalid("type",
                 "Sub-properties must have a 'type' that derives from their base property's 'type'.").message);
           });
         });
@@ -475,30 +499,30 @@ define([
           it("should throw when base is list and derived isn't", function() {
             var basePropMeta = Base.meta.props.get("baseNumLst");
             expect(function() {
-              basePropMeta.createSub({name: "baseNumLst", list: false}, {declaringMeta: Derived.Meta, index: 0});
+              extendPropMeta(basePropMeta, {name: "baseNumLst", list: false});
             }).toThrowError(
-                error.argInvalid("spec.list", "Sub-properties cannot change the 'list' attribute.").message);
+                error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.").message);
           });
 
           it("should throw when base is not list and derived is", function() {
             var basePropMeta = Base.meta.props.get("baseNum");
             expect(function() {
-              basePropMeta.createSub({name: "baseNum", list: true}, {declaringMeta: Derived.Meta, index: 0});
+              extendPropMeta(basePropMeta, {name: "baseNum", list: true});
             }).toThrowError(
-                error.argInvalid("spec.list", "Sub-properties cannot change the 'list' attribute.").message);
+                error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.").message);
           });
         });
 
         it("should respect other overridden attributes", function() {
           var basePropMeta = Base.meta.props.get("baseNum");
-          var propMeta = basePropMeta.createSub({
+          var propMeta = extendPropMeta(basePropMeta, {
                 name: "baseNum",
                 label: "A",
                 description: "B",
                 helpUrl: "C",
                 category: "D",
                 browsable: true
-              }, {declaringMeta: Derived.Meta, index: 0});
+              });
 
           expect(propMeta.label).toBe("A");
           expect(propMeta.description).toBe("B");
@@ -512,8 +536,8 @@ define([
         it("should throw", function() {
           var basePropMeta = Base.meta.props.get("baseStr");
           expect(function() {
-            basePropMeta.createSub({name: "baseStr2"}, {declaringMeta: Derived.Meta, index: 0});
-          }).toThrowError(error.argInvalid("spec.name", "Sub-properties cannot change the 'name' attribute.").message);
+            extendPropMeta(basePropMeta, {name: "baseStr2"});
+          }).toThrowError(error.argInvalid("name", "Property cannot change the 'name' attribute.").message);
         });
       });
     }); // #extend(spec, declaringType)...

@@ -118,10 +118,8 @@ define([
           if(!this._name) this.name = null; // throws...
 
           // Force assuming default values
-          if(!this._type)  this.type = null;
-          if(!this._label) this._resetLabel();
-
-          this._createValueAccessor();
+          if(!this._typeMeta) this.type = null;
+          if(!this._label)    this._resetLabel();
         }
       },
 
@@ -234,13 +232,20 @@ define([
 
         if(this.isRoot) {
           if(!value) throw error.argRequired("name");
-          // Can only be set once,or throws.
-          O.setConst(this, "_name", value);
-          O.setConst(this, "_namePriv", "_" + value);
+          if(this._name) {
+            if(this._name !== value)
+              throw error.argInvalid("name", "Property cannot change the 'name' attribute.");
+          } else {
+            // Can only be set once,or throws.
+            O.setConst(this, "_name", value);
+            O.setConst(this, "_namePriv", "_" + value);
+
+            this._createValueAccessor();
+          }
         } else {
           // Hierarchy consistency
           if(value && value !== this._name)
-            throw error.argInvalid("name", "Sub-properties cannot change the 'name' attribute.");
+            throw error.argInvalid("name", "Property cannot change the 'name' attribute.");
         }
       },
       //endregion
@@ -287,7 +292,7 @@ define([
 
           // Validate that it is a sub-type of the base property's type.
           if(typeMeta !== this._typeMeta) {
-            if(!O_isProtoOf.call(typeMeta, this._typeMeta))
+            if(!O_isProtoOf.call(this._typeMeta, typeMeta))
               throw error.argInvalid(
                   "type",
                   "Sub-properties must have a 'type' that derives from their base property's 'type'.");
@@ -330,7 +335,7 @@ define([
             namePriv = this._namePriv;
 
         if((name in mesa) || (namePriv in mesa))
-          throw error.argInvalid("spec.name", "Property cannot have name '" + name + "' cause it's reserved.");
+          throw error.argInvalid("name", "Property cannot have name '" + name + "' cause it's reserved.");
 
         // Receives a `Property` instance (see `Complex#constructor`).
         //mesa[namePriv] = new Property( ... );

@@ -165,8 +165,8 @@ define([
 
     // Wire proto and constructor, so that the `instanceof` operator works.
     Object.defineProperty(subProto, "constructor", {
-      configurable: true,
-      writable: true,
+      //configurable: true,
+      //writable: true,
       value: SubClass
     });
     SubClass.prototype = subProto;
@@ -290,7 +290,9 @@ define([
          name !== "valueOf" &&
          name !== "Array" &&
          name !== "Object" &&
-         name !== "base")
+         name !== "base" &&
+         name !== "name" &&
+         name !== "displayName")
         inst_extend_propDesc.call(this, name, BaseClass, undefined, /*funOnly:*/true);
   }
 

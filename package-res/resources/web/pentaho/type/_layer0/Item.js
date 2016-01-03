@@ -139,7 +139,7 @@ define([
       // 3. The Meta class requires Mesa to already exist, to be able to define accessors
       var metaInstSpec  = O["delete"](instSpec,  "meta"),
           metaClassSpec = O["delete"](classSpec, "meta"),
-          metaName      = this.name && (this.name + ".Meta");
+          metaName      = SubMesa.name && (SubMesa.name + ".Meta");
 
       var ka = keyArgs ? Object.create(keyArgs) : {};
       ka.mesa = SubMesa.prototype;
