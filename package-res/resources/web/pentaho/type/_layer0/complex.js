@@ -110,7 +110,7 @@ define([
         _props: null,
 
         /**
-         * Gets or configures (when set) the `PropertyMeta` collection of the complex type.
+         * Gets or configures (when set) the `Property.Meta` collection of the complex type.
          *
          * To _configure_ the properties _set_ `props` with
          * any value accepted by {@link pentaho.type.PropertyMetaCollection#configure}.

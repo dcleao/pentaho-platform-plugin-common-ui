@@ -71,10 +71,7 @@ define([
       // TODO: countMin, countMax, required, applicable, readonly, visible, value, members?, p
 
       /**
-       * Creates a _root_ property metadata instance, given a property specification.
-       *
-       * Non-root properties are created by calling {@link pentaho.type.PropertyMeta#createSub}
-       * on the base property.
+       * Creates a property metadata instance, given a property specification.
        *
        * @param {pentaho.type.spec.UPropertyMeta} spec A property name or specification object.
        * @param {object} keyArgs Keyword arguments.
@@ -94,13 +91,12 @@ define([
         // Validate same context as base?
         this._declaringMeta = arg.required(keyArgs, "declaringMeta", "keyArgs");
 
-        var isRoot = this.isRoot;
-        if(!isRoot) {
+        if(!this.isRoot) {
           // Hierarchy consistency
           if(spec.name && spec.name !== this._name)
             throw error.argInvalid("spec.name", "Sub-properties cannot change the 'name' attribute.");
 
-          if(spec.list != null && (!!spec.list) !== this._list)
+          if(spec.list != null && Boolean(spec.list) !== this._list)
             throw error.argInvalid("spec.list", "Sub-properties cannot change the 'list' attribute.");
 
           // Resolve value type synchronously.
@@ -198,7 +194,7 @@ define([
 
       //region IListElement
       /**
-       * Gets the singular name of `PropertyMeta` list-elements.
+       * Gets the singular name of `Property.Meta` list-elements.
        * @type string
        * @readonly
        * @default "property"
@@ -208,7 +204,7 @@ define([
 
       //region IWithKey implementation
       /**
-       * Gets the singular name of `PropertyMeta` keys.
+       * Gets the singular name of `Property.Meta` keys.
        * @type string
        * @readonly
        * @default "name"

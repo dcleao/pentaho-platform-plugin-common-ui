@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/Abstract",
+  "pentaho/type/Item",
   "pentaho/type/Context",
   "pentaho/type/value"
 ], function(Abstract, Context, valueFactory) {

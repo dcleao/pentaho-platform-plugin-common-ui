@@ -15,19 +15,20 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/type/_layer0/PropertyMeta",
+  "pentaho/type/_layer0/Property",
   "pentaho/type/complex",
   "pentaho/type/string",
   "pentaho/type/boolean",
   "pentaho/type/number",
   "pentaho/util/error"
-], function(Context, PropertyMeta, complexFactory, stringFactory, booleanFactory, numberFactory, error) {
+], function(Context, Property, complexFactory, stringFactory, booleanFactory, numberFactory, error) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
   var context = new Context(),
+      PropertyMeta = Property.Meta,
       Boolean = context.get(booleanFactory),
       Complex = context.get(complexFactory),
       String  = context.get(stringFactory),

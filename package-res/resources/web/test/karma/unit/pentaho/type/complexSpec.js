@@ -18,16 +18,17 @@ define([
   "pentaho/type/complex",
   "pentaho/type/value",
   "pentaho/type/string",
-  "pentaho/type/_layer0/PropertyMeta",
+  "pentaho/type/_layer0/Property",
   "pentaho/type/_layer0/PropertyMetaCollection",
   "pentaho/util/error",
-], function(Context, complexFactory, valueFactory, stringFactory, PropertyMeta, PropertyMetaCollection, error) {
+], function(Context, complexFactory, valueFactory, stringFactory, Property, PropertyMetaCollection, error) {
 
   "use strict";
 
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
   var context = new Context(),
+      PropertyMeta = Property.Meta,
       Value   = context.get(valueFactory),
       Complex = context.get(complexFactory),
       String  = context.get(stringFactory);

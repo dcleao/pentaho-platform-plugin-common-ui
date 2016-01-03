@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "./Item.Meta.js",
+  "./Item.Meta",
   "../../lang/Base",
   "../../util/error",
   "../../util/object"
