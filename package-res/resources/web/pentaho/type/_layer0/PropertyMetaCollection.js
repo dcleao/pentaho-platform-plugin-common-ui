@@ -91,7 +91,7 @@ define([
         // Configure existing local property or override inherited one.
         if(spec !== name) {
           if(existing.declaringType === this._cachedKeyArgs.declaringMeta)
-            existing.configure(spec);
+            existing.extend(spec);
           else
             this.replace(spec, this.indexOf(existing));
         }
@@ -115,21 +115,25 @@ define([
       if(existing.declaringType === ka.declaringMeta) {
         // Configure existing local property and cancel replace.
         // If spec is not an object, then it's a noop.
-        if(spec !== name) existing.configure(spec);
+        if(spec !== name) existing.extend(spec);
         return;
       }
 
       // Replace with overridden property.
-      return Property.extendProto(existing, spec, ka).meta;
+      return Property.extendProto(existing.mesa, {meta: spec}, ka).meta;
     },
 
     _cast: function(spec, index) {
       // For new, root, local properties.
+
+      // A singular string property with the specified name.
+      if(typeof spec === "string") spec = {name: spec};
+
       var ka = this._cachedKeyArgs;
       ka.index = index;
-      var p = Property.extendProto(null, ka);
+      var pm = Property.extendProto(null, {meta: spec}, ka).meta;
       ka.index = -1;
-      return p;
+      return pm;
     },
     //endregion
 

@@ -117,67 +117,40 @@ define([
       // MESA I
       var subMesa = Object.create(mesa);
 
-      // META I
+      // META
       var metaInstSpec = O["delete"](instSpec,  "meta");
 
-      var subMeta = mesa.meta.extendProto(metaInstSpec, keyArgs);
+      var ka = keyArgs ? Object.create(keyArgs) : {};
+      ka.mesa = subMesa;
 
-      // BIND
-      bindMesaMetaProtos(subMesa, subMeta);
-
-      // META II
-      subMeta.extend(metaInstSpec);
+      mesa.meta.extendProto(metaInstSpec, ka);
 
       // MESA II
       return subMesa.extend(instSpec);
     },
 
-    // @override
-    _extend: function(name, instSpec, classSpec, keyArgs) {
-      if(!instSpec) instSpec = {};
-
-      // MESA I
-      // Create class but don't apply instSpec,
-      // (as this may need to override Property accessors only defined by Complex.Meta)
-      var SubMesa = this.base(name, instSpec.constructor && {constructor: instSpec.constructor});
-
-      // META I
+    /**
+     * @override
+     * @ignore
+     */
+    _subClassed: function(SubMesa, instSpec, classSpec, keyArgs) {
+      // 1. `instSpec` may override property accessors only defined by `Complex.Meta`
+      // 2. So, the Meta class must be created *before* applying instSpec and classSpec to SubMesa
+      // 3. The Meta class requires Mesa to already exist, to be able to define accessors
       var metaInstSpec  = O["delete"](instSpec,  "meta"),
-          metaClassSpec = O["delete"](classSpec, "meta");
+          metaClassSpec = O["delete"](classSpec, "meta"),
+          metaName      = this.name && (this.name + ".Meta");
 
-      // -> requires Mesa to already exist, to be able to define accessors
-      // -> Initial Meta.extend call explicitly only applies the `id` and `constructor` properties
-      //    (and any other immutable, shared props any sub-classes may have; See Item.Meta._extend).
-      var SubMeta = this.Meta.extend(name && (name + ".Meta"), metaInstSpec, metaClassSpec, keyArgs);
+      var ka = keyArgs ? Object.create(keyArgs) : {};
+      ka.mesa = SubMesa.prototype;
 
-      // BIND
-      bindMesaMeta(SubMesa, SubMeta);
+      this.Meta.extend(metaName, metaInstSpec, metaClassSpec, ka);
 
-      // META II
-      SubMeta.mix(metaInstSpec, metaClassSpec, keyArgs);
-
-      // MESA II
-      // Note: mix does not apply the `constructor` property, if any.
-      return SubMesa.mix(instSpec, classSpec, keyArgs);
+      SubMesa.mix(instSpec, classSpec);
     }
   });
 
-  bindMesaMeta(Item, ItemMeta);
+  ItemMeta._initMesa(Item);
 
   return Item;
-
-  function bindMesaMeta(Mesa, Meta) {
-
-    Mesa.Meta = Meta;
-    Meta.Mesa = Mesa;
-
-    bindMesaMetaProtos(Mesa.prototype, Meta.prototype);
-  }
-
-  function bindMesaMetaProtos(mesa, meta) {
-    Object.defineProperty(mesa, "_meta", {value: meta});
-
-    Object.defineProperty(meta, "mesa",  {value: mesa});
-    Object.defineProperty(meta, "proto", {value: meta});
-  }
 });

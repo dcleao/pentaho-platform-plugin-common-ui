@@ -104,10 +104,9 @@ define([
      */
     var Value = Item.extend("pentaho.type.Value", {
       meta: /** @lends pentaho.type.Value.Meta# */{
-        // Note: constructor only called on sub-classes of Value.Meta,
+        // Note: constructor/_init only called on sub-classes of Value.Meta,
         // and not on Value.Meta itself.
-        constructor: function() {
-
+        _init: function() {
           this.base.apply(this, arguments);
 
           // Block inheritance, with default values
@@ -115,6 +114,7 @@ define([
         },
 
         id: _baseMid + "value",
+
         styleClass: "pentaho-type-value",
 
         //region context property

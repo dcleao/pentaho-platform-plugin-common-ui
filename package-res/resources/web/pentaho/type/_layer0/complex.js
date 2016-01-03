@@ -22,6 +22,12 @@ define([
 
   "use strict";
 
+  // TODO: self-recursive complexes won't work if we don't handle them specially:
+  // Component.parent : Component
+  // Will cause requiring Component during it's own build procedure...
+  // Need to recognize requests for the currently being built _top-level_ complex in a special way -
+  // the one that cannot be built and have a module id.
+
   /**
    * Creates the `Complex` class for the given context.
    *
@@ -123,7 +129,7 @@ define([
           // Lazy creation.
           var proto = this.constructor.prototype;
           return O.getOwn(proto, "_props") ||
-              (proto._props = PropertyMetaCollection.to([], /*declaringMetaCtor:*/this.constructor));
+              (proto._props = PropertyMetaCollection.to([], /*declaringMeta:*/this));
         },
 
         set props(propSpecs) {

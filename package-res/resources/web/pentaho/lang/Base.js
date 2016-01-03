@@ -130,25 +130,28 @@ define([
 
   // Creates a sub-class of this class.
   // Static method of all "Base" constructors.
-  function class_extend(name, instSpec, classSpec) {
+  function class_extend(name, instSpec, classSpec, keyArgs) {
     if(arguments.length < 3 && typeof name !== "string") {
+      keyArgs = classSpec;
       classSpec = instSpec;
       instSpec = name;
       name = null;
     }
 
-    return this._extend(name, instSpec, classSpec);
+    return this._extend(name, instSpec, classSpec, keyArgs);
   }
 
-  function class_extend_core(name, instSpec, classSpec) {
+  function class_extend_core(name, instSpec, classSpec, keyArgs) {
 
     var SubClass = class_extend_subclass.call(this, name, instSpec);
 
-    // Mix
-    SubClass.mix(instSpec, classSpec);
+    if(fun.is(this._subClassed))
+      this._subClassed(SubClass, instSpec, classSpec, keyArgs);
+    else
+      SubClass.mix(instSpec, classSpec);
 
     // Init
-    if(fun.is(SubClass.init)) SubClass.init();
+    if(fun.is(SubClass.init)) SubClass.init(keyArgs);
 
     return SubClass;
   }
@@ -247,7 +250,7 @@ define([
     }
 
     // Note: #extend implementations *must not* copy the `constructor` property!
-    if(instSpec ) this.implement(instSpec);
+    if(instSpec)  this.implement(instSpec);
 
     // Note: overriding static methods sets the special `.base()` property on the constructor...
     if(classSpec) this.implementStatic(classSpec);

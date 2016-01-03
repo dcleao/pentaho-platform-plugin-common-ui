@@ -38,6 +38,10 @@ define(function() {
       return o && O_hasOwn.call(o, p) ? o[p] : dv;
     },
 
+    setConst: function(o, p, v) {
+      Object.defineProperty(o, p, {value: v});
+    },
+
     eachOwn: function(o, fun, ctx) {
       for(var p in o)
         if(O_hasOwn.call(o, p) && fun.call(ctx || o, o[p], p) === false)

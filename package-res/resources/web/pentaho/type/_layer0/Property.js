@@ -19,8 +19,9 @@ define([
   "../../lang/_AnnotatableLinked",
   "../../util/arg",
   "../../util/error",
+  "../../util/object",
   "../../util/text"
-], function(Item, Value, AnnotatableLinked, arg, error, text) {
+], function(Item, Value, AnnotatableLinked, arg, error, O, text) {
 
   "use strict";
 
@@ -46,7 +47,8 @@ define([
    * @see pentaho.type.Complex
    * @description Creates a property.
    *
-   * This constructor is used internally by the `pentaho/type` package and should not be used directly.
+   * This constructor is used internally by the `pentaho/type` package and
+   * should not be used directly.
    */
 
   /**
@@ -61,6 +63,11 @@ define([
    * @implements pentaho.lang.IConfigurable
    *
    * @classdesc The metadata of a property of a complex type.
+   *
+   * @description Creates a property metadata instance.
+   *
+   * This constructor is used internally by the `pentaho/type` package and
+   * should not be used directly.
    *
    * @see pentaho.type.Complex
    */
@@ -81,93 +88,40 @@ define([
        * @ignore
        */
       constructor: function(spec, keyArgs) {
-        if(spec == null) throw error.argRequired("spec");
-
         // A singular string property with the specified name.
         if(typeof spec === "string") spec = {name: spec};
 
         this.base(spec, keyArgs);
+      },
 
-        // Validate same context as base?
-        this._declaringMeta = arg.required(keyArgs, "declaringMeta", "keyArgs");
+      _init: function(spec, keyArgs) {
 
-        if(!this.isRoot) {
-          // Hierarchy consistency
-          if(spec.name && spec.name !== this._name)
-            throw error.argInvalid("spec.name", "Sub-properties cannot change the 'name' attribute.");
+        this.base.apply(this, arguments);
 
-          if(spec.list != null && Boolean(spec.list) !== this._list)
-            throw error.argInvalid("spec.list", "Sub-properties cannot change the 'list' attribute.");
+        // TODO: Validate same context as base?
 
-          // Resolve value type synchronously.
-          if(spec.type != null) {
-            var typeMeta = this.context.get(spec.type).meta;
+        O.setConst(this, "_declaringMeta", arg.required(keyArgs, "declaringMeta", "keyArgs"));
+        O.setConst(this, "_isPropRoot", Object.getPrototypeOf(this).isRoot);
 
-            // Validate that it is a sub-type of the base property's type.
-            if(typeMeta !== this._typeMeta) {
-              if(!O_isProtoOf.call(typeMeta, this._typeMeta))
-                throw error.argInvalid(
-                    "spec.type",
-                    "Sub-properties must have a 'type' that derives from their base property's 'type'.");
+        if(this._isPropRoot)
+          O.setConst(this, "_index", keyArgs.index || 0);
+      },
 
-              this._typeMeta = typeMeta;
-            }
-          }
-        } else {
-          this._name = spec.name;
-          if(!this._name) throw error.argRequired("spec.name");
+      _postInit: function() {
 
-          this._namePriv = "_" + this._name;
+        this.base.apply(this, arguments);
 
-          this._list = !!spec.list;
+        if(this._isPropRoot) {
+          // Required validation
+          if(!this._name) this.name = null; // throws...
 
-          this._index = arg.required(keyArgs, "index", "keyArgs");
-
-          // Resolve value type synchronously.
-          // Must be done after setting `_declaringMeta`.
-          this._typeMeta = this.context.get(spec.type).meta;
-
-          // Force default determination to break inheritance.
-          if(!("label" in spec)) this.label = null;
+          // Force assuming default values
+          if(!this._type)  this.type = null;
+          if(!this._label) this._resetLabel();
 
           this._createValueAccessor();
         }
-
-        this.configure(spec);
       },
-
-      //region context property
-      /**
-       * Gets the context of the property prototype.
-       *
-       * The context of a property is that of
-       * the complex type that declares it.
-       *
-       * @type pentaho.type.IContext
-       * @readonly
-       */
-      get context() {
-        return this._declaringMeta.context;
-      },
-      //endregion
-
-      //region root property
-      /**
-       * Gets the root _prototype_ instance.
-       * @type pentaho.type.Property.Meta
-       * @override
-       * @readonly
-       */
-      get root() {
-        return Property.meta;
-      },
-      //endregion
-
-      // TODO: self-recursive complexes won't work if we don't handle them specially:
-      // Component.parent : Component
-      // Will cause requiring Component during it's own build procedure...
-      // Need to recognize requests for the currently being built _top-level_ complex in a special way -
-      // the one that cannot be built and have a module id.
 
       //region IConfigurable implementation
 
@@ -179,7 +133,7 @@ define([
        * @param {!pentaho.type.spec.IPropertyMetaConfig} config A property configuration.
        * @ignore
        */
-      configure: function(config) {
+      xconfigure: function(config) {
         if(!config) throw error.argRequired("config");
 
         // undefined passes through.
@@ -225,6 +179,22 @@ define([
       //endregion
 
       //region attributes
+      //region context property
+      /**
+       * Gets the context of the property prototype.
+       *
+       * The context of a property is that of
+       * the complex type that declares it.
+       *
+       * @type pentaho.type.IContext
+       * @readonly
+       */
+      get context() {
+        return this._declaringMeta.context;
+      },
+      //endregion
+
+      //region declaringType attribute
       /**
        * The metadata of the complex type that declares this property.
        *
@@ -234,6 +204,7 @@ define([
       get declaringType() {
         return this._declaringMeta;
       },
+      //endregion
 
       //region index attribute
       /**
@@ -247,7 +218,53 @@ define([
       },
       //endregion
 
-      //region value type
+      //region name attribute
+
+      // -> nonEmptyString, Required, Immutable, Root-only.
+      _name: undefined,
+
+      get name() {
+        return this._name;
+      },
+
+      set name(value) {
+        value = nonEmptyString(value);
+
+        if(this._isPropRoot) {
+          if(!value) throw error.argRequired("name");
+          // Can only be set once,or throws.
+          O.setConst(this, "_name", value);
+          O.setConst(this, "_namePriv", "_" + value);
+        } else {
+          // Hierarchy consistency
+          if(value && value !== this._name)
+            throw error.argInvalid("name", "Sub-properties cannot change the 'name' attribute.");
+        }
+      },
+      //endregion
+
+      //region list attribute
+
+      // -> Optional(false), Immutable, Root-only.
+      _list: false,
+
+      get list() {
+        return this._list;
+      },
+
+      set list(value) {
+        if(this._isPropRoot) {
+          this._list = !!value;
+        } else if(value != null) {
+          // Hierarchy consistency
+          value = !!value;
+          if(value !== this._list)
+            throw error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.");
+        }
+      },
+      //endregion
+
+      //region value type attribute
       /**
        * The type of _singular_ values that the property can hold.
        *
@@ -256,6 +273,26 @@ define([
        */
       get type() {
         return this._typeMeta;
+      },
+
+      set type(value) {
+        // Resolves types synchronously.
+        if(this._isPropRoot) {
+          this._typeMeta = this.context.get(value).meta;
+        } else if(value != null) {
+          // Hierarchy consistency
+          var typeMeta = this.context.get(value).meta;
+
+          // Validate that it is a sub-type of the base property's type.
+          if(typeMeta !== this._typeMeta) {
+            if(!O_isProtoOf.call(typeMeta, this._typeMeta))
+              throw error.argInvalid(
+                  "type",
+                  "Sub-properties must have a 'type' that derives from their base property's 'type'.");
+
+            this._typeMeta = typeMeta;
+          }
+        }
       },
       //endregion
 
@@ -272,26 +309,6 @@ define([
       set value(value) {
         // TODO
         this._value = value;
-      },
-      //endregion
-
-      //region name attribute
-
-      // -> nonEmptyString, Required, Immutable, Root-only.
-      _name: undefined,
-
-      get name() {
-        return this._name;
-      },
-      //endregion
-
-      //region list attribute
-
-      // -> Optional(false), Immutable, Root-only.
-      _list: false,
-
-      get list() {
-        return this._list;
       },
       //endregion
 
@@ -331,6 +348,10 @@ define([
       //endregion
     } // end instance meta:
   });
+
+  function nonEmptyString(value) {
+    return value == null ? null : (String(value) || null);
+  }
 
   return Property;
 });

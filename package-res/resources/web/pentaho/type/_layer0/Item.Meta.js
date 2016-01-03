@@ -18,9 +18,10 @@ define([
   "../../lang/Base",
   "../../lang/_AnnotatableLinked",
   "../../util/error",
+  "../../util/arg",
   "../../util/fun",
   "../../util/object"
-], function(bundle, Base, AnnotatableLinked, error, fun, O) {
+], function(bundle, Base, AnnotatableLinked, error, arg, fun, O) {
 
   "use strict";
 
@@ -45,19 +46,40 @@ define([
   var ItemMeta = Base.extend("pentaho.type.Item.Meta",
       /** @lends pentaho.type.Item.Meta# */{
 
-    constructor: function(instSpec/*, keyArgs*/) {
+    constructor: function(instSpec, keyArgs) {
       if(!instSpec) instSpec = {};
 
-      this._id  = nonEmptyString( O["delete"](instSpec, "id") );
-      this._uid = _nextUid++;
+      this._init(instSpec, keyArgs);
+
+      this.extend(instSpec);
+
+      this._postInit(instSpec, keyArgs);
+    },
+
+    _init: function(instSpec, keyArgs) {
+      O.setConst(this, "_uid", _nextUid++);
+
+      // Bind
+      var mesa = arg.required(keyArgs, "mesa", "keyArgs");
+      O.setConst(mesa, "_meta", this);
+      O.setConst(this, "mesa",  mesa);
+
+      // Hierarchy
+      O.setConst(this, "proto", this);
+      if(!this.root && this !== ItemMeta.prototype)
+        O.setConst(this, "root", this);
 
       // Block inheritance, with default values
       this._styleClass = null;
       this._ordinal    = 0;
+      this._label      = null;
+    },
+
+    _postInit: function(instSpec, keyArgs) {
     },
 
     //region uid property
-    _uid: _nextUid++,
+    _uid: null,
 
     /**
      * Gets the unique item type id (auto-generated).
@@ -149,7 +171,7 @@ define([
       if(this.isRoot) return null;
 
       var proto = this.proto;
-      return (proto !== this ? proto : proto.proto) || null;
+      return (proto !== this ? proto : Object.getPrototypeOf(proto).proto) || null;
     },
     //endregion
 
@@ -188,6 +210,11 @@ define([
      */
     get id() {
       return this._id;
+    },
+
+    set id(value) {
+      // Can only be set once or throws.
+      O.setConst(this, "_id", nonEmptyString(value));
     },
     //endregion
 
@@ -369,21 +396,18 @@ define([
      * Use {@link pentaho.type.Item#extendProto} instead.
      *
      * @param {object} instSpec The prototype specification.
-     * @param {object} [keyArgs] Keyword arguments.
+     * @param {object} keyArgs Keyword arguments.
+     * @param {pentaho.type.Item} keyArgs.mesa The corresponding _sub-mesadata_ item.
      *
      * @return {pentaho.type.Item.Meta} The new sub-prototype.
      */
     extendProto: function(instSpec, keyArgs) {
-      var subProto = Object.create(this);
+      var subMeta = Object.create(this);
 
-      if(this === ItemMeta.prototype) {
-        // subProto is a root prototype
-        Object.defineProperty(subProto, "root", subProto);
-      }
+      // NOTE: `subMeta.constructor` is still the "base" constructor.
+      subMeta.constructor(instSpec, keyArgs);
 
-      this.constructor.call(subProto, instSpec, keyArgs);
-
-      return subProto;
+      return subMeta;
     }
   }, /** @lends pentaho.type.Item.Meta */{
 
@@ -404,21 +428,22 @@ define([
      * @override
      * @ignore
      */
-    _extend: function(name, instSpec, keyArgs) {
-      // All other instSpec/classSpec options are specified
-      // after initial construction using mix/extend. See `Item._extend`.
-      var SubMeta = this.base(name, {constructor: instSpec && instSpec.constructor}, null, keyArgs),
-          subMeta = SubMeta.prototype;
+    _subClassed: function(SubMeta, instSpec, classSpec, keyArgs) {
 
-      if(this === ItemMeta) {
-        // SubMeta is a root type
-        Object.defineProperty(subMeta, "root", subMeta);
-      }
+      SubMeta._initMesa(keyArgs.mesa.constructor, instSpec, keyArgs);
 
-      // Call "base" constructor to initialize sub-prototype.
-      this.call(subMeta, instSpec, keyArgs);
+      if(classSpec) SubMeta.implementStatic(classSpec);
+    },
 
-      return SubMeta;
+    // NOTE: optionally receiving `keyArgs` as an optimization.
+    // `_subClassed` is given a _derived_ `keyArgs`
+    // that can/should be passed to `this`(constructor).
+    _initMesa: function(Mesa, instSpec, keyArgs) {
+
+      Object.defineProperty(Mesa, "Meta", {value: this});
+      Object.defineProperty(this, "Mesa", {value: Mesa});
+
+      this.call(this.prototype, instSpec, keyArgs || {mesa: Mesa.prototype});
     }
   })
   .implement(AnnotatableLinked);
