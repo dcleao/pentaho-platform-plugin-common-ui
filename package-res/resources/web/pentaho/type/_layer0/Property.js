@@ -77,6 +77,9 @@ define([
 
       // TODO: countMin, countMax, required, applicable, readonly, visible, value, members?, p
 
+      // Note: constructor/_init only called on sub-classes of Property.Meta,
+      // and not on Property.Meta itself.
+
       /**
        * Creates a property metadata instance, given a property specification.
        *
@@ -101,9 +104,8 @@ define([
         // TODO: Validate same context as base?
 
         O.setConst(this, "_declaringMeta", arg.required(keyArgs, "declaringMeta", "keyArgs"));
-        O.setConst(this, "_isPropRoot", Object.getPrototypeOf(this).isRoot);
 
-        if(this._isPropRoot)
+        if(this.isRoot)
           O.setConst(this, "_index", keyArgs.index || 0);
       },
 
@@ -111,7 +113,7 @@ define([
 
         this.base.apply(this, arguments);
 
-        if(this._isPropRoot) {
+        if(this.isRoot) {
           // Required validation
           if(!this._name) this.name = null; // throws...
 
@@ -230,7 +232,7 @@ define([
       set name(value) {
         value = nonEmptyString(value);
 
-        if(this._isPropRoot) {
+        if(this.isRoot) {
           if(!value) throw error.argRequired("name");
           // Can only be set once,or throws.
           O.setConst(this, "_name", value);
@@ -253,7 +255,7 @@ define([
       },
 
       set list(value) {
-        if(this._isPropRoot) {
+        if(this.isRoot) {
           this._list = !!value;
         } else if(value != null) {
           // Hierarchy consistency
@@ -277,7 +279,7 @@ define([
 
       set type(value) {
         // Resolves types synchronously.
-        if(this._isPropRoot) {
+        if(this.isRoot) {
           this._typeMeta = this.context.get(value).meta;
         } else if(value != null) {
           // Hierarchy consistency
@@ -349,9 +351,9 @@ define([
     } // end instance meta:
   });
 
+  return Property;
+
   function nonEmptyString(value) {
     return value == null ? null : (String(value) || null);
   }
-
-  return Property;
 });

@@ -39,6 +39,8 @@ define([
    */
   return function(context) {
 
+    var _valueMeta = null;
+
     /**
      * @name pentaho.type.Value.Meta
      * @class
@@ -161,7 +163,7 @@ define([
 
         set format(value) {
           if(value == null) {
-            if(!this.isRoot) {
+            if(this !== _valueMeta) {
               delete this._format;
             }
           } else {
@@ -190,7 +192,7 @@ define([
         set domain(value) {
           if(value == null) {
             // inherit unless we're the root
-            if(!this.isRoot) {
+            if(this !== _valueMeta) {
               delete this._domain;
             }
           } else {
@@ -267,9 +269,15 @@ define([
         }
         //endregion
       }
+    },
+    /*classSpec:*/ null,
+    /*keyArgs:*/ {
+      isRoot: true
     }).implement({
       meta: bundle.structured.value
     });
+
+    _valueMeta = Value.meta;
 
     return Value;
   };

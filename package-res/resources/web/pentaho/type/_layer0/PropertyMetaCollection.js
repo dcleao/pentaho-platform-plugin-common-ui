@@ -51,7 +51,8 @@ define([
 
       this._cachedKeyArgs = {
         declaringMeta: declaringMeta,
-        index: -1
+        index:  -1,
+        isRoot: false
       };
 
       // Copy the declaring complex type's ancestor's properties.
@@ -131,8 +132,13 @@ define([
 
       var ka = this._cachedKeyArgs;
       ka.index = index;
+      ka.isRoot = true;
+
       var pm = Property.extendProto(null, {meta: spec}, ka).meta;
+
       ka.index = -1;
+      ka.isRoot = false;
+
       return pm;
     },
     //endregion

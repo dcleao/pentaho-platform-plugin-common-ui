@@ -26,7 +26,8 @@ define([
   "use strict";
 
   // Unique item class id exposed through Item.Meta#uid and used by Context instances.
-  var _nextUid = 1;
+  var _nextUid = 1,
+      _itemMeta = null;
 
   /**
    * @name pentaho.type.Item.Meta
@@ -64,15 +65,16 @@ define([
       O.setConst(mesa, "_meta", this);
       O.setConst(this, "mesa",  mesa);
 
-      // Hierarchy
-      O.setConst(this, "proto", this);
-      if(!this.root && this !== ItemMeta.prototype)
+      if(arg.optional(keyArgs, "isRoot"))
         O.setConst(this, "root", this);
 
+      // Hierarchy
+      O.setConst(this, "proto", this);
+
       // Block inheritance, with default values
+      this._id         = null;
       this._styleClass = null;
       this._ordinal    = 0;
-      this._label      = null;
     },
 
     _postInit: function(instSpec, keyArgs) {
@@ -126,18 +128,22 @@ define([
     //endregion
 
     //region root property
-    // root must be set on direct sub-classes of Item
-    // the "proto" which has no "proto" above it
-    // Set on Item.Meta._extend
+    // `root` is generally set on direct sub-classes of Item.
+    // Should be the first meaningful, non-abstract item class below `Item` along a given branch.
     /**
      * Gets the root _prototype_ item.
      *
-     * Root item types are the immediate sub-types of _item_.
-     * An _item_, by itself, is meaningless or totally abstract,
-     * a _root item_ is not.
+     * Generally, root item types are the immediate sub-types of _item_.
+     * The mandatory rule is, however, that
+     * root item types are _meaningful_, concrete roots of a type tree.
      *
-     * The `Item` type is the head of a _forest_ composed of
-     * type trees which are rooted in _root item types_.
+     * For example, {@link pentaho.type.Value} is a root type,
+     * because it is the root of the value types and there is a single tree of value types.
+     *
+     * However, {@link pentaho.type.Property} is not considered a root type.
+     * It is its immediate types - each root property within a complex type - which are considered roots.
+     * This aligns with users expectations of what an attribute named `root`
+     * in a property metadata instance should mean.
      *
      * @name root
      * @memberOf pentaho.type.Item.Meta#
@@ -226,7 +232,7 @@ define([
     _label: null,
 
     _resetLabel: function() {
-      if(!this.isRoot) {
+      if(this !== _itemMeta) {
         delete this._label;
       }
     },
@@ -258,7 +264,7 @@ define([
 
     set description(value) {
       if(value === undefined) {
-        if(!this.isRoot) {
+        if(this !== _itemMeta) {
           delete this._description;
         }
       } else {
@@ -280,7 +286,7 @@ define([
 
     set category(value) {
       if(value === undefined) {
-        if(!this.isRoot) {
+        if(this !== _itemMeta) {
           delete this._category;
         }
       } else {
@@ -302,7 +308,7 @@ define([
 
     set helpUrl(value) {
       if(value === undefined) {
-        if(!this.isRoot) {
+        if(this !== _itemMeta) {
           delete this._helpUrl;
         }
       } else {
@@ -324,7 +330,7 @@ define([
 
     set browsable(value) {
       if(value == null) {
-        if(!this.isRoot) {
+        if(this !== _itemMeta) {
           delete this._browsable;
         }
       } else {
@@ -345,7 +351,7 @@ define([
 
     set advanced(value) {
       if(value == null) {
-        if(!this.isRoot) {
+        if(this !== _itemMeta) {
           delete this._advanced;
         }
       } else {
@@ -440,17 +446,19 @@ define([
     // that can/should be passed to `this`(constructor).
     _initMesa: function(Mesa, instSpec, keyArgs) {
 
-      Object.defineProperty(Mesa, "Meta", {value: this});
-      Object.defineProperty(this, "Mesa", {value: Mesa});
+      O.setConst(Mesa, "Meta", this);
+      O.setConst(this, "Mesa", Mesa);
 
       this.call(this.prototype, instSpec, keyArgs || {mesa: Mesa.prototype});
     }
   })
   .implement(AnnotatableLinked);
 
+  _itemMeta = ItemMeta.prototype;
+
+  return ItemMeta;
+
   function nonEmptyString(value) {
     return value == null ? null : (String(value) || null);
   }
-
-  return ItemMeta;
 });

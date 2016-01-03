@@ -76,7 +76,7 @@ define([
         it("should be a sub-class of Value.Meta", function() {
           var Derived = Value.extend();
           expect(Derived.Meta).not.toBe(Value.Meta);
-          expect(Derived.Meta.prototype instanceof Value.Meta).toBe(true);
+          expect(Derived.meta instanceof Value.Meta).toBe(true);
         });
 
         // =====
@@ -87,7 +87,7 @@ define([
             it("should inherit `label`", function() {
               function expectIt(derivedSpec) {
                 var Derived = Value.extend({meta: derivedSpec});
-                expect(Derived.Meta.prototype.label).toBe(Value.Meta.prototype.label);
+                expect(Derived.meta.label).toBe(Value.meta.label);
               }
 
               expectIt({});
@@ -101,7 +101,7 @@ define([
             // Can change the label
             it("should respect the `label`", function() {
               var Derived = Value.extend({meta: {label: "Foo"}});
-              expect(Derived.Meta.prototype.label).toBe("Foo");
+              expect(Derived.meta.label).toBe("Foo");
             });
           });
         }); // #label
@@ -113,7 +113,7 @@ define([
             it("should have `null` as a default `id`", function() {
               function expectIt(spec) {
                 var Derived = Value.extend({meta: spec});
-                expect(Derived.Meta.prototype.id).toBe(null);
+                expect(Derived.meta.id).toBe(null);
               }
 
               expectIt({});
@@ -129,7 +129,7 @@ define([
                 meta: {id: "foo/bar"}
               });
 
-              expect(Derived.Meta.prototype.id).toBe("foo/bar");
+              expect(Derived.meta.id).toBe("foo/bar");
             });
           });
         }); // #id
@@ -142,7 +142,7 @@ define([
               function expectIt(spec) {
                 var Derived = Value.extend({meta: spec});
 
-                expect(Derived.Meta.prototype.description).toBe(Value.Meta.prototype.description);
+                expect(Derived.meta.description).toBe(Value.meta.description);
               }
 
               expectIt({});
@@ -155,7 +155,7 @@ define([
               function expectIt(spec) {
                 var Derived = Value.extend({meta: spec});
 
-                expect(Derived.Meta.prototype.description).toBe(null);
+                expect(Derived.meta.description).toBe(null);
               }
 
               expectIt({description: null});
@@ -167,7 +167,7 @@ define([
             it("should respect it", function() {
               var Derived = Value.extend({meta: {description: "Foo"}});
 
-              expect(Derived.Meta.prototype.description).toBe("Foo");
+              expect(Derived.meta.description).toBe("Foo");
             });
           });
         }); // #description
@@ -180,7 +180,7 @@ define([
               function expectIt(spec) {
                 var Derived = Value.extend({meta: spec});
 
-                expect(Derived.Meta.prototype.category).toBe(Value.Meta.prototype.category);
+                expect(Derived.meta.category).toBe(Value.meta.category);
               }
 
               expectIt({});
@@ -193,7 +193,7 @@ define([
               function expectIt(spec) {
                 var Derived = Value.extend({meta: spec});
 
-                expect(Derived.Meta.prototype.category).toBe(null);
+                expect(Derived.meta.category).toBe(null);
               }
 
               expectIt({category: null});
@@ -205,7 +205,7 @@ define([
             it("should respect it", function() {
               var Derived = Value.extend({meta: {category: "Foo"}});
 
-              expect(Derived.Meta.prototype.category).toBe("Foo");
+              expect(Derived.meta.category).toBe("Foo");
             });
           });
         }); // #category
@@ -218,7 +218,7 @@ define([
               function expectIt(spec) {
                 var Derived = Value.extend({meta: spec});
 
-                expect(Derived.Meta.prototype.helpUrl).toBe(Value.Meta.prototype.helpUrl);
+                expect(Derived.meta.helpUrl).toBe(Value.meta.helpUrl);
               }
 
               expectIt({});
@@ -231,7 +231,7 @@ define([
               function expectIt(spec) {
                 var Derived = Value.extend({meta: spec});
 
-                expect(Derived.Meta.prototype.helpUrl).toBe(null);
+                expect(Derived.meta.helpUrl).toBe(null);
               }
 
               expectIt({helpUrl: null});
@@ -243,7 +243,7 @@ define([
             it("should respect it", function() {
               var Derived = Value.extend({meta: {helpUrl: "Foo"}});
 
-              expect(Derived.Meta.prototype.helpUrl).toBe("Foo");
+              expect(Derived.meta.helpUrl).toBe("Foo");
             });
           });
         }); // #helpUrl
@@ -253,14 +253,14 @@ define([
         describe("#uid -", function() {
           it("should not be inherited", function() {
             var Derived = Value.extend();
-            expect(Derived.Meta.prototype.uid).not.toBe(Value.Meta.prototype.uid);
+            expect(Derived.meta.uid).not.toBe(Value.meta.uid);
           });
 
           it("should be unique", function() {
             var DerivedA = Value.extend(),
                 DerivedB = Value.extend();
-            expect(DerivedA.Meta.prototype.uid).not.toBe(DerivedB.Meta.prototype.uid);
-            expect(DerivedA.Meta.prototype.uid).not.toBe(Value.Meta.prototype.uid);
+            expect(DerivedA.meta.uid).not.toBe(DerivedB.meta.uid);
+            expect(DerivedA.meta.uid).not.toBe(Value.meta.uid);
           });
         }); // #uid
       });
