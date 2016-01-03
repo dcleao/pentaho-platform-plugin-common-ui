@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "./PropertyMeta",
+  "./Property",
   "../../lang/Collection",
   "../../util/arg",
   "../../util/error",
