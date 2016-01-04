@@ -75,7 +75,6 @@ define([
       // Block inheritance, with default values
       this._id         = null;
       this._styleClass = null;
-      this._ordinal    = 0;
     },
 
     _postInit: function(instSpec, keyArgs) {
@@ -380,16 +379,21 @@ define([
 
     //region ordinal property
     // @type integer
-    // -> Optional(0), Configurable
-
-    _ordinal: null,
+    // -> Optional(0), Inherited, Configurable
+    _ordinal: 0,
 
     get ordinal() {
       return this._ordinal;
     },
 
     set ordinal(value) {
-      this._ordinal = value == null ? 0 : Math.floor((+value) || 0);
+      if(value == null) {
+        if(this !== _itemMeta) {
+          delete this._ordinal;
+        }
+      } else {
+        this._ordinal = Math.floor((+value) || 0);
+      }
     },
     //endregion
 
