@@ -206,60 +206,61 @@ define([
         //endregion
 
         //region methods
-
-        // All empty values should have key=""
-        isEmpty: function(value) {
-          return value === null;
-        },
-
         getKey: function(value) {
           // A unique key of the value among values of the same "kind".
           // TODO: Specifically, unique among values of its first sub-class???
-          return this.isEmpty(value) ? "" : String(value);
+          return value == null ? "" : String(value);
         },
+
+        //region validate method
 
         // Unit validation of a value.
-        // Returns array of non-empty Error objects or null
-        validate: function(value) {
-          return this.isEmpty(value) ? null : this.validateNonEmpty(value);
+        // Returns array of non-empty Error objects or null.
+
+        // Configurable in a special way.
+        // Setting always sets the core.
+        // Getting always gets the wrapper.
+        get validate() {
+          return validateTop;
         },
 
-        // Should be consistent with result of compare.
-        // areEqual => compare -> 0
-        areEqual: function(va, vb) {
-          return va === vb ||
-              (this.isEmpty(va) && this.isEmpty(vb)) ||
-              this.areEqualNonEmpty(va, vb);
+        set validate(validate) {
+          this._validate = validate || validateCore;
         },
 
-        areEqualNonEmpty: function(va, vb) {
-          return va === vb;
+        _validate: validateCore,
+        //endregion
+
+        //region areEqual method
+
+        // Configurable in a special way.
+        // Setting always sets the core.
+        // Getting always gets the wrapper.
+        get areEqual() {
+          return areEqualTop;
         },
 
-        // consistent with isEmpty and areEqual
-        compare: function(va, vb) {
-          // Quick bailout test
-          if(va === vb) return 0;
-
-          if(this.isEmpty(va)) return this.isEmpty(vb) ? 0 : 1;
-          if(this.isEmpty(vb)) return -1;
-          if(this.areEqualNonEmpty(va, vb)) return 0;
-          return this.compareNonEqualOrEmpty(va, vb);
+        set areEqual(areEqual) {
+          this._areEqual = areEqual || areEqualCore;
         },
 
-        // Validation of a non-empty value.
-        // Should call the base method first.
-        // TODO: Only undefined and arrays are not possible values?
-        validateNonEmpty: function(value) {
-          return value === undefined    ? [new Error(bundle.structured.errors.value.isUndefined)] :
-                 value instanceof Array ? [new Error(bundle.structured.errors.value.singleValueIsArray)] :
-                 null;
+        _areEqual: areEqualCore,
+        //endregion
+
+        //region compare method
+        // Configurable in a special way.
+        // Setting always sets the core.
+        // Getting always gets the wrapper.
+        get compare() {
+          return compareTop;
         },
 
-        // natural ascending comparer of non-equal, non-empty values
-        compareNonEqualOrEmpty: function(va, vb) {
-          return fun.compare(va, vb);
+        set compare(compare) {
+          this._compare = compare || compareCore;
         },
+
+        _compare: compareCore,
+        //endregion
 
         // TODO: Serialization of a Specification to/from JSON
         toJSON: function(value) {
@@ -281,6 +282,50 @@ define([
 
     return Value;
   };
+
+  //region validate private methods
+  function validateTop(value) {
+    return value === null ? null : this._validate(value);
+  }
+
+  // Validation of a non-empty value.
+  // Should call the base method first.
+  // TODO: Only undefined and arrays are not possible values?
+  function validateCore(value) {
+    return value === undefined    ? [new Error(bundle.structured.errors.value.isUndefined)] :
+           value instanceof Array ? [new Error(bundle.structured.errors.value.singleValueIsArray)] :
+           !this.is(value)        ? [new Error(bundle.format(bundle.structured.errors.value.notOfType, [this.label]))] :
+           null;
+  }
+  //endregion
+
+  //region areEqual private methods
+  // Should be consistent with result of compare.
+  // areEqual => compare -> 0
+  function areEqualTop(va, vb) {
+    return va === vb || (va == null && vb == null) || this._areEqual(va, vb);
+  }
+
+  function areEqualCore(va, vb) {
+    return va === vb;
+  }
+  //endregion
+
+  //region compare private methods
+  // consistent with isEmpty and areEqual
+  function compareTop(va, vb) {
+    // Quick bailout test
+    if(va ===  vb) return 0;
+    if(va == null) return vb == null ? 0 : 1;
+    if(vb == null) return -1;
+    return this._areEqual(va, vb) ? 0 : this._compare(va, vb);
+  }
+
+  // natural ascending comparer of non-equal, non-empty values
+  function compareCore(va, vb) {
+    return fun.compare(va, vb);
+  }
+  //endregion
 
   function isSubsetOf(sub, sup, key) {
     if(!key) key = fun.identity;

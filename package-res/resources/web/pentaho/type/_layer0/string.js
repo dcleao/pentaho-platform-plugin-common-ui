@@ -50,6 +50,7 @@ define([
      * @name pentaho.type.String
      * @class
      * @extends pentaho.type.Simple
+     *
      * @classDesc A textual type.
      * @description Creates a string type.
      */
@@ -57,13 +58,7 @@ define([
       meta: {
         id: "pentaho/type/string",
         styleClass: "pentaho-type-string",
-
-        validateNonEmpty: function(value) {
-          return this.base(value) ||
-            (typeof value !== "string"
-              ? [new Error("Value is not of type 'string'.")]
-              : null);
-        }
+        cast: String
       }
     }).implement({
       meta: bundle.structured["string"]

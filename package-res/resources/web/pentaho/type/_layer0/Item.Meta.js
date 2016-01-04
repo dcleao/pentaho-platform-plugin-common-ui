@@ -27,7 +27,8 @@ define([
 
   // Unique item class id exposed through Item.Meta#uid and used by Context instances.
   var _nextUid = 1,
-      _itemMeta = null;
+      _itemMeta = null,
+      O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
    * @name pentaho.type.Item.Meta
@@ -406,15 +407,54 @@ define([
      * @param {pentaho.type.Item} keyArgs.mesa The corresponding _sub-mesadata_ item.
      *
      * @return {pentaho.type.Item.Meta} The new sub-prototype.
+     * @ignore
      */
-    extendProto: function(instSpec, keyArgs) {
+    _extendProto: function(instSpec, keyArgs) {
       var subMeta = Object.create(this);
 
       // NOTE: `subMeta.constructor` is still the "base" constructor.
       subMeta.constructor(instSpec, keyArgs);
 
       return subMeta;
-    }
+    },
+
+    /**
+     * Creates a _mesa_ instance of this _prototype_.
+     *
+     * @param {...any} args The construction arguments.
+     * @return {pentaho.type.Item} The created instance.
+     */
+    create: function() {
+      var inst = Object.create(this.mesa);
+      inst.constructor.apply(inst, arguments);
+      return inst;
+    },
+
+    /**
+     * Determines if a specified value is a _mesa_ instance of this _prototype_.
+     *
+     * @param {any} value The value to test.
+     * @return {boolean} `true` if if is an instance, `false` otherwise.
+     */
+    is: function(value) {
+      return O_isProtoOf.call(this.mesa, value);
+    },
+
+    //region to method
+    // Configurable in a special way.
+    // Setting always sets the core.
+    // Getting always gets the wrapper.
+    get to() {
+      return toTop;
+    },
+
+    set to(to) {
+      this._to = to || toCore;
+    },
+
+    _to: toCore
+    //endregion
+
   }, /** @lends pentaho.type.Item.Meta */{
 
     /**
@@ -457,6 +497,18 @@ define([
   _itemMeta = ItemMeta.prototype;
 
   return ItemMeta;
+
+  //region to private methods
+  function toTop(value) {
+    return value == null   ? null  :
+           this.is(value)  ? value :
+           this._to(value);
+  }
+
+  function toCore(value) {
+    return this.create(value);
+  }
+  //endregion
 
   function nonEmptyString(value) {
     return value == null ? null : (String(value) || null);

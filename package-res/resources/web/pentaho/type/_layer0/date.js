@@ -60,11 +60,8 @@ define([
 
         styleClass: "pentaho-type-date",
 
-        validateNonEmpty: function(value) {
-          return this.base(value) ||
-            ((value instanceof Date)
-              ? null
-              : [new Error("Value is not of type 'date'.")]);
+        cast: function(v) {
+          return (v instanceof Date) ? v : Date.parse(v);
         }
       }
     }).implement({

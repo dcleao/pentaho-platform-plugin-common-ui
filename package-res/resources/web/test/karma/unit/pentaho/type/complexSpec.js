@@ -388,5 +388,75 @@ define([
       }); // #props
 
     }); // .extend({...})
+
+    describe("new Complex() -", function() {
+      it("should be possible to create an instance with no arguments", function() {
+        new Complex();
+      });
+      it("should be possible to create an instance with empty arguments", function() {
+        new Complex({});
+      });
+    });
+
+    describe("new DerivedComplex() -", function() {
+      var Derived;
+      beforeEach(function() {
+        Derived = Complex.extend({
+          meta: {
+            label: "Derived",
+            props: [
+              "x",
+              "y"
+            ]
+          }
+        });
+      });
+
+      describe("when given empty arguments -", function() {
+        it("should not throw", function() {
+          new Derived();
+        });
+
+        it("should have every property with its default value", function() {
+          var derived = new Derived();
+
+          expect(derived.x).toBe(null);
+          expect(derived.y).toBe(null);
+        });
+
+        it("should respect values specified in an object", function() {
+          var derived = new Derived({x: "1", y: "2"});
+
+          expect(derived.x.value).toBe("1");
+          expect(derived.y.value).toBe("2");
+        });
+
+        it("should respect values specified in an array", function() {
+          var derived = new Derived(["1", "2"]);
+
+          expect(derived.x.value).toBe("1");
+          expect(derived.y.value).toBe("2");
+        });
+
+        it("should cast the specified values", function() {
+          var derived = new Derived([0, 1]);
+
+          expect(derived.x.value).toBe("0");
+          expect(derived.y.value).toBe("1");
+        });
+
+        it("should respect values specified in v/f syntax", function() {
+          var derived = new Derived({x: {v: 1, f: "1.0 EUR"}, y: {v: 2, f: "2.0 USD"}});
+
+          expect(derived.x.value).toBe("1");
+          expect(derived.y.value).toBe("2");
+
+          expect(derived.x.formatted).toBe("1.0 EUR");
+          expect(derived.y.formatted).toBe("2.0 USD");
+        });
+      });
+
+
+    });
   }); // pentaho/type/complex
 });

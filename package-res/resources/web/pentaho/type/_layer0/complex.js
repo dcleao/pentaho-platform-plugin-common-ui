@@ -87,22 +87,29 @@ define([
      */
     var Complex = Value.extend("pentaho.type.Complex", {
 
+      // Note: neither `Value` or `Item` do anything in their constructor,
+      // so, in the name of performance, we're purposely not calling base.
       constructor: function(spec) {
-        // Note: neither `Value` or `Abstract` do anything in their constructor,
-        // so, in the name of performance, we're purposely not calling base.
-
         // Create `Property` instances.
         var pMetas = this.meta.props,
             i = pMetas.length,
-            hasSpec = !!spec,
-            isArray = hasSpec && (spec instanceof Array),
-            pMeta, v;
+            nameProp = !spec ? undefined : ((spec instanceof Array) ? "index" : "name"),
+            pMeta;
 
         while(i--) {
           pMeta = pMetas[i];
-          v = hasSpec ? spec[isArray ? pMeta.index : pMeta.name] : undefined;
-          this[pMeta._namePriv] = null; // new Property(pMeta, this, v);
+          this[pMeta._namePriv] = pMeta.create(this, nameProp && spec[pMeta[nameProp]]);
         }
+      },
+
+      get: function(name) {
+        var pMeta = this.meta.props.get(name);
+        return pMeta ? this[pMeta._namePriv] : null;
+      },
+
+      getValue: function(name, dv) {
+        var pMeta = this.meta.props.get(name);
+        return pMeta ? this[pMeta._namePriv].value : dv;
       },
 
       meta: /** @lends pentaho.type.Complex.Meta# */{

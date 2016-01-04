@@ -78,7 +78,7 @@ define([
     var text = O.getOwn(this.source, key);
     if(text == null) return missingMsg === undefined ? key : missingMsg;
 
-    return MessageBundle.format(text, scope);
+    return this.format(text, scope);
   };
 
   /**
@@ -133,6 +133,8 @@ define([
       return before + (value == null ? "[?]" : value.toString());
     });
   };
+
+  MessageBundle.prototype.format = MessageBundle.format;
 
   return MessageBundle;
 

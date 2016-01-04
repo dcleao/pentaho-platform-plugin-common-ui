@@ -57,18 +57,16 @@ define([
     return Simple.extend("pentaho.type.Number", {
       meta: {
         id: "pentaho/type/number",
-
         styleClass: "pentaho-type-number",
-
-        validateNonEmpty: function(value) {
-          return this.base(value) ||
-            (typeof value !== "number"
-              ? [new Error("Value is not of type 'number'.")]
-              : null);
-        }
+        cast: toNumber
       }
     }).implement({
       meta: bundle.structured["number"]
     });
+
+    function toNumber(v) {
+      v = +v;
+      return isNaN(v) ? null : v;
+    }
   };
 });

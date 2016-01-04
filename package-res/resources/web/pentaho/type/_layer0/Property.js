@@ -73,6 +73,46 @@ define([
    */
   var Property = Item.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
 
+    constructor: function(owner, value) {
+      this._owner = owner;
+
+      // Does not fire change event
+      this._value = this._toValue(value);
+    },
+
+    //region owner attribute
+    get owner() {
+      return this._owner;
+    },
+    //endregion
+
+    //region value attribute
+    /**
+     * The value of the property.
+     *
+     * @type pentaho.type.Value | pentaho.type.Value[] | null
+     */
+    get value() {
+      return this._value;
+    },
+
+    set value(value) {
+      // TODO: change event
+      // TODO: areEqual
+      // TODO: list
+      value = this._toValue(value);
+      if(value !== this._value) {
+        this._value = value;
+      }
+    },
+
+    _toValue: function(value) {
+      return value === undefined
+          ? this.meta.value
+          : this.meta.type.to(value);
+    },
+    //endregion
+
     meta: /** @lends pentaho.type.Property.Meta# */{
 
       // TODO: countMin, countMax, required, applicable, readonly, visible, value, members?, p
@@ -271,7 +311,7 @@ define([
       },
       //endregion
 
-      //region value type attribute
+      //region (value) type attribute
       /**
        * The type of _singular_ values that the property can hold.
        *
@@ -304,8 +344,10 @@ define([
       //endregion
 
       //region value attribute
+      _value: null,
+
       /**
-       * The value of the property.
+       * The default value of the property.
        *
        * @type pentaho.type.Value | pentaho.type.Value[] | null
        */

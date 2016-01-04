@@ -123,7 +123,7 @@ define([
       var ka = keyArgs ? Object.create(keyArgs) : {};
       ka.mesa = subMesa;
 
-      mesa.meta.extendProto(metaInstSpec, ka);
+      mesa.meta._extendProto(metaInstSpec, ka);
 
       // MESA II
       return subMesa.extend(instSpec);

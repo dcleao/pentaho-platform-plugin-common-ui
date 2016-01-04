@@ -57,15 +57,8 @@ define([
     return Simple.extend("pentaho.type.Boolean", {
       meta: {
         id: "pentaho/type/boolean",
-
         styleClass: "pentaho-type-boolean",
-
-        validateNonEmpty: function(value) {
-          return this.base(value) ||
-            (typeof value !== "boolean"
-              ? [new Error("Value is not of type 'boolean'.")]
-              : null);
-        }
+        cast: Boolean
       }
     }).implement({
       meta: bundle.structured["boolean"]
