@@ -52,6 +52,6 @@ define([
         ]
       }
     })
-    .Type.implement(bundle.structured).Value;
+    .implement({meta: bundle.structured});
   };
 });
