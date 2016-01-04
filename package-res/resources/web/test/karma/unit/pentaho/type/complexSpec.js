@@ -406,7 +406,8 @@ define([
             label: "Derived",
             props: [
               "x",
-              "y"
+              "y",
+              {name: "z", list: true}
             ]
           }
         });
@@ -422,37 +423,51 @@ define([
 
           expect(derived.x).toBe(null);
           expect(derived.y).toBe(null);
+          expect(derived.z).toEqual([]);
         });
 
         it("should respect values specified in an object", function() {
-          var derived = new Derived({x: "1", y: "2"});
+          var derived = new Derived({x: "1", y: "2", z: ["0"]});
 
           expect(derived.x.value).toBe("1");
           expect(derived.y.value).toBe("2");
+          expect(derived.z.length).toBe(1);
+          expect(derived.z[0].value).toBe("0");
         });
 
         it("should respect values specified in an array", function() {
-          var derived = new Derived(["1", "2"]);
+          var derived = new Derived(["1", "2", ["0"]]);
 
           expect(derived.x.value).toBe("1");
           expect(derived.y.value).toBe("2");
+          expect(derived.z.length).toBe(1);
+          expect(derived.z[0].value).toBe("0");
         });
 
         it("should cast the specified values", function() {
-          var derived = new Derived([0, 1]);
+          var derived = new Derived([0, 1, [2]]);
 
           expect(derived.x.value).toBe("0");
           expect(derived.y.value).toBe("1");
+          expect(derived.z.length).toBe(1);
+          expect(derived.z[0].value).toBe("2");
         });
 
         it("should respect values specified in v/f syntax", function() {
-          var derived = new Derived({x: {v: 1, f: "1.0 EUR"}, y: {v: 2, f: "2.0 USD"}});
+          var derived = new Derived({
+            x: {v: 1, f: "1.0 EUR"},
+            y: {v: 2, f: "2.0 USD"},
+            z: [{v: 0, f: "0.0 POUNDS"}]
+          });
 
           expect(derived.x.value).toBe("1");
           expect(derived.y.value).toBe("2");
+          expect(derived.z.length).toBe(1);
+          expect(derived.z[0].value).toBe("0");
 
           expect(derived.x.formatted).toBe("1.0 EUR");
           expect(derived.y.formatted).toBe("2.0 USD");
+          expect(derived.z[0].formatted).toBe("0.0 POUNDS");
         });
       });
 

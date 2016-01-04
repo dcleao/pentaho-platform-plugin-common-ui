@@ -98,18 +98,51 @@ define([
 
     set value(value) {
       // TODO: change event
-      // TODO: areEqual
-      // TODO: list
       value = this._toValue(value);
-      if(value !== this._value) {
+      if(!this._areEqual(value, this._value)) {
         this._value = value;
       }
     },
 
+    _areEqual: function(va, vb) {
+      if(va === vb) return true;
+
+      var typeMeta = this.meta.type;
+      if(this.meta.list) {
+        var i = va.length;
+        if(i !== vb.length) return false;
+        while(i--) if(!typeMeta.areEqual(va[i], vb[i])) return false;
+        return true;
+      }
+
+      return typeMeta.areEqual(va, vb);
+    },
+
     _toValue: function(value) {
-      return value === undefined
-          ? this.meta.value
-          : this.meta.type.to(value);
+      if(this.meta.list) {
+        return value == null
+          // Reset. Copy the default value...
+          // TODO: fix meta.value default value for list properties
+          ? (this.meta.value || []).slice()
+          : this._toValueArray((value instanceof Array) ? value : [value]);
+      }
+
+      return this.meta.type.to(value);
+    },
+
+    _toValueArray: function(values) {
+      var i = values.length,
+          typeMeta = this.meta.type,
+          value;
+      while(i--) {
+        value = typeMeta.to(values[i]);
+        if(value != null) {
+          values[i] = value;
+        } else {
+          values.splice(i, 1);
+        }
+      }
+      return values;
     },
     //endregion
 
