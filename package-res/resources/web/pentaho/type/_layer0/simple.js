@@ -125,7 +125,7 @@ define([
       _formatted: null,
 
       /**
-       * The formatted value of the property.
+       * Gets or sets the formatted value of the property.
        *
        * @type ?string
        */
@@ -169,8 +169,12 @@ define([
           this._cast = cast || castCore;
         },
 
-        _cast: castCore
+        _cast: castCore,
         //endregion
+
+        toJSON: function(value) {
+          return this._value.toString();
+        }
       }
     }).implement({
       meta: bundle.structured.simple

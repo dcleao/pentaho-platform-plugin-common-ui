@@ -20,21 +20,14 @@ define([
   "../../util/arg",
   "../../util/error",
   "../../util/object",
-  "../../util/text"
-], function(Item, Value, AnnotatableLinked, arg, error, O, text) {
+  "../../util/text",
+  "../../util/fun"
+], function(Item, Value, AnnotatableLinked, arg, error, O, text, F) {
 
   "use strict";
 
-  var configurableProps = {
-          "label": 1,
-          "description": 1,
-          "category": 1,
-          "helpUrl": 1,
-          "defaultValue": 1,
-          "format": 1,
-          "browsable": 1
-        },
-      O_isProtoOf = Object.prototype.isPrototypeOf;
+  var O_isProtoOf = Object.prototype.isPrototypeOf,
+      _propMeta = null;
 
   /**
    * @name pentaho.type.Property
@@ -60,7 +53,6 @@ define([
    * @implements pentaho.lang.IWithKey
    * @implements pentaho.lang.IListElement
    * @implements pentaho.lang.ICollectionElement
-   * @implements pentaho.lang.IConfigurable
    *
    * @classdesc The metadata of a property of a complex type.
    *
@@ -80,7 +72,15 @@ define([
       this._value = this._toValue(value);
     },
 
+    //region attributes
+
     //region owner attribute
+    /**
+     * Gets the complex value that owns this property.
+     *
+     * @type !pentaho.type.Complex
+     * @readonly
+     */
     get owner() {
       return this._owner;
     },
@@ -88,7 +88,7 @@ define([
 
     //region value attribute
     /**
-     * The value of the property.
+     * Gets or sets the value of the property.
      *
      * @type pentaho.type.Value | pentaho.type.Value[] | null
      */
@@ -146,9 +146,74 @@ define([
     },
     //endregion
 
+    //region countMin attribute
+    /**
+     * Gets the current minimum number of values that the property must hold.
+     *
+     * @type number
+     * @readonly
+     */
+    get countMin() {
+      return this.meta.countMinEval(this._owner);
+    },
+    //endregion
+
+    //region countMax attribute
+    /**
+     * Gets the current maximum number of values that the property can hold.
+     *
+     * @type number
+     * @readonly
+     */
+    get countMax() {
+      return this.meta.countMaxEval(this._owner);
+    },
+    //endregion
+
+    //region required attribute
+    /**
+     * Gets a value that indicates if the property is currently required.
+     *
+     * @type boolean
+     * @readonly
+     */
+    get required() {
+      return this.meta.requiredEval(this._owner);
+    },
+    //endregion
+
+    //region applicable attribute
+    /**
+     * Gets a value that indicates if the property is currently applicable.
+     *
+     * @type boolean
+     * @readonly
+     */
+    get applicable() {
+      return this.meta.applicableEval(this._owner);
+    },
+    //endregion
+
+    //region readOnly attribute
+    /**
+     * Gets a value that indicates if the property is currently readonly.
+     *
+     * @type boolean
+     * @readonly
+     */
+    get readOnly() {
+      return this.meta.readOnlyEval(this._owner);
+    },
+    //endregion
+    //endregion
+
     meta: /** @lends pentaho.type.Property.Meta# */{
 
-      // TODO: countMin, countMax, required, applicable, readonly, visible, value, members?, p
+      // TODO: cardinality related: countMin, countMax, required
+      // TODO: applicable, readonly, visible
+      // TODO: value, members?
+      // TODO: p -> AnnotatableLinked.configure(this, config);
+      // TODO: dynamic attributes, this complex environment, non-standard base impl. composition
 
       // Note: constructor/_init only called on sub-classes of Property.Meta,
       // and not on Property.Meta itself.
@@ -196,29 +261,6 @@ define([
         }
       },
 
-      //region IConfigurable implementation
-
-      // Used by constructor, createSub and PropertyMetaCollection._replace
-
-      /**
-       * Configures a property.
-       *
-       * @param {!pentaho.type.spec.IPropertyMetaConfig} config A property configuration.
-       * @ignore
-       */
-      xconfigure: function(config) {
-        if(!config) throw error.argRequired("config");
-
-        // undefined passes through.
-        // Value semantics is determined by each setter.
-        for(var p in config)
-          if(configurableProps[p] === 1)
-            this[p] = config[p];
-
-        AnnotatableLinked.configure(this, config);
-      },
-      //endregion
-
       //region IListElement
       /**
        * Gets the singular name of `Property.Meta` list-elements.
@@ -252,6 +294,7 @@ define([
       //endregion
 
       //region attributes
+
       //region context property
       /**
        * Gets the context of the property prototype.
@@ -401,6 +444,55 @@ define([
       },
       //endregion
 
+      //region countMin attribute
+      _countMin: 0,
+      _countMinEval: F.constant(0),
+
+      /**
+       * Gets or sets whether a property is required.
+       *
+       * A non-negative integer.
+       *
+       * A _required_ property must have at least one value.
+       * {@link pentaho.type.Property#countMin} is greater than one.
+       *
+       * Gets a non-null value only when `countMin` is also a constant non-null value.
+       *
+       * @type null | number | (function(this:pentaho.type.Complex) : number)
+       */
+      get required() {
+        var countMin = this.countMin;
+        return countMin == null || F.is(countMin) ? null : (countMin > 0);
+      },
+
+      set required(value) {
+        if(this === _propMeta) return;
+
+        if(value == null) {
+          // Reset local value
+          delete this._countMin;
+          delete this._countMinEval;
+        } else {
+          this._countMin = value;
+          this._countMinEval = this._countMinCombine(
+              Object.getPrototypeOf(this)._countMinEval, // "Escape" local value, if any.
+              F.to(value));
+        }
+      },
+
+      /**
+       * Evaluates the value of `required` attribute of this property
+       * on a given owner complex value.
+       *
+       * @param {pentaho.type.Complex} owner The complex value that owns the property.
+       * @return {number} The evaluated value of the `required` attribute.
+       */
+      requiredEval: function(owner) {
+        return this.countMinEval(owner) > 0;
+      },
+
+      //endregion
+
       //endregion
 
       //region value accessor
@@ -408,8 +500,9 @@ define([
         var mesa = this._declaringMeta.mesa,
             name = this._name,
             namePriv = this._namePriv;
+            //nameFormattedPriv = name + "Formatted";
 
-        if((name in mesa) || (namePriv in mesa))
+        if((name in mesa) || (namePriv in mesa)/* || (nameFormattedPriv in mesa)*/)
           throw error.argInvalid("name", "Property cannot have name '" + name + "' cause it's reserved.");
 
         // Receives a `Property` instance (see `Complex#constructor`).
@@ -420,20 +513,196 @@ define([
 
           get: function propertyValueGetter() {
             return this[namePriv].value;
+            //var value = this[namePriv].value;
+            //return value && value.valueOf();
           },
 
           set: function propertyValueSetter(value) {
             this[namePriv].value = value;
           }
         });
-      }
+        /*
+        Object.defineProperty(mesa, name + "Formatted", {
+          configurable: true,
+
+          get: function propertyFormattedGetter() {
+            var value = this[namePriv].value;
+            return value && value.toString();
+          }
+        });
+        */
+      },
       //endregion
+
+      // Configuration support
+      set attrs(attrSpecs) {
+        Object.keys(attrSpecs).forEach(function(name) {
+          this._dynamicAttribute(name, attrSpecs[name]);
+        }, this);
+        return this;
+      },
+
+      _dynamicAttribute: function(name, spec) {
+        var cast = spec.cast,
+            dv = spec.value,
+            combine = spec.combine,
+            namePriv = "_" + name,
+            namePrivEval = namePriv + "Eval",
+            root = this;
+
+        this[namePriv] = dv; // assumed already cast
+        this[namePrivEval] = F.constant(dv);
+
+        Object.defineProperty(this, name, {
+          get: function() {
+            return O.getOwn(this, namePriv);
+          },
+          set: function(value) {
+            // cannot change the root value
+            if(this === root) return;
+
+            if(value == null) {
+              // Reset local values
+              delete this[namePriv];
+              delete this[namePrivEval];
+            } else {
+              var fValue;
+              if(F.is(value)) {
+                fValue = value;
+                if(cast) fValue = wrapWithCast(fValue, cast.bind(this), dv);
+              } else {
+                value = cast ? cast.call(this, value, dv) : value;
+                fValue = F.constant(value);
+              }
+
+              this[namePriv] = value;
+              this[namePrivEval] = combine.call(
+                  this,
+                  Object.getPrototypeOf(this)[namePrivEval], // "Escape" local value, if any.
+                  fValue);
+            }
+          }
+        });
+
+        this[name + "Eval"] = function(owner) {
+          return this[namePrivEval].call(owner);
+        };
+      }
     } // end instance meta:
+  }).implement({
+    meta: {
+      attrs: {
+        /**
+         * Evaluates the value of the `countMin` attribute of this property
+         * on a given owner complex value.
+         *
+         * @name countMinEval
+         * @memberOf pentaho.type.Property.Meta#
+         * @param {pentaho.type.Complex} owner The complex value that owns the property.
+         * @return {number} The evaluated value of the `countMin` attribute.
+         */
+
+        /**
+         * Gets or sets the minimum number of values that a property of this type can have.
+         *
+         * A non-negative integer.
+         * When the property is _not_ a {@link pentaho.type.Property#list} property,
+         * the value clamped to not being greater than one.
+         *
+         * The effective value is the **maximum** between that specified and
+         * the evaluated value of the ancestor property.
+         *
+         * The `countMin`value is a non-negative integer.
+         *
+         * @name countMin
+         * @memberOf pentaho.type.Property.Meta#
+         * @type number | (function(this:pentaho.type.Complex) : number)
+         * @see pentaho.type.Property.Meta#countMinEval
+         */
+        countMin: {
+          value: 0,
+          cast:  castCount,
+          combine: function(baseEval, localEval) {
+            return function() {
+              return Math.max(baseEval.call(this), localEval.call(this));
+            };
+          }
+        },
+
+        /**
+         * Gets or sets the maximum number of values that a property of this type must have.
+         *
+         * The effective value is the **minimum** between that specified and
+         * the evaluated value of the ancestor property.
+         *
+         * The `countMax` value is constrained to be greater than or equal to the
+         * value of {@link pentaho.type.Property.Meta#countMin}.
+         * However, that constraint is not enforced in the value of this property,
+         * but only upon evaluation, by {@link pentaho.type.Property.Meta#countMaxEval}.
+         *
+         * @name countMax
+         * @memberOf pentaho.type.Property.Meta#
+         * @type number | (function(this:pentaho.type.Complex) : number)
+         * @see pentaho.type.Property.Meta#countMaxEval
+         */
+        countMax: {
+          value: Infinity,
+          cast:  castCount,
+          combine: function(baseEval, localEval) {
+            return function() {
+              return Math.min(baseEval.call(this), localEval.call(this));
+            };
+          }
+        }
+      }
+    }
+  }).implement({
+
+    // Override the auto/ generated method (by the above attrs declaration)
+    // to implement the >= countMin constraint.
+
+    /**
+     * Evaluates the value of the `countMax` attribute of this property
+     * on a given owner complex value.
+     *
+     * The `countMax` value is constrained to be greater than or equal to the
+     * value of {@link pentaho.type.Property.Meta#countMin}.
+     * When the argument `countMin` is specified,
+     * it is used to constraint the evaluated value of `countMax`.
+     * Otherwise, the `countMin` attribute is evaluated, internally,
+     * and used to apply the constraint.
+     *
+     * @name countMaxEval
+     * @memberOf pentaho.type.Property.Meta#
+     * @param {pentaho.type.Complex} owner The complex value that owns the property.
+     * @param {number} [countMin] The evaluated value of the `countMin` attribute, on the same owner.
+     * @return {number} The evaluated value of the `countMax` attribute.
+     */
+    countMaxEval: function(owner, countMin) {
+      if(countMin == null) countMin = this.countMinEval(owner);
+      return Math.max(countMin, this.base(owner));
+    }
   });
+
+  _propMeta = Property.meta;
 
   return Property;
 
   function nonEmptyString(value) {
     return value == null ? null : (String(value) || null);
+  }
+
+  function wrapWithCast(fun, cast) {
+    return function() {
+      var v = fun.call(this, arguments);
+      return v == null ? null : cast(v);
+    };
+  }
+
+  function castCount(v, dv) {
+    v = +v;
+    v = isNaN(v) || v < 0 ? dv : Math.floor(v);
+    if(!this.list && v > 1) v = 1;
+    return v;
   }
 });
