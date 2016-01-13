@@ -14,36 +14,27 @@
  * limitations under the License.
  */
 define([
-  "./Item",
-  "./value",
-  "./element",
-  "./list",
-  "./simple",
-  "./complex",
-  "./string",
-  "./number",
-  "./boolean",
-  "./date",
   "./object",
-  "./function"
-], function(Item, Value, Element, List, Simple, Complex, String, Number, Boolean, Date, Object, Function) {
+  "./fun"
+], function(O, fun) {
 
   "use strict";
-  
-  return {
-    "Item": Item,
 
-    // types
-    "value":    Value,
-    "element":  Element,
-    "list":     List,
-    "simple":   Simple,
-    "string":   String,
-    "number":   Number,
-    "boolean":  Boolean,
-    "date":     Date,
-    "complex":  Complex,
-    "object":   Object,
-    "function": Function
+  return {
+    isSubsetOf: function(sub, sup, key) {
+      if(!key) key = fun.identity;
+
+      var L1 = sup.length, L2 = sub.length, i, supIndex;
+      if(L2 > L1) return false;
+
+      supIndex = {};
+      i = L1;
+      while(i--) supIndex[key(sup[i])] = 1;
+
+      i = L2;
+      while(i--) if(!O.hasOwn(supIndex, key(sub[i]))) return false;
+
+      return true;
+    }
   };
 });

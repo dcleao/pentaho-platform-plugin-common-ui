@@ -15,21 +15,21 @@
  */
 define([
   "module",
-  "./value",
+  "./element",
   "../util/error",
   "../i18n!types"
-], function(module, valueFactory, error, bundle) {
+], function(module, elemFactory, error, bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Value = context.get(valueFactory);
+    var Element = context.get(elemFactory);
 
     /**
      * @name pentaho.type.Simple.Meta
      * @class
-     * @extends pentaho.type.Value.Meta
+     * @extends pentaho.type.Element.Meta
      *
      * @classDesc The metadata class of {@link pentaho.type.Simple}.
      */
@@ -37,7 +37,7 @@ define([
     /**
      * @name pentaho.type.Simple
      * @class
-     * @extends pentaho.type.Value
+     * @extends pentaho.type.Element
      * @amd pentaho/type/simple
      *
      * @classDesc The base abstract class of un-structured, indivisible values.
@@ -66,7 +66,7 @@ define([
      *
      * @description Creates a simple instance.
      */
-    return Value.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
+    return Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
 
       constructor: function(spec) {
         // Should allow a spec at construction time?
@@ -149,6 +149,41 @@ define([
         return f != null ? f : String(this._value);
       },
 
+      /**
+       * Gets the key of the simple value.
+       *
+       * The key of a value identifies it among values of the same concrete type.
+       *
+       * If two values have the same concrete type and their
+       * keys are equal, then it must also be the case that
+       * {@link pentaho.type.Value.Meta#areEqual}
+       * returns `true` when given the two values.
+       * The opposite should be true as well.
+       * If two values of the same concrete type have distinct keys,
+       * then {@link pentaho.type.Value.Meta#areEqual} should return `false`.
+       *
+       * The default simple value implementation, returns the result of calling
+       * `toString()` on {@link pentaho.type.Simple#value}.
+       *
+       * @type string
+       * @readonly
+       */
+      get key() {
+        return this._value.toString();
+      },
+
+      /**
+       * Creates a clone of the simple value.
+       *
+       * @return {!pentaho.type.Simple} The simple value clone.
+       */
+      clone: function() {
+        var SimpleClass = this.constructor;
+        // TODO: when Object fixes the problem of not distinguishing
+        // spec from the object value itself, may avoid creating an instance here...
+        return new SimpleClass({v: this.value, f: this.formatted});
+      },
+
       meta: /** pentaho.type.Simple.Meta# */{
         id: module.id,
         "abstract": true,
@@ -164,7 +199,7 @@ define([
          * into the value stored in a simple's {@link pentaho.type.Simple#value}
          * property.
          *
-         * The casting function is never given a `null` or `undefined` value.
+         * The casting function is never given a {@link nully} value.
          *
          * If, when given a value,
          * the casting function returns `null`,

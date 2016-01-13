@@ -60,13 +60,11 @@ define([
    */
   var Property = Item.extend("pentaho.type.Property", /** @lends pentaho.type.Property# */{
 
-    meta: /** @lends pentaho.type.Property.Meta# */{
-      // TODO: applicable, readOnly, visible
-      // TODO: value, members?
-      // TODO: p -> AnnotatableLinked.configure(this, config);
-      // TODO: dynamic attributes, this complex environment, non-standard base impl. composition
+    // TODO: value, members?
+    // TODO: p -> AnnotatableLinked.configure(this, config);
 
-      // Note: constructor/_init only called on sub-classes of Property.Meta,
+    meta: /** @lends pentaho.type.Property.Meta# */{
+      // Note: constructor/_init is only called on sub-classes of Property.Meta,
       // and not on Property.Meta itself.
 
       /**
@@ -94,11 +92,7 @@ define([
 
         O.setConst(this, "_declaringMeta", arg.required(keyArgs, "declaringMeta", "keyArgs"));
 
-        if(this.isRoot)
-          O.setConst(this, "_index", keyArgs.index || 0);
-
-        // Antecipate setting the list property or dependent dynamicAttribute setters could fail...
-        this.list = spec.list;
+        if(this.isRoot) O.setConst(this, "_index", keyArgs.index || 0);
       },
 
       _postInit: function() {
@@ -220,40 +214,44 @@ define([
       //endregion
 
       //region list attribute
-
-      // -> Optional(false), Immutable, Root-only.
-      _list: false,
-
       /**
        * Gets a value that indicates if the property is a _list_.
        *
-       * The value of a list property is a {@link Array.<pentaho.type.Value>},
-       * while the value of a non-list property is a {@link pentaho.type.Value} or `null`.
+       * A property is a _list_ property if its value type,
+       * {@link pentaho.type.Property.Meta#type}, is a list type,
+       * i.e., if it is or extends {@link pentaho.type.List}.
        *
-       * @type !pentaho.type.Value.Meta
+       * @type boolean
        * @readonly
        */
       get list() {
-        return this._list;
+        return this._typeMeta.list;
       },
+      //endregion
 
-      // config support
-      set list(value) {
-        if(this.isRoot) {
-          // Can only be set-once or cannot change, or throws.
-          O.setConst(this, "_list", !!value);
-        } else if(value != null) {
-          // Hierarchy consistency
-          value = !!value;
-          if(value !== this._list)
-            throw error.argInvalid("list", "Sub-properties cannot change the 'list' attribute.");
-        }
+      //region (value) element type attribute
+      /**
+       * The base element type of the _singular_ values that the property can hold.
+       *
+       * When the property is a list property,
+       * that list type's element type,
+       * {@link pentaho.type.List.Meta#of},
+       * is returned.
+       * Otherwise,
+       * {@link pentaho.type.Property.type} is returned.
+       *
+       * @type !pentaho.type.Element.Meta
+       * @readonly
+       */
+      get elemType() {
+        var type = this._typeMeta;
+        return type.list ? type.of : type;
       },
       //endregion
 
       //region (value) type attribute
       /**
-       * The type of _singular_ values that the property can hold.
+       * The base type of the value that the property can hold.
        *
        * @type !pentaho.type.Value.Meta
        * @readonly
@@ -323,63 +321,26 @@ define([
       },
       //endregion
 
-      //region value related methods
       /**
-       * Determines if two value fragments, of this property's value type, are equal.
-       *
-       * If the property is a _list_ property, then both arguments must be arrays.
-       * Otherwise, both arguments must not be arrays.
-       *
-       * @param {pentaho.type.Value|pentaho.type.Value[]} va The first value fragment.
-       * @param {pentaho.type.Value|pentaho.type.Value[]} vb The second value fragment.
-       *
-       * @return {boolean} `true` if the values are equal, `false`, otherwise.
-       */
-      areEqualValues: function(va, vb) {
-        if(va === vb) return true;
-        var typeMeta = this.type;
-        if(this.list) {
-          var i = va.length;
-          if(i !== vb.length) return false;
-          while(i--) if(!typeMeta.areEqual(va[i], vb[i])) return false;
-          return true;
-        }
-
-        return typeMeta.areEqual(va, vb);
-      },
-
-      /**
-       * Converts the given value specification to a value fragment of this property's value type.
+       * Converts the given value specification to a value of
+       * this property's value type.
        *
        * @param {any} valueSpec A value specification.
        *
-       * @return {pentaho.type.Value|pentaho.type.Value[]} A value fragment.
+       * @return {pentaho.type.Value} A value.
        */
       toValue: function(valueSpec) {
-        if(this.list) {
-          return valueSpec == null
-              // Reset. Copy the default value...
-              // TODO: fix meta.value default value for list properties
-              ? (this.value || []).slice()
-              : this._toValueArray((valueSpec instanceof Array) ? valueSpec : [valueSpec]);
+        // Assume default value?
+        if(valueSpec == null) {
+          // TODO: move the defaulting of the defaultValue for the list case to the defaultValue attribute...
+          var value = this.value;
+          return value     ? value.clone()      :
+                 this.list ? this.type.create() :
+                 value;
         }
 
-        return this.type.to(valueSpec);
-      },
-
-      _toValueArray: function(values) {
-        var i = values.length,
-            typeMeta = this.type,
-            value;
-        while(i--) {
-          value = typeMeta.to(values[i]);
-          if(value != null) {
-            values[i] = value;
-          } else {
-            values.splice(i, 1);
-          }
-        }
-        return values;
+        var type = this.type;
+        return this.context.create(valueSpec, type, type);
       },
       //endregion
 
