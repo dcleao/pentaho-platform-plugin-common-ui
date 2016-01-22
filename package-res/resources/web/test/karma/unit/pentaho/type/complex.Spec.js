@@ -442,6 +442,29 @@ define([
 
     });
 
+    describe("#uid -", function() {
+      it("should return a string value", function() {
+        var uid = new Complex().uid;
+        expect(typeof uid).toBe("string");
+      });
+
+      it("should have a distinct value for every instance", function() {
+        var uid1 = new Complex().uid,
+            uid2 = new Complex().uid,
+            uid3 = new Complex().uid;
+        expect(uid1).not.toBe(uid2);
+        expect(uid2).not.toBe(uid3);
+        expect(uid3).not.toBe(uid1);
+      });
+    });
+
+    describe("#key -", function() {
+      it("should return the value of #uid", function() {
+        var value = new Complex();
+        expect(value.uid).toBe(value.key);
+      });
+    });
+
     describe("#get(name, lenient)", function() {
       it("should return the `Value` of an existing singular property", function() {
         var Derived = Complex.extend({

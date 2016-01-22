@@ -117,6 +117,29 @@ define([
       },
 
       /**
+       * Gets the key of the list value.
+       *
+       * The key of a value identifies it among values of the same concrete type.
+       *
+       * If two values have the same concrete type and their
+       * keys are equal, then it must also be the case that
+       * {@link pentaho.type.Value.Meta#areEqual}
+       * returns `true` when given the two values.
+       * The opposite should be true as well.
+       * If two values of the same concrete type have distinct keys,
+       * then {@link pentaho.type.Value.Meta#areEqual} should return `false`.
+       *
+       * The default list implementation, returns the value of the
+       * list instance's {@link pentaho.type.List#uid}.
+       *
+       * @type string
+       * @readonly
+       */
+      get key() {
+        return this._uid;
+      },
+
+      /**
        * Gets the number of elements in the list.
        *
        * @type number

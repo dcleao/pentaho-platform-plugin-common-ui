@@ -86,15 +86,9 @@ define([
 
         //region domain
 
-        // Closed domain of _values_ of this type.
-        // Also defines the default natural ordering of the values.
+        // TODO: Also defines the default natural ordering of the values?
         // When inherited, specified values must be a subset of those in the base class.
-        // Although they can be in a different order.
-        // By default, the list is an undetermined, possibly infinite,
-        // set of all values allowed in the base domain...
-        // Because it is not possible to escape a base domain,
-        // both setting to undefined or null resets the property,
-        // inheriting the base domain.
+        // Although they can be in a different order...?
         _domain: null,
 
         /**
@@ -127,8 +121,10 @@ define([
             }
           } else {
             var ancestor = this.ancestor;
-            if(!ancestor)
-              throw error.operInvalid(bundle.structured.errors.type.domainSetOnRootType);
+
+            // assert !!ancestor
+            // Because Value.prototype is defined as isRoot,
+            // and ancestor is only null on the root, it is never null here.
 
             // validate and convert to ancestor type.
             value = value.map(function(valuei) {
@@ -171,10 +167,6 @@ define([
         _compare: compareCore
         //endregion
       }
-    },
-    /*classSpec:*/ null,
-    /*keyArgs:*/{
-      isRoot: true
     }).implement({
       meta: bundle.structured.element
     });

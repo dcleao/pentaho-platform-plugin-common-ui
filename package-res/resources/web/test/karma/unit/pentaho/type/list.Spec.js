@@ -40,7 +40,7 @@ define([
     meta: {of: Number}
   });
 
-  describe("pentaho/type/List -", function() {
+  describe("pentaho/type/list -", function() {
 
     it("is a function", function() {
       expect(typeof List).toBe("function");
@@ -213,6 +213,29 @@ define([
     });
 
     //region read methods
+    describe("#uid -", function() {
+      it("should return a string value", function() {
+        var uid = new List().uid;
+        expect(typeof uid).toBe("string");
+      });
+
+      it("should have a distinct value for every instance", function() {
+        var uid1 = new List().uid,
+            uid2 = new List().uid,
+            uid3 = new List().uid;
+        expect(uid1).not.toBe(uid2);
+        expect(uid2).not.toBe(uid3);
+        expect(uid3).not.toBe(uid1);
+      });
+    });
+
+    describe("#key -", function() {
+      it("should return the value of #uid", function() {
+        var value = new List();
+        expect(value.uid).toBe(value.key);
+      });
+    });
+
     describe("#count -", function() {
       it("should return 0 when a list is created empty", function() {
         expect(new List().count).toBe(0);
@@ -956,5 +979,33 @@ define([
       });
     });
     //endregion
+
+    describe("#clone()", function() {
+      it("should return a different list instance", function() {
+        var list = new List();
+        var clone = list.clone();
+        expect(clone).not.toBe(list);
+      });
+
+      it("should return a list instance with the same count", function() {
+        var list = new NumberList([1, 2, 3]);
+        var clone = list.clone();
+        expect(clone.count).toBe(list.count);
+      });
+
+      it("should return a list instance of the same constructor", function() {
+        var list = new NumberList([1, 2, 3]);
+        var clone = list.clone();
+        expect(clone.constructor).toBe(NumberList);
+      });
+
+      it("should return a list instance with identical elements", function() {
+        var list = new NumberList([1, 2, 3]);
+        var clone = list.clone();
+        expect(clone.at(0)).toBe(list.at(0));
+        expect(clone.at(1)).toBe(list.at(1));
+        expect(clone.at(2)).toBe(list.at(2));
+      });
+    });
   });
 });

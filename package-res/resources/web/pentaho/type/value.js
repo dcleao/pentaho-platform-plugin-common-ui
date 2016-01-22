@@ -95,11 +95,14 @@ define([
        * If two values are equal, they must have an equal {@link pentaho.type.Value#key}.
        * Otherwise, if they are different, they must have a different `key`.
        *
+       * The default implementation returns `true` is the two values
+       * have the same `key` and `false` otherwise.
+       *
        * @param {!pentaho.type.Value} other A value to test for equality.
        * @return {boolean} `true` if the given value is equal to this one, `false`, otherwise.
        */
       equals: function(other) {
-        return this === other;
+        return this === other || this.key === other.key;
       },
 
       /**
