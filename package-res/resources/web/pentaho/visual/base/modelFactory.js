@@ -48,21 +48,8 @@ define([
      * @param {pentaho.visual.base.IModel} modelSpec A plain object containing the model specification.
      */
     var Model = Complex.extend({
-        constructor: function(spec) {
-          this.base(spec);
-          var missingProps = this.meta.props.filter(function(prop) {
-            return prop.required && !spec.hasOwnProperty(prop.name);
-          }).map(function(prop) {
-            return prop.name;
-          });
-          if(missingProps.length > 0) {
-            throw new TypeError("IncompleteSpec: The following required properties were not specified: " + missingProps.join(","));
-          }
-
-        },
         meta: {
           id: "pentaho/visual/base",
-          v2Id: "base",
           view: "View",
           "abstract": true,
           props: [
