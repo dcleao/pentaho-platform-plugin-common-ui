@@ -18,9 +18,8 @@ define([
   "./value",
   "../i18n!types",
   "../util/error",
-  "../util/fun",
-  "../util/array",
-], function(module, valueFactory, bundle, error, fun, A) {
+  "../util/fun"
+], function(module, valueFactory, bundle, error, fun) {
 
   "use strict";
 
@@ -80,65 +79,6 @@ define([
             }
           } else {
             this._format = value || {};
-          }
-        },
-        //endregion
-
-        //region domain
-
-        // TODO: Also defines the default natural ordering of the values?
-        // When inherited, specified values must be a subset of those in the base class.
-        // Although they can be in a different order...?
-        _domain: null,
-
-        /**
-         * Gets or sets the fixed domain of the type.
-         *
-         * The domain attribute restricts a type
-         * to a set of discrete values of the ancestor type.
-         *
-         * If the ancestor type also has `domain` set,
-         * the specified set of values must be a subset of those,
-         * or an error is thrown.
-         *
-         * Setting to a {@link nully} value or to an empty array,
-         * clears the local value and inherits the ancestor's domain.
-         *
-         * NOTE: This attribute can only be used successfully on
-         *  a type that has a non-abstract base type.
-         *
-         * @type {pentaho.type.List}
-         */
-        get domain() {
-          return this._domain;
-        },
-
-        set domain(value) {
-          if(value == null || !value.length) {
-            // inherit unless we're the root
-            if(this !== _elemMeta) {
-              delete this._domain;
-            }
-          } else {
-            var ancestor = this.ancestor;
-
-            // assert !!ancestor
-            // Because Value.prototype is defined as isRoot,
-            // and ancestor is only null on the root, it is never null here.
-
-            // validate and convert to ancestor type.
-            value = value.map(function(valuei) {
-              if(valuei == null)
-                throw error.argInvalid("domain", bundle.structured.errors.type.domainHasNullElement);
-
-              return ancestor.to(valuei);
-            }, this);
-
-            var baseDomain = Object.getPrototypeOf(this)._domain;
-            if(baseDomain && !A.isSubsetOf(value, baseDomain, value_key))
-              throw error.argInvalid("domain", bundle.structured.errors.type.domainIsNotSubsetOfBase);
-
-            this._domain = value;
           }
         },
         //endregion

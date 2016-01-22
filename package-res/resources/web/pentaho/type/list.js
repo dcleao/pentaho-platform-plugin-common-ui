@@ -52,7 +52,7 @@ define([
      * also be overridden to copy those properties.
      *
      * @constructor
-     * @param {Object} [spec] The list specification.
+     * @param {Object} [spec] The list specification or another compatible list instance.
      */
     var List = Value.extend("pentaho.type.List", /** @lends pentaho.type.List# */{
 
@@ -69,6 +69,7 @@ define([
           var elemSpecs =
               Array.isArray(spec) ? spec :
               (spec.constructor === Object && Array.isArray(spec.d)) ? spec.d :
+              (spec instanceof List) ? spec._elems :
               null;
 
           if(elemSpecs) {
