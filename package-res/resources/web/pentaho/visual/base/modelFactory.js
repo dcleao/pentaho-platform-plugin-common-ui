@@ -15,9 +15,8 @@
  */
 define([
   "pentaho/type/complex",
-  "pentaho/i18n!type",
-  "pentaho/util/error"
-], function(complexFactory, bundle, error) {
+  "pentaho/i18n!type"
+], function(complexFactory, bundle) {
 
   "use strict";
 
@@ -26,7 +25,7 @@ define([
    *
    * @name modelFactory
    * @memberOf pentaho.visual
-   * @type pentaho.type.Factory
+   * @type pentaho.type.Factory.<pentaho.visual.base.Model>
    * @amd pentaho/visual/modelFactory
    */
   return function(context) {

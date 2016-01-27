@@ -523,7 +523,7 @@ define([
 
         // supports configuration
         set of(value) {
-          if(!value) throw error.argRequired("name");
+          if(!value) throw error.argRequired("of");
 
           // NOTE: one of the problems is determining if two types are equal,
           //  because these can be anonymous types. Equality would have to mean

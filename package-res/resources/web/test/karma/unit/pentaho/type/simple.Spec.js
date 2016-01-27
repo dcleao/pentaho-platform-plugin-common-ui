@@ -51,7 +51,7 @@ define([
 
       describe("#domain -", function() {
         it("should respect a specified base domain", function() {
-          var B = Number.extend({
+          var B = Number.restrict({
             meta: {
               domain: [1, 2, 3]
             }
@@ -71,37 +71,26 @@ define([
         });
 
         it("should inherit the base domain elements when unspecified", function() {
-          var B = Number.extend({
+          var B = Number.restrict({
             meta: {
               domain: [1, 2, 3]
             }
           });
 
-          var C = B.extend();
+          var C = B.restrict();
 
-          var domain = B.meta.domain;
-          expect(domain instanceof List).toBe(true);
-          expect(domain.count).toBe(3);
-
-          var subDomain = C.meta.domain;
-          expect(subDomain).not.toBe(domain);
-
-          expect(subDomain.count).toEqual(domain.count);
-
-          expect(subDomain.at(0).value).toEqual(domain.at(0).value);
-          expect(subDomain.at(1).value).toEqual(domain.at(1).value);
-          expect(subDomain.at(2).value).toEqual(domain.at(2).value);
+          expect(C.meta.domain).toBe(B.meta.domain);
         });
 
         it("should throw if the specified domain is not a subset of the base domain", function() {
-          var B = Number.extend({
+          var B = Number.restrict({
             meta: {
               domain: [1, 2, 3]
             }
           });
 
           expect(function() {
-            B.extend({
+            B.restrict({
               meta: {
                 domain: [1, 4]
               }
@@ -112,13 +101,13 @@ define([
         });
 
         it("should respect a specified domain that is a subset of the base domain", function() {
-          var B = Number.extend({
+          var B = Number.restrict({
             meta: {
               domain: [1, 2, 3]
             }
           });
 
-          var C = B.extend({
+          var C = B.restrict({
             meta: {
               domain: [1, 2]
             }
@@ -132,16 +121,16 @@ define([
           expect(domain.at(1).value).toBe(2);
         });
 
-        it("should inherit the base domain when later set to nully or empty array", function() {
+        it("should inherit the base domain when later set to nully", function() {
 
           function expectIt(newDomain) {
-            var B = Number.extend({
+            var B = Number.restrict({
               meta: {
                 domain: [1, 2, 3]
               }
             });
 
-            var C = B.extend({
+            var C = B.restrict({
               meta: {
                 domain: [1, 2]
               }
@@ -160,7 +149,6 @@ define([
 
           expectIt(null);
           expectIt(undefined);
-          expectIt([]);
         });
       }); // #domain
 

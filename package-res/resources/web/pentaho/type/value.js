@@ -17,8 +17,9 @@ define([
   "module",
   "./Item",
   "../i18n!types",
-  "../util/error"
-], function(module, Item, bundle, error) {
+  "../util/error",
+  "../util/object"
+], function(module, Item, bundle, error, O) {
 
   "use strict";
 
@@ -191,6 +192,59 @@ define([
         },
         //endregion
 
+        //region restrictions
+        _restrictions: [],
+
+        /**
+         * Gets the restriction mixin classes that an unrestricted type supports.
+         *
+         * Can only be specified when extending an _unrestricted type_.
+         *
+         * @type Array.<pentaho.type.RetrictionMixin>
+         * @readonly
+         */
+        get restrictions() {
+          return this._restrictions;
+        },
+
+        // for configuration only
+        set restrictions(values) {
+          if(this.restrictsType)
+            throw error.operInvalid(bundle.structured.errors.value.restrictionsSetOnRestricted);
+
+          var restrictions = O.getOwn(this, "_restrictions");
+          if(!restrictions)
+            restrictions = this._restrictions = this._restrictions.slice();
+
+          // Add new restrictions from values
+          if(Array.isArray(values))
+            values.forEach(addRestriction);
+          else
+            addRestriction(values);
+
+          function addRestriction(Mixin) {
+            if(restrictions.indexOf(Mixin) < 0)
+              restrictions.push(Mixin);
+          }
+        },
+
+        /**
+         * Gets the ancestor unrestricted type, if any.
+         *
+         * When a type is a _restricted_ type,
+         * returns the base unrestricted type which it restricts.
+         * Otherwise, returns `null`.
+         *
+         * A restricted type is an **abstract** subtype of an _unrestricted_ type.
+         *
+         * @type ?pentaho.type.Value.Meta
+         * @readonly
+         */
+        get restrictsType() {
+          return null;
+        },
+        //endregion
+
         // Returns array of non-empty Error objects or null.
         /**
          * Performs validation on a given value and
@@ -233,8 +287,104 @@ define([
                   (va.constructor === vb.constructor) && va.equals(vb));
         }
       }
+    }, /** @lends pentaho.type.Value */{
+
+      /**
+       * Creates a restricted subtype of this one.
+       *
+       * An error is thrown if the `constructor` property is specified in `instSpec`.
+       * the constructor of restricted subtypes is fixed and always returns an
+       * instance of the unrestricted type instead.
+       *
+       * If this type is an unrestricted type,
+       * a restricted type that restricts it is returned.
+       * Otherwise, if this type is already a restricted type,
+       * a more restricted type is created and returned.
+       *
+       * @param {?string} [name] A name of the type used for debugging purposes.
+       * @param {Object} instSpec The restriction type instance specification.
+       *
+       * The available options are those accepted by each of the unrestricted type's
+       * restrictions.
+       * Please check each type's documentation to know which restrictions it supports.
+       *
+       * @return {Class.<pentaho.type.Value>} The subtype's constructor.
+       *
+       * @see pentaho.type.Value.Meta#restrictsType
+       */
+      restrict: function(name, instSpec) {
+
+        if(typeof name !== "string") {
+          instSpec = name;
+          name = null;
+        }
+
+        // Restricted types have a fixed, controlled constructor.
+        if(instSpec && O.hasOwn(instSpec, "constructor"))
+          throw error.operInvalid(bundle.structured.errors.value.restrictionTypeCtor);
+
+        var restrictsMeta = this.meta;
+
+        // Am already a restricted type?
+        if(restrictsMeta.restrictsType) {
+          // Just extend it and return it.
+          // Grab the original extend method, as, below,
+          // it is replaced by an always-throws version for restricted types.
+          var class_extend = Value.extend;
+          return class_extend.call(this, name || "", instSpec);
+        }
+
+        // --- Create a root restricted type
+
+        var RestrictsType = this;
+
+        var Restricted = this.extend(name || "", {
+            // Constructor always returns an instance of `restrictsType`.
+            constructor: function() {
+              return O.make(RestrictsType, arguments);
+            },
+
+            meta: {
+              // Say this is a restricted type and which is the type it restricts.
+              get restrictsType() {
+                return restrictsMeta;
+              },
+
+              // Redirect to restrictsMeta.
+              is: function(value) {
+                return restrictsMeta.is(value);
+              },
+
+              // Redirect to restrictsMeta.
+              create: function() {
+                throw restrictsMeta.create.apply(restrictsMeta, arguments);
+              }
+            }
+          }, {
+            // Can only further _restrict_ a Restricted class, not `extend` it.
+            extend: function() {
+              throw error.operInvalid();
+            }
+          });
+
+        // --- Mixin RestrictionMixin classes
+        // Note that only the instance side of `RestrictionMixin` classes is mixed in.
+        //  The class/static side contains the `validate` method that is called directly,
+        //  later, upon value validation.
+        // Also, it is the _meta_ side of Restricted that receives the mixin.
+        restrictsMeta.restrictions.forEach(function(RestrictionMixin) {
+          this.implement(RestrictionMixin.prototype);
+        }, Restricted.Meta);
+
+        // --- Apply instSpec
+        // This is where the just defined mixin getters/setters
+        // can/should be called to configure the restricted type.
+        if(instSpec)
+          Restricted.implement(instSpec);
+
+        return Restricted;
+      }
     },
-    /*classSpec:*/ null,
     /*keyArgs:*/ {
       isRoot: true
     }).implement({
