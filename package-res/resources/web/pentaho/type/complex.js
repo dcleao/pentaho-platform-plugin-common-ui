@@ -433,7 +433,7 @@ define([
         this.meta.each(function(pMeta) {
           var value = self._values[pMeta.name];
 
-          Array.prototype.push.apply(errors, pMeta.type.validate(value));
+          Array.prototype.push.apply(errors, pMeta.validate(value));
         });
 
         return errors.length > 0 ? errors : null;
