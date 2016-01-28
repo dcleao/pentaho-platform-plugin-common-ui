@@ -15,9 +15,7 @@
  */
 define([
   "pentaho/type/Context",
-  "pentaho/util/error",
-  "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Context, error, bundle) {
+], function(Context) {
 
   "use strict";
 
@@ -25,8 +23,7 @@ define([
 
   var context = new Context(),
       Value   = context.get("pentaho/type/value"),
-      Element = context.get("pentaho/type/element"),
-      Number  = context.get("pentaho/type/number");
+      Element = context.get("pentaho/type/element");
 
   describe("pentaho/type/element -", function() {
     it("should be a function", function() {

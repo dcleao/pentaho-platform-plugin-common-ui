@@ -325,8 +325,7 @@ define([
        * @protected
        */
       _cast: function(valueSpec) {
-        var meta = this.meta;
-        return meta.context.create(valueSpec, meta._elemMeta, meta._elemMeta);
+        return this.meta._elemMeta.to(valueSpec);
       },
 
       //region Change tracking

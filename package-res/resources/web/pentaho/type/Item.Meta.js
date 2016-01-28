@@ -507,6 +507,9 @@ define([
       return subMeta;
     },
 
+    // TODO: Now that Property instances are never created,
+    //   only types with constructors get created.
+
     /**
      * Creates a _mesa_ instance of this _prototype_.
      *
@@ -547,6 +550,9 @@ define([
     to: function(value) {
       return value == null   ? null  :
              this.is(value)  ? value :
+             // Am a normal constructor type?
+             // TODO: Context can only handle constructor types and does: new Type( ... )
+             this.constructor.prototype === this ? this.context.create(value, this, this) :
              this.create(value);
     }
 

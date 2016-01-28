@@ -334,6 +334,9 @@ define([
           return class_extend.call(this, name || "", instSpec);
         }
 
+        if(!restrictsMeta.restrictions.length)
+          throw error.operInvalid(bundle.structured.errors.value.restrictTypeWithoutRestrictions);
+
         // --- Create a root restricted type
 
         var RestrictsType = this;
@@ -357,7 +360,7 @@ define([
 
               // Redirect to restrictsMeta.
               create: function() {
-                throw restrictsMeta.create.apply(restrictsMeta, arguments);
+                return restrictsMeta.create.apply(restrictsMeta, arguments);
               }
             }
           }, {

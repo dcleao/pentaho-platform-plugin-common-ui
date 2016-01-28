@@ -201,6 +201,8 @@ define([
       var DefaultType = defaultType ? this.get(defaultType) : null;
       var BaseType    = baseType    ? this.get(baseType)    : null;
 
+      if(BaseType && BaseType.meta.is(valueSpec)) return valueSpec;
+
       // If it is a plain Object, does it have the inline, metadata property, "_"?
       var Type, inlineTypeMetadata;
       if(typeof valueSpec === "object" &&

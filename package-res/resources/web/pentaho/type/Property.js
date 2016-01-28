@@ -353,10 +353,7 @@ define([
           return noDefault ? null : this._freshDefaultValue();
         }
 
-        var type = this.type;
-        return type.is(valueSpec)
-          ? valueSpec
-          : this.context.create(valueSpec, type, type);
+        return this.type.to(valueSpec);
       },
 
       /**

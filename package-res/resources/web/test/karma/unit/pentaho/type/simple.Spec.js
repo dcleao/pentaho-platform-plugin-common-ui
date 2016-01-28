@@ -24,12 +24,10 @@ define([
   /*global describe:true, it:true, expect:true, beforeEach:true*/
 
   var context = new Context(),
-      List    = context.get("pentaho/type/list"),
       Element = context.get("pentaho/type/element"),
-      Simple  = context.get("pentaho/type/simple"),
-      Number  = context.get("pentaho/type/number");
+      Simple  = context.get("pentaho/type/simple");
 
-  describe("pentaho/type/element -", function() {
+  describe("pentaho/type/simple -", function() {
     it("should be a function", function() {
       expect(typeof Simple).toBe("function");
     });
@@ -48,109 +46,6 @@ define([
       it("should be a sub-class of `Element.Meta`", function() {
         expect(ElemMeta.prototype instanceof Element.Meta).toBe(true);
       });
-
-      describe("#domain -", function() {
-        it("should respect a specified base domain", function() {
-          var B = Number.restrict({
-            meta: {
-              domain: [1, 2, 3]
-            }
-          });
-
-          var domain = B.meta.domain;
-          expect(domain instanceof List).toBe(true);
-          expect(domain.count).toBe(3);
-
-          expect(domain.at(0) instanceof Number).toBe(true);
-          expect(domain.at(1) instanceof Number).toBe(true);
-          expect(domain.at(2) instanceof Number).toBe(true);
-
-          expect(domain.at(0).value).toBe(1);
-          expect(domain.at(1).value).toBe(2);
-          expect(domain.at(2).value).toBe(3);
-        });
-
-        it("should inherit the base domain elements when unspecified", function() {
-          var B = Number.restrict({
-            meta: {
-              domain: [1, 2, 3]
-            }
-          });
-
-          var C = B.restrict();
-
-          expect(C.meta.domain).toBe(B.meta.domain);
-        });
-
-        it("should throw if the specified domain is not a subset of the base domain", function() {
-          var B = Number.restrict({
-            meta: {
-              domain: [1, 2, 3]
-            }
-          });
-
-          expect(function() {
-            B.restrict({
-              meta: {
-                domain: [1, 4]
-              }
-            });
-          }).toThrowError(
-              error.argInvalid("domain", bundle.structured.errors.type.domainIsNotSubsetOfBase)
-                  .message);
-        });
-
-        it("should respect a specified domain that is a subset of the base domain", function() {
-          var B = Number.restrict({
-            meta: {
-              domain: [1, 2, 3]
-            }
-          });
-
-          var C = B.restrict({
-            meta: {
-              domain: [1, 2]
-            }
-          });
-
-          var domain = C.meta.domain;
-          expect(domain instanceof List).toBe(true);
-          expect(domain.count).toBe(2);
-
-          expect(domain.at(0).value).toBe(1);
-          expect(domain.at(1).value).toBe(2);
-        });
-
-        it("should inherit the base domain when later set to nully", function() {
-
-          function expectIt(newDomain) {
-            var B = Number.restrict({
-              meta: {
-                domain: [1, 2, 3]
-              }
-            });
-
-            var C = B.restrict({
-              meta: {
-                domain: [1, 2]
-              }
-            });
-
-            var domain = C.meta.domain;
-            expect(domain instanceof List).toBe(true);
-            expect(domain.count).toBe(2);
-
-            C.meta.domain = newDomain;
-
-            domain = C.meta.domain;
-            expect(domain instanceof List).toBe(true);
-            expect(domain.count).toBe(3);
-          }
-
-          expectIt(null);
-          expectIt(undefined);
-        });
-      }); // #domain
 
       // TODO: cast
     });
