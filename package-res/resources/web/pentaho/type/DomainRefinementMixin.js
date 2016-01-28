@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 define([
-  "./RestrictionMixin",
+  "./RefinementMixin",
   "../i18n!types",
   "../util/error"
-], function(RestrictionMixin, bundle, error) {
+], function(Refinement, bundle, error) {
 
   "use strict";
 
   /**
-   * @name pentaho.type.DomainRestrictionMixin
-   * @amd pentaho/type/DomainRestrictionMixin
+   * @name pentaho.type.DomainRefinementMixin
+   * @amd pentaho/type/DomainRefinementMixin
    * @class
-   * @extends pentaho.type.RestrictionMixin
-   * @classDesc The _domain_ restriction mixin enables defining an abstract subtype
+   * @extends pentaho.type.RefinementMixin
+   * @classDesc The _domain_ refinement mixin enables defining an abstract subtype
    *   whose domain is limited to a discrete number of the supertype's instances.
    *
    * @description The constructor is not used, as a mixin.
    */
-  return RestrictionMixin.extend("pentaho.type.DomainRestrictionMixin", /** @lends pentaho.type.DomainRestrictionMixin# */{
+  return Refinement.extend("pentaho.type.DomainRefinementMixin", /** @lends pentaho.type.DomainRefinementMixin# */{
 
     //region domain
 
@@ -43,17 +43,17 @@ define([
     /**
      * Gets the fixed domain of the type, if any, or `null`.
      *
-     * The domain attribute restricts a type to a set of discrete values
-     * whose type is that of the unrestricted type, {@link pentaho.type.Value.Meta#restrictsType}.
+     * The domain attribute refines a type to a set of discrete values
+     * whose type is that of the unrefined type, {@link pentaho.type.Value.Meta#refinesType}.
      *
-     * If the ancestor type is a restriction and has `domain` set,
+     * If the ancestor type is refined and has `domain` set,
      * the specified set of values must be a subset of those,
      * or an error is thrown.
      *
      * Setting to a {@link Nully} value,
      * clears the local value and inherits the ancestor's domain.
      *
-     * Setting to an empty array, effectively creates an _empty type restriction_.
+     * Setting to an empty array, effectively creates an _empty refined type_.
      *
      * @type {?pentaho.type.List}
      * @readonly
@@ -63,10 +63,10 @@ define([
     },
 
     set domain(value) {
-      // The root is the direct descendant of the restrictsType.
-      var restrictsType = this.restrictsType,
+      // The root is the direct descendant of the refinesType.
+      var refinesType = this.refinesType,
           ancestor = Object.getPrototypeOf(this),
-          isRoot = restrictsType === ancestor,
+          isRoot = refinesType === ancestor,
           localDomain;
 
       // TODO: Either ancestors should be locked when deriving,
@@ -85,8 +85,8 @@ define([
         // An Array, a List, ...
 
         // Convert value to ListType.
-        // A list of the restricts type.
-        var ListType = this.context.get([restrictsType]);
+        // A list of the refines type.
+        var ListType = this.context.get([refinesType]);
         localDomain = new ListType(value);
 
         if(!isRoot) {

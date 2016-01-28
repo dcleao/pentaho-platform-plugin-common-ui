@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/DomainRestrictionMixin",
+  "pentaho/type/DomainRefinementMixin",
   "pentaho/type/Context",
   "pentaho/util/error",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(DomainRestrictionMixin, Context, error, bundle) {
+], function(DomainRefinementMixin, Context, error, bundle) {
 
   "use strict";
 
@@ -28,20 +28,20 @@ define([
       List    = context.get("pentaho/type/list"),
       Number  = context.get("pentaho/type/number");
 
-  describe("pentaho/type/DomainRestrictionMixinSpec -", function() {
+  describe("pentaho/type/DomainRefinementMixinSpec -", function() {
     it("should be a function", function() {
-      expect(typeof DomainRestrictionMixin).toBe("function");
+      expect(typeof DomainRefinementMixin).toBe("function");
     });
 
     describe("#domain -", function() {
       it("should have a default null domain", function() {
-        var B = Number.restrict();
+        var B = Number.refine();
 
         expect(B.meta.domain).toBe(null);
       });
 
       it("should respect a specified root/base domain", function() {
-        var B = Number.restrict({
+        var B = Number.refine({
           meta: {
             domain: [1, 2, 3]
           }
@@ -61,26 +61,26 @@ define([
       });
 
       it("should inherit the base domain elements when unspecified", function() {
-        var B = Number.restrict({
+        var B = Number.refine({
           meta: {
             domain: [1, 2, 3]
           }
         });
 
-        var C = B.restrict();
+        var C = B.refine();
 
         expect(C.meta.domain).toBe(B.meta.domain);
       });
 
       it("should throw if the specified domain is not a subset of the base domain", function() {
-        var B = Number.restrict({
+        var B = Number.refine({
           meta: {
             domain: [1, 2, 3]
           }
         });
 
         expect(function() {
-          B.restrict({
+          B.refine({
             meta: {
               domain: [1, 4]
             }
@@ -91,13 +91,13 @@ define([
       });
 
       it("should respect a specified domain that is a subset of the base domain", function() {
-        var B = Number.restrict({
+        var B = Number.refine({
           meta: {
             domain: [1, 2, 3]
           }
         });
 
-        var C = B.restrict({
+        var C = B.refine({
           meta: {
             domain: [1, 2]
           }
@@ -114,7 +114,7 @@ define([
       it("should set the root domain to null when set to nully", function() {
 
         function expectIt(newDomain) {
-          var B = Number.restrict({
+          var B = Number.refine({
             meta: {
               domain: [1, 2, 3]
             }
@@ -136,13 +136,13 @@ define([
       it("should inherit the base domain when later set to nully", function() {
 
         function expectIt(newDomain) {
-          var B = Number.restrict({
+          var B = Number.refine({
             meta: {
               domain: [1, 2, 3]
             }
           });
 
-          var C = B.restrict({
+          var C = B.refine({
             meta: {
               domain: [1, 2]
             }
@@ -163,9 +163,9 @@ define([
         expectIt(undefined);
       });
 
-      it("should respect a specified domain on an restricted type without domain", function() {
-        var B = Number.restrict();
-        var C = B.restrict({
+      it("should respect a specified domain on an refined type without domain", function() {
+        var B = Number.refine();
+        var C = B.refine({
           meta: {
             domain: [1, 2]
           }
@@ -179,13 +179,13 @@ define([
       });
 
       it("should allow specifying the base domain", function() {
-        var B = Number.restrict({
+        var B = Number.refine({
           meta: {
             domain: [1, 2, 3]
           }
         });
 
-        var C = B.restrict({
+        var C = B.refine({
           meta: {
             domain: [B.meta.domain.at(1)]
           }
@@ -201,11 +201,11 @@ define([
 
     describe(".validate(value)", function() {
       it("should be defined", function() {
-        expect(typeof DomainRestrictionMixin.validate).toBe("function");
+        expect(typeof DomainRefinementMixin.validate).toBe("function");
       });
 
       it("should return null on a value that is equal to one of the domain values", function() {
-        var B = Number.restrict({
+        var B = Number.refine({
           meta: {
             domain: [1, 2, 3]
           }
@@ -213,11 +213,11 @@ define([
 
         var v = new Number(1);
 
-        expect(DomainRestrictionMixin.validate.call(B.meta, v)).toBe(null);
+        expect(DomainRefinementMixin.validate.call(B.meta, v)).toBe(null);
       });
 
       it("should return an Error on a value that is not equal to one of the domain values", function() {
-        var B = Number.restrict({
+        var B = Number.refine({
           meta: {
             domain: [1, 2, 3]
           }
@@ -225,7 +225,7 @@ define([
 
         var v = new Number(4);
 
-        expect(DomainRestrictionMixin.validate.call(B.meta, v) instanceof Error).toBe(true);
+        expect(DomainRefinementMixin.validate.call(B.meta, v) instanceof Error).toBe(true);
       });
     });
   });

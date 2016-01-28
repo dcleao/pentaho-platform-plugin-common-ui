@@ -16,11 +16,11 @@
 define([
   "module",
   "./value",
-  "./DomainRestrictionMixin",
+  "./DomainRefinementMixin",
   "../i18n!types",
   "../util/error",
   "../util/fun"
-], function(module, valueFactory, DomainRestrictionMixin, bundle, error, fun) {
+], function(module, valueFactory, DomainRefinementMixin, bundle, error, fun) {
 
   "use strict";
 
@@ -62,7 +62,7 @@ define([
 
         styleClass: "pentaho-type-element",
 
-        restrictions: [DomainRestrictionMixin],
+        refinements: [DomainRefinementMixin],
 
         //region format
 

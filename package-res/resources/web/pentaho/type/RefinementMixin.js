@@ -20,33 +20,33 @@ define([
   "use strict";
 
   /**
-   * @name pentaho.type.RestrictionMixin
-   * @amd pentaho/type/RestrictionMixin
+   * @name pentaho.type.RefinementMixin
+   * @amd pentaho/type/RefinementMixin
    * @class
-   * @classDesc The restriction mixin is used to extend a value metadata class,
-   * {@link pentaho.type.Value.Meta}, with attributes which, when specified, allow it to be restricted.
+   * @classDesc The refinement mixin is used to extend a value metadata class,
+   * {@link pentaho.type.Value.Meta}, with attributes which, when specified, allow it to be refined.
    *
-   * To define an actual restriction, inherit from this class and:
+   * To define an actual refinement, inherit from this class and:
    * 1. in the prototype, define any attributes that should be mixed into the target value metadata class
-   * 2. implement the static {@link pentaho.type.RestrictionMixin.validate} method
+   * 2. implement the static {@link pentaho.type.RefinementMixin.validate} method
    *    that will perform the actual validation on instances of the target class.
    *
    * @description The constructor is not used, as a mixin.
    * @abstract
-   * @see pentaho.type.Value.Meta#restrictsType
+   * @see pentaho.type.Value.Meta#refinesType
    */
-  return Base.extend("pentaho.type.RestrictionMixin", {
+  return Base.extend("pentaho.type.RefinementMixin", {
     /* mixin stuff */
-  }, /** @lends pentaho.type.RestrictionMixin */{
+  }, /** @lends pentaho.type.RefinementMixin */{
     /**
      * Performs validation of a given value.
      *
-     * This method is invoked **on** the restricted type metadata,
+     * This method is invoked **on** the refined type metadata,
      *  an instance of {@link pentaho.type.Value.Meta}.
      *
      * The default implementation simply returns `null`.
      *
-     * @param {!pentaho.type.Value} value The value to validate according to this restriction.
+     * @param {!pentaho.type.Value} value The value to validate according to this refinement.
      *
      * @return {Error|Array.<!Error>|null} An `Error`, a non-empty array of `Error` or `null`.
      */

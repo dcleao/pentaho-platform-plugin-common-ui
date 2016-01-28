@@ -16,10 +16,10 @@
 define([
   "pentaho/type/Item",
   "pentaho/type/Context",
-  "pentaho/type/RestrictionMixin",
+  "pentaho/type/RefinementMixin",
   "pentaho/util/error",
   "pentaho/i18n!/pentaho/type/i18n/types"
-], function(Item, Context, RestrictionMixin, error, bundle) {
+], function(Item, Context, RefinementMixin, error, bundle) {
 
   "use strict";
 
@@ -236,152 +236,152 @@ define([
           });
         }); // #abstract
 
-        describe("#restrictions", function() {
+        describe("#refinements", function() {
           it("should get an empty array when unspecified", function() {
             var Derived = Value.extend();
 
-            var derivedRestrictions = Derived.meta.restrictions;
-            expect(Array.isArray(derivedRestrictions)).toBe(true);
-            expect(derivedRestrictions.length).toBe(0);
+            var derivedRefinements = Derived.meta.refinements;
+            expect(Array.isArray(derivedRefinements)).toBe(true);
+            expect(derivedRefinements.length).toBe(0);
           });
 
-          it("should add a specified restriction class", function() {
+          it("should add a specified refinement class", function() {
             var Derived = Value.extend({
               meta: {
-                restrictions: RestrictionMixin
+                refinements: RefinementMixin
               }
             });
 
-            var derivedRestrictions = Derived.meta.restrictions;
-            expect(Array.isArray(derivedRestrictions)).toBe(true);
-            expect(derivedRestrictions.length).toBe(1);
-            expect(derivedRestrictions[0]).toBe(RestrictionMixin);
+            var derivedRefinements = Derived.meta.refinements;
+            expect(Array.isArray(derivedRefinements)).toBe(true);
+            expect(derivedRefinements.length).toBe(1);
+            expect(derivedRefinements[0]).toBe(RefinementMixin);
           });
 
-          it("should filter out specified duplicate restriction classes", function() {
+          it("should filter out specified duplicate refinement classes", function() {
             var Derived = Value.extend({
               meta: {
-                restrictions: [RestrictionMixin, RestrictionMixin]
+                refinements: [RefinementMixin, RefinementMixin]
               }
             });
 
-            var derivedRestrictions = Derived.meta.restrictions;
-            expect(Array.isArray(derivedRestrictions)).toBe(true);
-            expect(derivedRestrictions.length).toBe(1);
-            expect(derivedRestrictions[0]).toBe(RestrictionMixin);
+            var derivedRefinements = Derived.meta.refinements;
+            expect(Array.isArray(derivedRefinements)).toBe(true);
+            expect(derivedRefinements.length).toBe(1);
+            expect(derivedRefinements[0]).toBe(RefinementMixin);
           });
 
           it("should accept more than one specified distinct Mixin class", function() {
-            var Mixin1 = RestrictionMixin.extend(),
-                Mixin2 = RestrictionMixin.extend();
+            var Mixin1 = RefinementMixin.extend(),
+                Mixin2 = RefinementMixin.extend();
 
             var Derived = Value.extend({
               meta: {
-                restrictions: [Mixin1, Mixin2]
+                refinements: [Mixin1, Mixin2]
               }
             });
 
-            var derivedRestrictions = Derived.meta.restrictions;
-            expect(Array.isArray(derivedRestrictions)).toBe(true);
-            expect(derivedRestrictions.length).toBe(2);
-            expect(derivedRestrictions[0]).toBe(Mixin1);
-            expect(derivedRestrictions[1]).toBe(Mixin2);
+            var derivedRefinements = Derived.meta.refinements;
+            expect(Array.isArray(derivedRefinements)).toBe(true);
+            expect(derivedRefinements.length).toBe(2);
+            expect(derivedRefinements[0]).toBe(Mixin1);
+            expect(derivedRefinements[1]).toBe(Mixin2);
           });
 
-          it("should allow to _add_ Mixin classes when there are already local restrictions", function() {
-            var Mixin1 = RestrictionMixin.extend(),
-                Mixin2 = RestrictionMixin.extend();
+          it("should allow to _add_ Mixin classes when there are already local refinements", function() {
+            var Mixin1 = RefinementMixin.extend(),
+                Mixin2 = RefinementMixin.extend();
 
             var Derived = Value.extend({
               meta: {
-                restrictions: [Mixin1]
+                refinements: [Mixin1]
               }
             });
 
-            Derived.meta.restrictions = Mixin2;
+            Derived.meta.refinements = Mixin2;
 
-            var derivedRestrictions = Derived.meta.restrictions;
-            expect(derivedRestrictions.length).toBe(2);
-            expect(derivedRestrictions[0]).toBe(Mixin1);
-            expect(derivedRestrictions[1]).toBe(Mixin2);
+            var derivedRefinements = Derived.meta.refinements;
+            expect(derivedRefinements.length).toBe(2);
+            expect(derivedRefinements[0]).toBe(Mixin1);
+            expect(derivedRefinements[1]).toBe(Mixin2);
           });
 
-          it("should inherit the base restrictions array when not specified locally", function() {
-            var Mixin1 = RestrictionMixin.extend(),
-                Mixin2 = RestrictionMixin.extend();
+          it("should inherit the base refinements array when not specified locally", function() {
+            var Mixin1 = RefinementMixin.extend(),
+                Mixin2 = RefinementMixin.extend();
 
             var A = Value.extend({
               meta: {
-                restrictions: [Mixin1, Mixin2]
+                refinements: [Mixin1, Mixin2]
               }
             });
 
             var B = A.extend();
 
-            expect(B.meta.restrictions).toBe(A.meta.restrictions);
+            expect(B.meta.refinements).toBe(A.meta.refinements);
           });
 
-          it("should create a new array with all base restrictions array when specified locally", function() {
-            var Mixin1 = RestrictionMixin.extend(),
-                Mixin2 = RestrictionMixin.extend(),
-                Mixin3 = RestrictionMixin.extend();
+          it("should create a new array with all base refinements array when specified locally", function() {
+            var Mixin1 = RefinementMixin.extend(),
+                Mixin2 = RefinementMixin.extend(),
+                Mixin3 = RefinementMixin.extend();
 
             var A = Value.extend({
               meta: {
-                restrictions: [Mixin1, Mixin2]
+                refinements: [Mixin1, Mixin2]
               }
             });
 
             var B = A.extend({
               meta: {
-                restrictions: [Mixin1, Mixin3]
+                refinements: [Mixin1, Mixin3]
               }
             });
 
-            var derivedRestrictions = B.meta.restrictions;
-            expect(derivedRestrictions).not.toBe(A.meta.restrictions);
-            expect(A.meta.restrictions.length).toBe(2);
-            expect(derivedRestrictions.length).toBe(3);
-            expect(derivedRestrictions[0]).toBe(Mixin1);
-            expect(derivedRestrictions[1]).toBe(Mixin2);
-            expect(derivedRestrictions[2]).toBe(Mixin3);
+            var derivedRefinements = B.meta.refinements;
+            expect(derivedRefinements).not.toBe(A.meta.refinements);
+            expect(A.meta.refinements.length).toBe(2);
+            expect(derivedRefinements.length).toBe(3);
+            expect(derivedRefinements[0]).toBe(Mixin1);
+            expect(derivedRefinements[1]).toBe(Mixin2);
+            expect(derivedRefinements[2]).toBe(Mixin3);
           });
 
-          it("should throw when set on a restricted type", function() {
+          it("should throw when set on a refined type", function() {
             var Derived = Value.extend({
               meta: {
-                restrictions: [RestrictionMixin]
+                refinements: [RefinementMixin]
               }
             });
 
             expect(function() {
-              Derived.restrict({
+              Derived.refine({
                 meta: {
-                  restrictions: []
+                  refinements: []
                 }
               });
             }).toThrowError(
-                error.operInvalid(bundle.structured.errors.value.restrictionsSetOnRestricted).message);
+                error.operInvalid(bundle.structured.errors.value.refinementsSetOnRefined).message);
           });
-        }); // #restrictions
+        }); // #refinements
 
-        describe("#restrictsType", function() {
-          it("should be null on an unrestricted type", function() {
-            expect(Value.meta.restrictsType).toBe(null);
+        describe("#refinesType", function() {
+          it("should be null on an unrefined type", function() {
+            expect(Value.meta.refinesType).toBe(null);
 
             var Derived = Value.extend();
-            expect(Derived.meta.restrictsType).toBe(null);
+            expect(Derived.meta.refinesType).toBe(null);
           });
 
-          it("should be null on an unrestricted type which has restrictions", function() {
+          it("should be null on an unrefined type which has refinements", function() {
             var Derived = Value.extend({
               meta: {
-                restrictions: RestrictionMixin
+                refinements: RefinementMixin
               }
             });
 
-            expect(Derived.meta.restrictions.length).toBeGreaterThan(0);
-            expect(Derived.meta.restrictsType).toBe(null);
+            expect(Derived.meta.refinements.length).toBeGreaterThan(0);
+            expect(Derived.meta.refinesType).toBe(null);
           });
         });
       });
@@ -469,187 +469,187 @@ define([
       });
     });// end #validate
 
-    describe(".restrict([name, ] instSpec) -", function() {
+    describe(".refine([name, ] instSpec) -", function() {
 
-      it("should not allow restricting an unrestricted class when it has no associated restrictions", function() {
+      it("should not allow refining an unrefined class when it has no associated refinements", function() {
         expect(function() {
-          Value.restrict();
+          Value.refine();
         }).toThrowError(
-            error.operInvalid(bundle.structured.errors.value.restrictTypeWithoutRestrictions).message);
+            error.operInvalid(bundle.structured.errors.value.refineTypeWithoutRefinements).message);
       });
 
-      it("should allow restricting an unrestricted type with associated restrictions", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: [Mixin]}});
+      it("should allow refining an unrefined type with associated refinements", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: [Mixin]}});
 
-        TypeWithRestrictions.restrict();
+        TypeWithRefinements.refine();
       });
 
-      it("should throw when trying to specify the mesa constructor of a restricted type", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: [Mixin]}});
+      it("should throw when trying to specify the mesa constructor of a refined type", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: [Mixin]}});
 
         expect(function() {
-          TypeWithRestrictions.restrict({
+          TypeWithRefinements.refine({
             constructor: function() {}
           });
-        }).toThrowError(error.operInvalid(bundle.structured.errors.value.restrictionTypeCtor).message);
+        }).toThrowError(error.operInvalid(bundle.structured.errors.value.refinementTypeCtor).message);
       });
 
-      it("should create a restricted type constructor that inherits from this", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: Mixin}});
+      it("should create a refined type constructor that inherits from this", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: Mixin}});
 
-        var Restricted = TypeWithRestrictions.restrict();
+        var Refined = TypeWithRefinements.refine();
 
-        expect(Restricted.prototype instanceof TypeWithRestrictions).toBe(true);
+        expect(Refined.prototype instanceof TypeWithRefinements).toBe(true);
       });
 
-      it("should create a restricted type constructor that when invoked returns a direct instance of this", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: Mixin}});
+      it("should create a refined type constructor that when invoked returns a direct instance of this", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: Mixin}});
 
-        var Restricted = TypeWithRestrictions.restrict();
-        var instance = new Restricted();
-        expect(instance instanceof Restricted).toBe(false);
-        expect(instance instanceof TypeWithRestrictions).toBe(true);
-        expect(instance.constructor).toBe(TypeWithRestrictions);
+        var Refined = TypeWithRefinements.refine();
+        var instance = new Refined();
+        expect(instance instanceof Refined).toBe(false);
+        expect(instance instanceof TypeWithRefinements).toBe(true);
+        expect(instance.constructor).toBe(TypeWithRefinements);
       });
 
-      it("should create a restricted type constructor that has the specified name", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: Mixin}});
+      it("should create a refined type constructor that has the specified name", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: Mixin}});
 
-        var Restricted = TypeWithRestrictions.restrict("MyRestricted");
+        var Refined = TypeWithRefinements.refine("MyRefined");
         // PhantomJS still fails configuring the name property...
-        expect(Restricted.name || Restricted.displayName).toBe("MyRestricted");
+        expect(Refined.name || Refined.displayName).toBe("MyRefined");
       });
 
-      it("should create a restricted type whose Meta#is(.) returns true for a this instance", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: Mixin}});
+      it("should create a refined type whose Meta#is(.) returns true for a this instance", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: Mixin}});
 
-        var Restricted = TypeWithRestrictions.restrict();
-        expect(Restricted.meta.is(new TypeWithRestrictions())).toBe(true);
+        var Refined = TypeWithRefinements.refine();
+        expect(Refined.meta.is(new TypeWithRefinements())).toBe(true);
       });
 
-      it("should create a restricted type whose Meta#create(.) returns direct instances of this", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: Mixin}});
+      it("should create a refined type whose Meta#create(.) returns direct instances of this", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: Mixin}});
 
-        var Restricted = TypeWithRestrictions.restrict();
-        var converted = Restricted.meta.create({});
-        expect(converted.constructor).toBe(TypeWithRestrictions);
+        var Refined = TypeWithRefinements.refine();
+        var converted = Refined.meta.create({});
+        expect(converted.constructor).toBe(TypeWithRefinements);
       });
 
-      it("should create a restricted type whose .extend(.) throws", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: Mixin}});
+      it("should create a refined type whose .extend(.) throws", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: Mixin}});
 
-        var Restricted = TypeWithRestrictions.restrict();
+        var Refined = TypeWithRefinements.refine();
         expect(function() {
-          Restricted.extend();
+          Refined.extend();
         }).toThrowError(error.operInvalid().message);
       });
 
-      it("should create a restricted type having restrictsType equal to this", function() {
-        var Mixin = RestrictionMixin.extend();
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: Mixin}});
+      it("should create a refined type having refinesType equal to this", function() {
+        var Mixin = RefinementMixin.extend();
+        var TypeWithRefinements = Value.extend({meta: {refinements: Mixin}});
 
-        var Restricted = TypeWithRestrictions.restrict();
+        var Refined = TypeWithRefinements.refine();
 
-        expect(Restricted.meta.restrictsType).toBe(TypeWithRestrictions.meta);
+        expect(Refined.meta.refinesType).toBe(TypeWithRefinements.meta);
       });
 
-      it("should create a restricted type with the specified Restriction classes' prototype mixed in", function() {
-        var Mixin1 = RestrictionMixin.extend({
+      it("should create a refined type with the specified Refinement classes' prototype mixed in", function() {
+        var Mixin1 = RefinementMixin.extend({
           attribute1: {}
         });
 
-        var Mixin2 = RestrictionMixin.extend({
+        var Mixin2 = RefinementMixin.extend({
           attribute2: {}
         });
 
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: [Mixin1, Mixin2]}});
+        var TypeWithRefinements = Value.extend({meta: {refinements: [Mixin1, Mixin2]}});
 
-        var Restricted = TypeWithRestrictions.restrict();
+        var Refined = TypeWithRefinements.refine();
 
-        expect(Restricted.meta.attribute1).toBe(Mixin1.prototype.attribute1);
-        expect(Restricted.meta.attribute2).toBe(Mixin2.prototype.attribute2);
+        expect(Refined.meta.attribute1).toBe(Mixin1.prototype.attribute1);
+        expect(Refined.meta.attribute2).toBe(Mixin2.prototype.attribute2);
       });
 
-      it("should not mixin the Restriction classes' static interface", function() {
-        var Mixin = RestrictionMixin.extend({}, {
+      it("should not mixin the Refinement classes' static interface", function() {
+        var Mixin = RefinementMixin.extend({}, {
           attribute1: {},
           attribute2: function() {}
         });
 
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: [Mixin]}});
+        var TypeWithRefinements = Value.extend({meta: {refinements: [Mixin]}});
 
-        var Restricted = TypeWithRestrictions.restrict();
+        var Refined = TypeWithRefinements.refine();
 
-        expect(Restricted.meta.attribute1).toBe(undefined);
-        expect(Restricted.meta.attribute2).toBe(undefined);
+        expect(Refined.meta.attribute1).toBe(undefined);
+        expect(Refined.meta.attribute2).toBe(undefined);
 
         // Meta
-        expect(Restricted.meta.constructor.attribute1).toBe(undefined);
-        expect(Restricted.meta.constructor.attribute2).toBe(undefined);
+        expect(Refined.meta.constructor.attribute1).toBe(undefined);
+        expect(Refined.meta.constructor.attribute2).toBe(undefined);
       });
 
-      it("should be able to use the Restriction Mixin's members directly in the restricts spec", function() {
+      it("should be able to use the Refinement Mixin's members directly in the refines spec", function() {
 
-        var Mixin1 = RestrictionMixin.extend({
+        var Mixin1 = RefinementMixin.extend({
           set attribute1(v) {
             this._attribute1 = v;
           }
         });
 
-        var Mixin2 = RestrictionMixin.extend({
+        var Mixin2 = RefinementMixin.extend({
           set attribute2(v) {
             this._attribute2 = v;
           }
         });
 
-        var TypeWithRestrictions = Value.extend({meta: {restrictions: [Mixin1, Mixin2]}});
+        var TypeWithRefinements = Value.extend({meta: {refinements: [Mixin1, Mixin2]}});
 
         var v1 = {}, v2 = {};
-        var Restricted = TypeWithRestrictions.restrict({
+        var Refined = TypeWithRefinements.refine({
           meta: {
             attribute1: v1,
             attribute2: v2
           }
         });
 
-        expect(Restricted.meta._attribute1).toBe(v1);
-        expect(Restricted.meta._attribute2).toBe(v2);
+        expect(Refined.meta._attribute1).toBe(v1);
+        expect(Refined.meta._attribute2).toBe(v2);
       });
 
-      it("should allow to further restrict a restricted type preserving the restrictsType", function() {
-        var TypeWithRestrictions = Value.extend({
+      it("should allow to further refine a refined type preserving the refinesType", function() {
+        var TypeWithRefinements = Value.extend({
           meta: {
-            restrictions: RestrictionMixin
+            refinements: RefinementMixin
           }
         });
 
-        var R1 = TypeWithRestrictions.restrict();
-        var R2 = R1.restrict();
+        var R1 = TypeWithRefinements.refine();
+        var R2 = R1.refine();
 
-        expect(R1.meta.restrictsType).toBe(TypeWithRestrictions.meta);
-        expect(R2.meta.restrictsType).toBe(TypeWithRestrictions.meta);
+        expect(R1.meta.refinesType).toBe(TypeWithRefinements.meta);
+        expect(R2.meta.refinesType).toBe(TypeWithRefinements.meta);
       });
 
-      it("should allow to further restrict a restricted type and set its name", function() {
-        var TypeWithRestrictions = Value.extend({
+      it("should allow to further refine a refined type and set its name", function() {
+        var TypeWithRefinements = Value.extend({
           meta: {
-            restrictions: RestrictionMixin
+            refinements: RefinementMixin
           }
         });
 
-        var R1 = TypeWithRestrictions.restrict();
-        var R2 = R1.restrict("Fooo");
+        var R1 = TypeWithRefinements.refine();
+        var R2 = R1.refine("Fooo");
 
         expect(R2.name || R2.displayName).toBe("Fooo");
       });
-    }); // end .restrict
+    }); // end .refine
   });
 });

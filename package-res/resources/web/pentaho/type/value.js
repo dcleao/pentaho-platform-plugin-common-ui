@@ -192,55 +192,55 @@ define([
         },
         //endregion
 
-        //region restrictions
-        _restrictions: [],
+        //region refinements
+        _refinements: [],
 
         /**
-         * Gets the restriction mixin classes that an unrestricted type supports.
+         * Gets the refinement mixin classes that an unrefined type supports.
          *
-         * Can only be specified when extending an _unrestricted type_.
+         * Can only be specified when extending an _unrefined type_.
          *
          * @type Array.<pentaho.type.RetrictionMixin>
          * @readonly
          */
-        get restrictions() {
-          return this._restrictions;
+        get refinements() {
+          return this._refinements;
         },
 
         // for configuration only
-        set restrictions(values) {
-          if(this.restrictsType)
-            throw error.operInvalid(bundle.structured.errors.value.restrictionsSetOnRestricted);
+        set refinements(values) {
+          if(this.refinesType)
+            throw error.operInvalid(bundle.structured.errors.value.refinementsSetOnRefined);
 
-          var restrictions = O.getOwn(this, "_restrictions");
-          if(!restrictions)
-            restrictions = this._restrictions = this._restrictions.slice();
+          var refinements = O.getOwn(this, "_refinements");
+          if(!refinements)
+            refinements = this._refinements = this._refinements.slice();
 
-          // Add new restrictions from values
+          // Add new refinements from values
           if(Array.isArray(values))
-            values.forEach(addRestriction);
+            values.forEach(addRefinement);
           else
-            addRestriction(values);
+            addRefinement(values);
 
-          function addRestriction(Mixin) {
-            if(restrictions.indexOf(Mixin) < 0)
-              restrictions.push(Mixin);
+          function addRefinement(Mixin) {
+            if(refinements.indexOf(Mixin) < 0)
+              refinements.push(Mixin);
           }
         },
 
         /**
-         * Gets the ancestor unrestricted type, if any.
+         * Gets the ancestor unrefined type, if any.
          *
-         * When a type is a _restricted_ type,
-         * returns the base unrestricted type which it restricts.
+         * When a type is a _refined_ type,
+         * returns the base unrefined type which it refines.
          * Otherwise, returns `null`.
          *
-         * A restricted type is an **abstract** subtype of an _unrestricted_ type.
+         * A refined type is an **abstract** subtype of an _unrefined_ type.
          *
          * @type ?pentaho.type.Value.Meta
          * @readonly
          */
-        get restrictsType() {
+        get refinesType() {
           return null;
         },
         //endregion
@@ -290,102 +290,102 @@ define([
     }, /** @lends pentaho.type.Value */{
 
       /**
-       * Creates a restricted subtype of this one.
+       * Creates a refined subtype of this one.
        *
        * An error is thrown if the `constructor` property is specified in `instSpec`.
-       * the constructor of restricted subtypes is fixed and always returns an
-       * instance of the unrestricted type instead.
+       * the constructor of refined subtypes is fixed and always returns an
+       * instance of the unrefined type instead.
        *
-       * If this type is an unrestricted type,
-       * a restricted type that restricts it is returned.
-       * Otherwise, if this type is already a restricted type,
-       * a more restricted type is created and returned.
+       * If this type is an unrefined type,
+       * a refined type that refines it is returned.
+       * Otherwise, if this type is already a refined type,
+       * a more refined type is created and returned.
        *
        * @param {?string} [name] A name of the type used for debugging purposes.
-       * @param {Object} instSpec The restriction type instance specification.
+       * @param {Object} instSpec The refined type instance specification.
        *
-       * The available options are those accepted by each of the unrestricted type's
-       * restrictions.
-       * Please check each type's documentation to know which restrictions it supports.
+       * The available options are those accepted by each of the unrefined type's
+       * refinements.
+       * Please check each type's documentation to know which refinements it supports.
        *
        * @return {Class.<pentaho.type.Value>} The subtype's constructor.
        *
-       * @see pentaho.type.Value.Meta#restrictsType
+       * @see pentaho.type.Value.Meta#refinesType
        */
-      restrict: function(name, instSpec) {
+      refine: function(name, instSpec) {
 
         if(typeof name !== "string") {
           instSpec = name;
           name = null;
         }
 
-        // Restricted types have a fixed, controlled constructor.
+        // Refined types have a fixed, controlled constructor.
         if(instSpec && O.hasOwn(instSpec, "constructor"))
-          throw error.operInvalid(bundle.structured.errors.value.restrictionTypeCtor);
+          throw error.operInvalid(bundle.structured.errors.value.refinementTypeCtor);
 
-        var restrictsMeta = this.meta;
+        var refinesMeta = this.meta;
 
-        // Am already a restricted type?
-        if(restrictsMeta.restrictsType) {
+        // Am already a refined type?
+        if(refinesMeta.refinesType) {
           // Just extend it and return it.
           // Grab the original extend method, as, below,
-          // it is replaced by an always-throws version for restricted types.
+          // it is replaced by an always-throws version for refined types.
           var class_extend = Value.extend;
           return class_extend.call(this, name || "", instSpec);
         }
 
-        if(!restrictsMeta.restrictions.length)
-          throw error.operInvalid(bundle.structured.errors.value.restrictTypeWithoutRestrictions);
+        if(!refinesMeta.refinements.length)
+          throw error.operInvalid(bundle.structured.errors.value.refineTypeWithoutRefinements);
 
-        // --- Create a root restricted type
+        // --- Create a root refined type
 
-        var RestrictsType = this;
+        var RefinesType = this;
 
-        var Restricted = this.extend(name || "", {
-            // Constructor always returns an instance of `restrictsType`.
+        var Refined = this.extend(name || "", {
+            // Constructor always returns an instance of `refinesType`.
             constructor: function() {
-              return O.make(RestrictsType, arguments);
+              return O.make(RefinesType, arguments);
             },
 
             meta: {
-              // Say this is a restricted type and which is the type it restricts.
-              get restrictsType() {
-                return restrictsMeta;
+              // Say this is a refined type and which is the type it refines.
+              get refinesType() {
+                return refinesMeta;
               },
 
-              // Redirect to restrictsMeta.
+              // Redirect to refinesMeta.
               is: function(value) {
-                return restrictsMeta.is(value);
+                return refinesMeta.is(value);
               },
 
-              // Redirect to restrictsMeta.
+              // Redirect to refinesMeta.
               create: function() {
-                return restrictsMeta.create.apply(restrictsMeta, arguments);
+                return refinesMeta.create.apply(refinesMeta, arguments);
               }
             }
           }, {
-            // Can only further _restrict_ a Restricted class, not `extend` it.
+            // Can only further _refine_ a Refined class, not `extend` it.
             extend: function() {
               throw error.operInvalid();
             }
           });
 
-        // --- Mixin RestrictionMixin classes
-        // Note that only the instance side of `RestrictionMixin` classes is mixed in.
+        // --- Mixin RefinementMixin classes
+        // Note that only the instance side of `RefinementMixin` classes is mixed in.
         //  The class/static side contains the `validate` method that is called directly,
         //  later, upon value validation.
-        // Also, it is the _meta_ side of Restricted that receives the mixin.
-        restrictsMeta.restrictions.forEach(function(RestrictionMixin) {
-          this.implement(RestrictionMixin.prototype);
-        }, Restricted.Meta);
+        // Also, it is the _meta_ side of Refined that receives the mixin.
+        refinesMeta.refinements.forEach(function(RefinementMixin) {
+          this.implement(RefinementMixin.prototype);
+        }, Refined.Meta);
 
         // --- Apply instSpec
         // This is where the just defined mixin getters/setters
-        // can/should be called to configure the restricted type.
+        // can/should be called to configure the refined type.
         if(instSpec)
-          Restricted.implement(instSpec);
+          Refined.implement(instSpec);
 
-        return Restricted;
+        return Refined;
       }
     },
     /*keyArgs:*/ {
