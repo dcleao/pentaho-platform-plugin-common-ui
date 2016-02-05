@@ -546,14 +546,20 @@ define([ 'dojo/number', 'dojo/i18n', 'common-ui/prompting/PromptPanel',
             }
           });
           comp.type = "ScrollingPromptPanelLayoutComponent";
-          spyOn(window, "$");
+
+          // TODO: Find alternative for:
+          //spyOn(window, "$");
+
           var components = [ comp ];
           panel.dashboard.components = components;
           panel.refresh(paramDefn);
           expect(panel.paramDefn).toBe(paramDefn);
           expect(window.setTimeout).not.toHaveBeenCalled();
           expect(panel._focusedParam).not.toBeDefined();
-          expect(window.$).not.toHaveBeenCalled();
+
+          // TODO: Find alternative for:
+          //expect(window.$).not.toHaveBeenCalled();
+
           expect(panel._multiListBoxTopValuesByParam).toEqual({
             "_compTestName" : {
               "scrollTopValue" : 100,

@@ -17,11 +17,12 @@
 
 define([
       "cdf/Dashboard.Clean",
+      "common-ui/jquery-clean",
       "common-ui/prompting/PromptPanel",
       "common-ui/prompting/parameters/ParameterXmlParser",
       "common-ui/prompting/api/EventAPI",
       "text!./parameterDefinition.xml!strip"],
-    function (Dashboard, PromptPanel, ParameterXmlParser, EventAPI, parameterDefinitionXml) {
+    function (Dashboard, $, PromptPanel, ParameterXmlParser, EventAPI, parameterDefinitionXml) {
 
       describe("EventAPI unit tests", function () {
         var eventApi, apiSpy, promptPanelSpy, dashboardSpy, callback;
