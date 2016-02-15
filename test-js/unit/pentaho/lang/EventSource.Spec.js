@@ -56,13 +56,32 @@ define([
     }); // on#
 
     describe("#off(type, listener) -", function() {
-
-      xit("should still notify a listener if it is unregistered during an emit cycle", function() {
-        expect(true).toBe(false);
+      var event, state;
+      beforeEach(function() {
+        event = new Event("foo");
+        state = "original";
+        eventSource.on("foo", function() {
+          eventSource.on("foo", function() {
+            state = state + " third";
+          });
+          state = state + " first";
+        });
+        eventSource.on("foo", function() {
+          eventSource.off("foo");
+          state = state + " second";
+        });
       });
 
-      xit("should only stop notifying a listener in the emit cycles that take place after unregistering the listener", function() {
-        expect(true).toBe(false);
+      it("should still notify a listener if it is unregistered during an emit cycle", function() {
+        eventSource._emit(event);
+        expect(state).toBe("original first second");
+      });
+
+      it("should only stop notifying a listener in the emit cycles that take place after unregistering the listener", function() {
+        eventSource._emit(event);
+        expect(state).toBe("original first second");
+        eventSource._emit(event);
+        expect(state).toBe("original first second");
       });
 
     }); // #off
