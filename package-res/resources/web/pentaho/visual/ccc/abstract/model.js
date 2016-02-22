@@ -15,20 +15,51 @@
  */
 define([
   "pentaho/visual/base/modelFactory",
-  "pentaho/i18n!type"
-  //"./theme/type"
+  "pentaho/i18n!./i18n/model",
+  "./themes"
 ], function(visualFactory, bundle) {
 
   "use strict";
 
-  
   return function(context) {
 
     var Visual = context.get(visualFactory);
 
     return Visual.extend({
+      meta: {
+        id: "pentaho/visual/ccc/abstract",
+        abstract: true,
+        view: "View",
+        styleClass: "",
+
+        props: [
+          //region visual roles (Old data reqs)
+          {
+            name: "rows",
+            type: ["string"],
+            required: false
+          },
+          {
+            name: "columns",
+            type: ["string"],
+            required: false
+          },
+          {
+            name: "measures",
+            type: ["number"],
+            required: true
+          },
+          {
+            name: 'multi',
+            type: ["string"],
+            required: false
+          }
+          //endregion
+
+        ]
+      }
       
     })
-    .implement({meta: bundle.structured});
+    .implement({meta: bundle.structured["abstract"]});
   };
 });

@@ -192,9 +192,31 @@
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
 
-  requireCfg.packages.push({
-      "name": "pentaho/visual/base",
-      "main": "model"
+  // Visual API
+  requireService["pentaho/visual/config"] = "IVisualApiConfiguration";
+
+  // Visual API - CCC
+  requireService["pentaho/visual/ccc/visualTypeProvider"] = "IVisualTypeProvider";
+  requireService["pentaho/visual/ccc/visualApiConfig"] = "IVisualApiConfiguration";
+
+  // Sample visualizations
+  requireService["pentaho/visual/samples/calc/visualTypeProvider"] = "IVisualTypeProvider";
+
+  // CCC Theme
+  requireMap["*"]["pentaho/visual/ccc/abstract/themes"] =
+    "pentaho/visual/ccc/abstract/themes/" +
+    (["myfootheme"].indexOf(active_theme) < 0 ? "default" : active_theme);
+
+  // Visualizations Packages
+  function registerPackage(name, main) {
+    requireCfg.packages.push({
+      "name": name,
+      "main": main
     });
+  }
+
+  registerPackage("pentaho/visual/base", "modelFactory");
+  registerPackage("pentaho/visual/ccc/abstract", "model");
+  registerPackage("pentaho/visual/ccc/bar", "model");
 
 }());
