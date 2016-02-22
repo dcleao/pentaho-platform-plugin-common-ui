@@ -245,7 +245,7 @@ define([
     },
 
     dispose: function() {
-      this._element = null;
+      this.element = null;
       if(this._chart && this._chart.dispose) {
         this._chart.dispose();
         this._chart = null;
@@ -282,7 +282,7 @@ define([
       var options = this.options = def.create(this._options);
       def.set(
           options,
-          "canvas",          this._element,
+          "canvas",          this.element,
           "height",          drawSpec.height || 400,
           "width",           drawSpec.width  || 400,
           "dimensionGroups", {},
@@ -846,7 +846,7 @@ define([
 
       // By default hide overflow, otherwise,
       // resizing the window frequently ends up needlessly showing scrollbars.
-      this._element.parentNode.style.overflow = "hidden"; // Hide overflow
+      this.element.parentNode.style.overflow = "hidden"; // Hide overflow
 
       var colorScaleKind = this._getColorScaleKind();
       if(colorScaleKind)
@@ -1163,7 +1163,7 @@ define([
       var options = this.options;
 
       // Let the vertical scrollbar show up if necessary
-      var containerStyle = this._element.parentNode.style;
+      var containerStyle = this.element.parentNode.style;
       containerStyle.overflowX = "hidden";
       containerStyle.overflowY = "auto";
 
@@ -1270,8 +1270,8 @@ define([
     },
 
     _render: function() {
-      while(this._element.firstChild)
-        this._element.removeChild(this._element.firstChild);
+      while(this.element.firstChild)
+        this.element.removeChild(this.element.firstChild);
 
       var ChartClass = pvc[this._cccClass];
 
