@@ -193,22 +193,48 @@
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
 
   // CCC Theme
-  requireMap["*"]["pentaho/visual/ccc/abstract/themes"] =
-    "pentaho/visual/ccc/abstract/themes/" +
-    (["myfootheme"].indexOf(active_theme) < 0 ? "default" : active_theme);
+  requireMap["*"]["pentaho/visual/ccc/abstract/themes"] = "pentaho/visual/ccc/abstract/themes/" +
+      (["myFooTheme"].indexOf(active_theme) < 0 ? "default" : active_theme);
 
   // Visualizations Packages
   function registerVizPackage(name) {
-    requireCfg.packages.push({
-      "name": name,
-      "main": "model"
-    });
+    requireCfg.packages.push({"name": name, "main": "model"});
 
     requireService[name] = "pentaho/type/base";
   }
 
-  registerVizPackage("pentaho/visual/base");
-  registerVizPackage("pentaho/visual/ccc/abstract");
-  registerVizPackage("pentaho/visual/ccc/bar");
+  [
+    // base visual
+    "pentaho/visual/base",
+
+    // calc viz
+    "pentaho/visual/samples/calc",
+
+    // ccc vizs
+    "pentaho/visual/ccc/abstract",
+    "pentaho/visual/ccc/cartesianAbstract",
+    "pentaho/visual/ccc/categoricalContinuousAbstract",
+    "pentaho/visual/ccc/barAbstract",
+    "pentaho/visual/ccc/barNormalizedAbstract",
+    "pentaho/visual/ccc/barHorizontal",
+    "pentaho/visual/ccc/barHorizontalStacked",
+    "pentaho/visual/ccc/barHorizontalNormalized",
+    "pentaho/visual/ccc/bar",
+    "pentaho/visual/ccc/barStacked",
+    "pentaho/visual/ccc/barNormalized"
+    /*
+    "pentaho/visual/ccc/barLine",
+    "pentaho/visual/ccc/waterfall",
+
+    "pentaho/visual/ccc/line",
+    "pentaho/visual/ccc/metricDot",
+    "pentaho/visual/ccc/areaStacked",
+    "pentaho/visual/ccc/pie",
+    "pentaho/visual/ccc/heatGrid",
+    "pentaho/visual/ccc/sunburst",
+    "pentaho/visual/ccc/treemap",
+    "pentaho/visual/ccc/boxplot"
+    */
+  ].forEach(registerVizPackage);
 
 }());

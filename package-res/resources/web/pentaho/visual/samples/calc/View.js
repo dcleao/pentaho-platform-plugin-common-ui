@@ -19,12 +19,6 @@ define([
    * @param {pentaho.visual.samples.calc.Model} model The calculator's visualization `Model`.
    */
   return Visual.extend(/** @lends pentaho.visual.samples.calc.View */{
-    /* Base class constructor
-    constructor: function(element, model) {
-      this._element = element;
-      this.model   = model;
-    },
-    */
 
     /** @override */
     _init: function() {
