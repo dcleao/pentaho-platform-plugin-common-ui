@@ -16,7 +16,7 @@
 define([
   "cdf/lib/CCC/def",
   "cdf/lib/CCC/cdo",
-  "../cartesianAbstract/AbstractCartesianChart"
+  "../cartesianAbstract/View"
 ], function(def, cdo, AbstractCartesianChart) {
 
   "use strict";

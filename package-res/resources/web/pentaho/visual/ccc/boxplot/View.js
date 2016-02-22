@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 define([
-  "../categoricalContinuousAbstract/AbstractCategoricalContinuousChart"
+  "../categoricalContinuousAbstract/View"
 ], function(AbstractCategoricalContinuousChart) {
 
   "use strict";

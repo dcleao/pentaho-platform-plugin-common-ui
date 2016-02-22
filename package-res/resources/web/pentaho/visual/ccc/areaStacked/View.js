@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 define([
-  "../barAbstract/AbstractBarChart"
-], function(AbstractBarChart) {
+  "../categoricalContinuousAbstract/View"
+], function(AbstractCategoricalContinuousChart) {
 
   "use strict";
 
-  return AbstractBarChart.extend({
+  return AbstractCategoricalContinuousChart.extend({
+
+    _cccClass: "StackedAreaChart",
+
     _options: {
-      valuesNormalized: true,
-      stacked: true
+      axisOffset: 0,
+      tooltipOffset: 15
     },
 
-    _configure: function() {
-      this.base();
-
-      this.options.orthoAxisTickFormatter = formatTickPercent;
+    _setNullInterpolationMode: function(options, value) {
+      options.nullInterpolationMode = value;
     }
   });
-
-  function formatTickPercent(v) {
-    return v + "%";
-  }
 });

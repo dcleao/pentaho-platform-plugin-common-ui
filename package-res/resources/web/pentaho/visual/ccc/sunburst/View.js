@@ -16,7 +16,7 @@
 define([
   "cdf/lib/CCC/protovis",
   "cdf/lib/CCC/def",
-  "../abstract/AbstractChart",
+  "../abstract/View",
   "../util"
 ], function(pv, def, AbstractChart, util) {
 

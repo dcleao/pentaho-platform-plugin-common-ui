@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "../abstract/AbstractChart"
+  "../abstract/View"
 ], function(AbstractChart) {
 
   "use strict";

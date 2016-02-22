@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "../cartesianAbstract/AbstractCartesianChart",
+  "../cartesianAbstract/View",
   "../trends"
 ], function(AbstractCartesianChart) {
 

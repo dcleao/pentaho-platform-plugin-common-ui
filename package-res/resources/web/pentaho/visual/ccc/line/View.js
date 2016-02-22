@@ -14,21 +14,50 @@
  * limitations under the License.
  */
 define([
-  "../categoricalContinuousAbstract/AbstractCategoricalContinuousChart"
+  "../categoricalContinuousAbstract/View",
+  "../trends"
 ], function(AbstractCategoricalContinuousChart) {
 
   "use strict";
 
   return AbstractCategoricalContinuousChart.extend({
+    _cccClass: "LineChart",
 
-    _cccClass: "StackedAreaChart",
+    _supportsTrends: true,
 
     _options: {
-      axisOffset: 0, tooltipOffset: 15
+      axisOffset: 0,
+      tooltipOffset: 15
+    },
+
+    _readUserOptions: function(options, drawSpec) {
+
+      this.base(options, drawSpec);
+
+      var shape = drawSpec.shape;
+      if(shape && shape === "none") {
+        options.dotsVisible = false;
+      } else {
+        options.dotsVisible = true;
+        options.extensionPoints.dot_shape = shape;
+      }
     },
 
     _setNullInterpolationMode: function(options, value) {
       options.nullInterpolationMode = value;
+    },
+
+    _configureLegend: function() {
+
+      this.base();
+
+      var options = this.options,
+          extPoints = options.extensionPoints,
+          dotSize = extPoints.dot_shapeSize;
+      if(dotSize != null) {
+        var dotRadius = Math.sqrt(dotSize);
+        options.legendMarkerSize = Math.max(15, 2 * (dotRadius + 3));
+      }
     }
   });
 });

@@ -15,7 +15,7 @@
  */
 define([
   "cdf/lib/CCC/def",
-  "../abstract/AbstractChart"
+  "../abstract/View"
 ], function(def, AbstractChart) {
 
   "use strict";
