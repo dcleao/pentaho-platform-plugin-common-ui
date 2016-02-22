@@ -14,52 +14,52 @@
 * limitations under the License.
 */
 define([
-    "cdf/lib/CCC/def",
-    "../cartesianAbstract/AbstractCartesianChart"
+  "cdf/lib/CCC/def",
+  "../cartesianAbstract/AbstractCartesianChart"
 ], function(def, AbstractCartesianChart) {
 
-    return AbstractCartesianChart.extend({
-        methods: {
-            _genericMeasureCccDimName: "value",
+  "use strict";
 
-            _options: {
-                panelSizeRatio: 0.8
-            },
+  return AbstractCartesianChart.extend({
+    _genericMeasureCccDimName: "value",
 
-            _isAxisTitleVisible: function(type) {
-                return !this._hasMultiChartColumns || type === 'ortho';
-            },
+    _options: {
+      panelSizeRatio: 0.8
+    },
 
-            _getOrthoAxisTitle: function() {
-                var roleNames = def.getOwn(this._getRolesByCccDimGroup(), this._genericMeasureCccDimName);
-                return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
-            },
+    _isAxisTitleVisible: function(type) {
+      return !this._hasMultiChartColumns || type === "ortho";
+    },
 
-            _getBaseAxisTitle: function() {
-                var roleNames = this._getRolesByCccDimGroup()["category"];
-                return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
-            },
+    _getOrthoAxisTitle: function() {
+      var roleNames = def.getOwn(this._getRolesByCccDimGroup(), this._genericMeasureCccDimName);
+      return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
+    },
 
-            _configure: function() {
-                this.base();
+    _getBaseAxisTitle: function() {
+      var roleNames = this._getRolesByCccDimGroup()["category"];
+      return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
+    },
 
-                this._configureAxisRange(/*isPrimary*/true, 'ortho');
+    _configure: function() {
+      this.base();
 
-                if(this.options.orientation === 'vertical') {
-                    var eps = this.options.extensionPoints;
-                    eps.xAxisLabel_textAngle    = -Math.PI/4;
-                    eps.xAxisLabel_textAlign    = 'right';
-                    eps.xAxisLabel_textBaseline = 'top';
-                } else {
-                    this.options.xAxisPosition = 'top';
-                }
-            },
+      this._configureAxisRange(/*isPrimary*/true, "ortho");
 
-            _configureDisplayUnits: function() {
-                this.base();
+      if(this.options.orientation === "vertical") {
+        var eps = this.options.extensionPoints;
+        eps.xAxisLabel_textAngle    = -Math.PI/4;
+        eps.xAxisLabel_textAlign    = "right";
+        eps.xAxisLabel_textBaseline = "top";
+      } else {
+        this.options.xAxisPosition = "top";
+      }
+    },
 
-                this._configureAxisDisplayUnits(/*isPrimary*/true, 'ortho');
-            }
-        }
-    });
+    _configureDisplayUnits: function() {
+      this.base();
+
+      this._configureAxisDisplayUnits(/*isPrimary*/true, "ortho");
+    }
+  });
 });

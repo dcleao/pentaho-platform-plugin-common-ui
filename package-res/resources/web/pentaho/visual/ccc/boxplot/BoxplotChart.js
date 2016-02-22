@@ -14,37 +14,37 @@
 * limitations under the License.
 */
 define([
-    "../categoricalContinuousAbstract/AbstractCategoricalContinuousChart"
+  "../categoricalContinuousAbstract/AbstractCategoricalContinuousChart"
 ], function(AbstractCategoricalContinuousChart) {
 
-    return AbstractCategoricalContinuousChart.extend({
-        methods: {
-            _cccClass: 'BoxplotChart',
+  "use strict";
 
-            _roleToCccDimGroup: {
-                'multi':       'multiChart',
-                'rows':        'category',
-                'measures':    'median',
-                'percentil25': 'percentil25',
-                'percentil75': 'percentil75',
-                'percentil5':  'percentil5',
-                'percentil95': 'percentil95'
-            },
+  return AbstractCategoricalContinuousChart.extend({
+    _cccClass: "BoxplotChart",
 
-            _options: {
-                boxRuleWhisker_strokeDasharray: '- '
-            }
-            /*
-            _readData: function() {
+    _roleToCccDimGroup: {
+      "multi":       "multiChart",
+      "rows":        "category",
+      "measures":    "median",
+      "percentil25": "percentil25",
+      "percentil75": "percentil75",
+      "percentil5":  "percentil5",
+      "percentil95": "percentil95"
+    },
 
-                this.base();
+    _options: {
+      boxRuleWhisker_strokeDasharray: "- "
+    }
+    /*
+    _readData: function() {
 
-                // In CCC, it is read as a custom format (more relational-like)
-                // Where categoriesCount is the number of "category" dimensions,
-                // not including multi-chart columns...
-                this.options.dataCategoriesCount = this.axes.row.gemsByRole.rows.length;
-            }
-            */
-        }
-    });
+      this.base();
+
+      // In CCC, it is read as a custom format (more relational-like)
+      // Where categoriesCount is the number of "category" dimensions,
+      // not including multi-chart columns...
+      this.options.dataCategoriesCount = this.axes.row.gemsByRole.rows.length;
+    }
+    */
+  });
 });

@@ -1,105 +1,112 @@
 /*!
-* Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2010 - 2015 Pentaho Corporation.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 define([
-    "../cartesianAbstract/AbstractCartesianChart",
-    "../trends"
+  "../cartesianAbstract/AbstractCartesianChart",
+  "../trends"
 ], function(AbstractCartesianChart) {
 
-    return AbstractCartesianChart.extend({
-        methods: {
-            _cccClass: 'MetricDotChart',
+  "use strict";
 
-            _supportsTrends: true,
+  return AbstractCartesianChart.extend({
+    _cccClass: "MetricDotChart",
 
-            _options: {
-                axisGrid: true,
+    _supportsTrends: true,
 
-                sizeAxisUseAbs:  false,
-                sizeAxisRatio:   1/5,
-                sizeAxisRatioTo: 'height', // plot area client height
-                sizeAxisOriginIsZero: true,
+    _options: {
+      axisGrid: true,
 
-                autoPaddingByDotSize: false
-            },
+      sizeAxisUseAbs:  false,
+      sizeAxisRatio:   1 / 5,
+      sizeAxisRatioTo: "height", // plot area client height
+      sizeAxisOriginIsZero: true,
 
-            /* Override Default map */
-            _roleToCccDimGroup: {
-                'multi':    'multiChart',
-                'rows':     'category',
-                'x':        'x',
-                'y':        'y',
-                'size':     'size',
-                'color':    'color'
-            },
+      autoPaddingByDotSize: false
+    },
 
-            _discreteColorRole: 'color',
+    /* Override Default map */
+    _roleToCccDimGroup: {
+      "multi": "multiChart",
+      "rows": "category",
+      "x": "x",
+      "y": "y",
+      "size": "size",
+      "color": "color"
+    },
 
-            // Roles already in the axis' titles
-            _noRoleInTooltipMeasureRoles: {'x': true, 'y': true, 'measures': false},
+    _discreteColorRole: "color",
 
-            _getColorScaleKind: function() {
-                var isDiscrete = this._getRoleIsDiscrete("color");
-                return isDiscrete == null ? undefined  :
-                       isDiscrete         ? "discrete" :
-                       "continuous";
-            },
+    // Roles already in the axis' titles
+    _noRoleInTooltipMeasureRoles: {
+      "x": true,
+      "y": true,
+      "measures": false
+    },
 
-            _configure: function() {
-                this.base();
+    _getColorScaleKind: function() {
+      var isDiscrete = this._getRoleIsDiscrete("color");
+      return isDiscrete == null ? undefined  :
+             isDiscrete         ? "discrete" : "continuous";
+    },
 
-                this._configureAxisRange(/*isPrimary*/true,  'base');
-                this._configureAxisRange(/*isPrimary*/false, 'ortho');
+    _configure: function() {
 
-                // ~ DOT SIZE
-                this.options.axisOffset = this._isRoleBound("size")
-                    ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
-                    : 0;
-            },
+      this.base();
 
-            _configureColor: function(colorScaleKind) {
-                this.base(colorScaleKind);
+      this._configureAxisRange(/*isPrimary*/true,  "base" );
+      this._configureAxisRange(/*isPrimary*/false, "ortho");
 
-                if(colorScaleKind === 'discrete') {
-                    // Must force the discrete type
-                    this.options.dimensionGroups.color = {valueType: String};
-                }
-            },
+      /*jshint laxbreak:true*/
+      // ~ DOT SIZE
+      this.options.axisOffset = this._isRoleBound("size")
+          ? (1.1 * this.options.sizeAxisRatio / 2) // Axis offset like legacy analyzer
+          : 0;
+    },
 
-            _isLegendVisible: function() {
-                // Prevent default behavior that hides the legend when there are no series.
-                // Hide the legend even if there is only one "series".
+    _configureColor: function(colorScaleKind) {
+      this.base(colorScaleKind);
 
-                return this._getRoleIsDiscrete("color") === true &&
-                    (this._dataTable.isCrossTable && this._dataTable.implem.cols.length > 1);
-            },
+      if(colorScaleKind === "discrete") {
+        // Must force the discrete type
+        this.options.dimensionGroups.color = {valueType: String};
+      }
+    },
 
-            _getOrthoAxisTitle: function() {
-                return this._getMeasureRoleTitle('y');
-            },
+    _isLegendVisible: function() {
+      // Prevent default behavior that hides the legend when there are no series.
+      // Hide the legend even if there is only one "series".
 
-            _getBaseAxisTitle: function() {
-                return this._getMeasureRoleTitle('x');
-            },
+      return this._getRoleIsDiscrete("color") === true &&
+          this._dataTable.isCrossTable &&
+          this._dataTable.implem.cols.length > 1;
+    },
 
-            _configureDisplayUnits: function() {
-                this.base();
+    _getOrthoAxisTitle: function() {
+      return this._getMeasureRoleTitle("y");
+    },
 
-                this._configureAxisDisplayUnits(/*isPrimary*/true,  'base' , /*allowFractional*/true);
-                this._configureAxisDisplayUnits(/*isPrimary*/false, 'ortho', /*allowFractional*/true);
-            }
-        }
-    });
+    _getBaseAxisTitle: function() {
+      return this._getMeasureRoleTitle("x");
+    },
+
+    _configureDisplayUnits: function() {
+
+      this.base();
+
+      this._configureAxisDisplayUnits(/*isPrimary*/true,  "base",  /*allowFractional*/true);
+      this._configureAxisDisplayUnits(/*isPrimary*/false, "ortho", /*allowFractional*/true);
+    }
+  });
 });

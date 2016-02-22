@@ -14,49 +14,50 @@
 * limitations under the License.
 */
 define([
-    "../categoricalContinuousAbstract/AbstractCategoricalContinuousChart"
+  "../categoricalContinuousAbstract/AbstractCategoricalContinuousChart"
 ], function(AbstractCategoricalContinuousChart) {
 
-    return AbstractCategoricalContinuousChart.extend({
-        methods: {
-            _cccClass: 'BarChart',
+  "use strict";
 
-            _configure: function() {
-                this.base();
+  return AbstractCategoricalContinuousChart.extend({
 
-                var options = this.options;
-                if(options.orientation !== 'vertical')
-                    options.visualRoles.category = {isReversed: true};
-            },
+    _cccClass: "BarChart",
 
-            _configureLabelsAnchor: function(options, visualSpec) {
+    _configure: function() {
+      this.base();
 
-                options.extensionPoints.label_textMargin = 7;
+      var options = this.options;
+      if(options.orientation !== "vertical")
+        options.visualRoles.category = {isReversed: true};
+    },
 
-                switch(visualSpec.labelsOption) {
-                    case 'center':
-                        options.valuesAnchor = 'center';
-                        break;
+    _configureLabelsAnchor: function(options, visualSpec) {
 
-                    case 'inside_end':
-                        options.valuesAnchor = options.orientation === 'horizontal' ? 'right' : 'top';
-                        break;
+      options.extensionPoints.label_textMargin = 7;
 
-                    case 'inside_base':
-                        options.valuesAnchor = options.orientation === 'horizontal' ? 'left' : 'bottom';
-                        break;
+      switch(visualSpec.labelsOption) {
+        case "center":
+          options.valuesAnchor = "center";
+          break;
 
-                    case 'outside_end':
-                        if(options.orientation === 'horizontal') {
-                            options.valuesAnchor = 'right';
-                            options.extensionPoints.label_textAlign ='left';
-                        } else {
-                            options.valuesAnchor = 'top';
-                            options.extensionPoints.label_textBaseline = 'bottom';
-                        }
-                        break;
-                }
-            }
-        }
-    });
+        case "inside_end":
+          options.valuesAnchor = options.orientation === "horizontal" ? "right" : "top";
+          break;
+
+        case "inside_base":
+          options.valuesAnchor = options.orientation === "horizontal" ? "left" : "bottom";
+          break;
+
+        case "outside_end":
+          if(options.orientation === "horizontal") {
+            options.valuesAnchor = "right";
+            options.extensionPoints.label_textAlign ="left";
+          } else {
+            options.valuesAnchor = "top";
+            options.extensionPoints.label_textBaseline = "bottom";
+          }
+          break;
+      }
+    }
+  });
 });
