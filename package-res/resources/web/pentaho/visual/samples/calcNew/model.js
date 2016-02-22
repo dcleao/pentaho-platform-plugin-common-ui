@@ -1,7 +1,7 @@
 define([
   "pentaho/visual/base/modelFactory",
-  "pentaho/i18n!type"
-  //"./theme/type"
+  "pentaho/i18n!model"
+  //"./theme/model"
 ], function(visualFactory, bundle) {
 
   "use strict";
@@ -26,12 +26,10 @@ define([
         view: "View", // relative to declaring type's `id` unless prefixed with '/'. When type is anonymous, it's global?
         styleClass: "pentaho-visual-samples-calculator",
         props: [
-          // TODO: review how to declare visual roles...
           {
             name: "levels",
-            type: "string",
-            //list: true,
-            //required: true
+            type: ["string"],
+            required: true
           },
           {
             name: "measure",
@@ -45,11 +43,11 @@ define([
             name: "operation",
             type: {
               base: "refinement",
-              of: "string", // "." - inherited property type
+              of:   "string",
               facets: "DiscreteDomain",
               domain: ["min", "max", "avg", "sum"]
             },
-            value: "MIN"
+            value: "min"
           }
         ]
       }

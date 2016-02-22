@@ -17,8 +17,9 @@ define([
   "cdf/lib/CCC/protovis",
   "cdf/lib/CCC/def",
   "../abstract/View",
-  "../util"
-], function(pv, def, AbstractChart, util) {
+  "../util",
+  "pentaho/i18n!../abstract/i18n/view"
+], function(pv, def, AbstractChart, util, bundle) {
 
   "use strict";
 
@@ -124,7 +125,7 @@ define([
     _configure: function() {
       this.base();
 
-      this.options.rootCategoryLabel = this._message("chartSunburstRootCategoryLabel");
+      this.options.rootCategoryLabel = bundle.get("sunburst.rootCategoryLabel");
 
       this._configureDisplayUnits();
     },

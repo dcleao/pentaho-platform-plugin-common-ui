@@ -192,19 +192,9 @@
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
 
-  // Visual API
-  requireService["pentaho/visual/config"] = "IVisualApiConfiguration";
-
-  // Visual API - CCC
-  requireService["pentaho/visual/ccc/visualTypeProvider"] = "IVisualTypeProvider";
-  requireService["pentaho/visual/ccc/visualApiConfig"] = "IVisualApiConfiguration";
-
-  // Sample visualizations
-  requireService["pentaho/visual/samples/calc/visualTypeProvider"] = "IVisualTypeProvider";
-
   requireCfg.packages.push({
       "name": "pentaho/visual/base",
-      "main": "modelFactory"
+      "main": "model"
     });
 
 }());

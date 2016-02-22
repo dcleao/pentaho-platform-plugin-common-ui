@@ -15,8 +15,9 @@
  */
 define([
   "cdf/lib/CCC/def",
-  "../abstract/View"
-], function(def, AbstractChart) {
+  "../abstract/View",
+  "pentaho/i18n!../abstract/i18n/view"
+], function(def, AbstractChart, bundle) {
 
   "use strict";
 
@@ -74,7 +75,7 @@ define([
       var last  = labels.pop(),
           first = labels.join(", ");
       if(first && last) {
-        return this._message("chartAxisTitleMultipleDimText", [first, last]);
+        return bundle.get("axis.title.multipleDimText", [first, last]);
       }
 
       return first || last;
@@ -109,7 +110,7 @@ define([
       var text,
           displayUnits = this._drawSpec["displayUnits" + (primary ? "" : "Secondary")],
           scaleFactor  = this._parseDisplayUnits(displayUnits);
-      if(scaleFactor > 1) text = this._message("dlgChartOption_" + displayUnits);
+      if(scaleFactor > 1) text = bundle.get("axis.displayUnits." + displayUnits);
 
       this._cartesianAxesDisplayUnitsText[axisType] = text || "";
     }

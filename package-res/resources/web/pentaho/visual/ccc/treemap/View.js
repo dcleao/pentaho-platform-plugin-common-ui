@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "../abstract/View"
-], function(AbstractChart) {
+  "../abstract/View",
+  "pentaho/i18n!../abstract/i18n/view"
+], function(AbstractChart, bundle) {
 
   "use strict";
 
@@ -43,7 +44,7 @@ define([
 
       this.base();
 
-      this.options.rootCategoryLabel = this._message("chartTreeMapRootCategoryLabel");
+      this.options.rootCategoryLabel = bundle.get("treemap.rootCategoryLabel");
     },
 
     _getDiscreteColors: function() {

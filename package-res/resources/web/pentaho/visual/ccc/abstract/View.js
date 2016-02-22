@@ -25,8 +25,12 @@ define([
   "pentaho/visual/color/utils",
   "pentaho/visual/color/paletteRegistry",
   "pentaho/data/TableView",
+  "pentaho/i18n!view",
   "css!./themes/tipsy"
-], function(View, def, pvc, cdo, pv, Axis, util, visualEvents, visualColorUtils, visualPaletteRegistry, DataView) {
+], function(View,
+    def, pvc, cdo, pv, Axis,
+    util, visualEvents, visualColorUtils, visualPaletteRegistry,
+    DataView, bundle) {
 
   "use strict";
 
@@ -123,11 +127,6 @@ define([
   };
 
   return View.extend(/** @lends pentaho.visual.ccc.base.View# */{
-
-    constructor: function(element, model) {
-      // this._element = createOptions.domElement;
-      this.base(element, model);
-    },
 
     //region PROPERTIES
     _options: baseOptions,
@@ -245,7 +244,9 @@ define([
     },
 
     dispose: function() {
-      this.element = null;
+
+      this.base();
+
       if(this._chart && this._chart.dispose) {
         this._chart.dispose();
         this._chart = null;
@@ -270,11 +271,6 @@ define([
       // Make a copy
       drawSpec = this._drawSpec = def.copy(drawSpec);
 
-      // TODO: Analyzer dependency alert!!
-      this._vizHelper = (typeof cv !== "undefined" &&
-          cv.pentahoVisualizationHelpers[drawSpec.type]) ||
-          this._createSelfVizHelper();
-
       // Store the current selections
       this._selections = drawSpec.highlights;
 
@@ -282,7 +278,7 @@ define([
       var options = this.options = def.create(this._options);
       def.set(
           options,
-          "canvas",          this.element,
+          "canvas",          this._element,
           "height",          drawSpec.height || 400,
           "width",           drawSpec.width  || 400,
           "dimensionGroups", {},
@@ -290,23 +286,6 @@ define([
           "visualRoles",     {},
           "readers",         [],
           "calculations",    []);
-    },
-
-    _createSelfVizHelper: function() {
-      return {
-        isInteractionEnabled: function() {
-          return true;
-        },
-        showConfirm: function(msg, msgId) {
-          if(typeof alert !== "undefined") alert(msg);
-        },
-        message: function(msgId, args) {
-          return msgId + (args ? (" " + args.join(", ")) : "");
-        },
-        getDoubleClickTooltip: function() {
-          return "";
-        }
-      };
     },
     //endregion
 
@@ -316,14 +295,18 @@ define([
     },
 
     _buildVisualMap: function() {
-      var drawSpec = this._drawSpec,
+      var model = this.model,
           visualMap = {};
 
       Object.keys(this._roleToCccDimGroup)
           .forEach(function(roleName) {
-            if(this[roleName] && def.array.is(drawSpec[roleName]))
-              visualMap[roleName] = drawSpec[roleName];
-
+            if(this[roleName]) {
+              if(model.meta.get(roleName).list) {
+                visualMap[roleName] = model.getv(roleName).toArray().map(function(elem) { return elem.value; });
+              } else {
+                visualMap[roleName] = model.getv(roleName);
+              }
+            }
           }, this._roleToCccDimGroup);
 
       return visualMap;
@@ -846,7 +829,7 @@ define([
 
       // By default hide overflow, otherwise,
       // resizing the window frequently ends up needlessly showing scrollbars.
-      this.element.parentNode.style.overflow = "hidden"; // Hide overflow
+      this._element.parentNode.style.overflow = "hidden"; // Hide overflow
 
       var colorScaleKind = this._getColorScaleKind();
       if(colorScaleKind)
@@ -866,7 +849,7 @@ define([
       options.axisFont = util.defaultFont(options.axisFont, 12);
       options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
 
-      if(!this._vizHelper.isInteractionEnabled()) {
+      if(!this.model.getv("interactive")) {
         options.interactive = false;
       } else {
         if(options.tooltipEnabled) this._configureTooltip();
@@ -969,26 +952,26 @@ define([
     _getMemberPalette: function() {
       /* TEST
        return {
-       "[Markets].[Territory]": {
-       "[Markets].[APAC]":   "rgb(150, 0, 0)",
-       "[Markets].[EMEA]":   "rgb(0, 150, 0)",
-       "[Markets].[Japan]":  "rgb(0, 0, 150)",
-       "[Markets].[NA]":     "pink"
-       },
+         "[Markets].[Territory]": {
+           "[Markets].[APAC]":   "rgb(150, 0, 0)",
+           "[Markets].[EMEA]":   "rgb(0, 150, 0)",
+           "[Markets].[Japan]":  "rgb(0, 0, 150)",
+           "[Markets].[NA]":     "pink"
+         },
 
-       "[Order Status].[Type]": {
-       "[Order Status].[Cancelled]":  "turquoise",
-       "[Order Status].[Disputed]":   "tomato",
-       //"[Order Status].[In Process]": "steelblue",
-       "[Order Status].[Shipped]":    "seagreen"
-       //"[Order Status].[On Hold]":    "",
-       //"[Order Status].[Resolved]":   ""
-       },
+         "[Order Status].[Type]": {
+           "[Order Status].[Cancelled]":  "turquoise",
+           "[Order Status].[Disputed]":   "tomato",
+           //"[Order Status].[In Process]": "steelblue",
+           "[Order Status].[Shipped]":    "seagreen"
+           //"[Order Status].[On Hold]":    "",
+           //"[Order Status].[Resolved]":   ""
+         },
 
-       "[Measures].[MeasuresLevel]": {
-       "[MEASURE:0]": "violet",
-       "[MEASURE:1]": "orange"
-       }
+         "[Measures].[MeasuresLevel]": {
+           "[MEASURE:0]": "violet",
+           "[MEASURE:1]": "orange"
+         }
        };
        */
 
@@ -1057,7 +1040,7 @@ define([
       if(trendType !== "none") {
         var trendName = drawSpec.trendName;
         if(!trendName)
-          trendName = this._message("dropZoneLabels_TREND_NAME_" + trendType.toUpperCase());
+          trendName = bundle.get("trend.name." + trendType.toLowerCase(), trendType);
 
         options.trendLabel = trendName;
 
@@ -1163,7 +1146,7 @@ define([
       var options = this.options;
 
       // Let the vertical scrollbar show up if necessary
-      var containerStyle = this.element.parentNode.style;
+      var containerStyle = this._element.parentNode.style;
       containerStyle.overflowX = "hidden";
       containerStyle.overflowY = "auto";
 
@@ -1197,7 +1180,8 @@ define([
       }, this);
 
       if(!complex.isVirtual) {
-        msg = this._vizHelper.getDoubleClickTooltip();
+        // TODO: container double click tooltip
+        //msg = this._vizHelper.getDoubleClickTooltip();
         if(msg) tooltipLines.push(msg);
       }
 
@@ -1207,11 +1191,9 @@ define([
       var selections = this._selections,
           selectedCount = selections && selections.length;
       if(selectedCount) {
-        var msgId = selectedCount === 1 ?
-            "chartTooltipFooterSelectedSingle" :
-            "chartTooltipFooterSelectedMany";
+        var msgId = selectedCount === 1 ? "tooltip.footer.selectedOne" : "tooltip.footer.selectedMany";
 
-        msg = this._message(msgId, [selectedCount]);
+        msg = bundle.get(msgId, [selectedCount]);
 
         tooltipLines.push(msg);
       }
@@ -1270,8 +1252,8 @@ define([
     },
 
     _render: function() {
-      while(this.element.firstChild)
-        this.element.removeChild(this.element.firstChild);
+      while(this._element.firstChild)
+        this._element.removeChild(this._element.firstChild);
 
       var ChartClass = pvc[this._cccClass];
 
@@ -1443,12 +1425,13 @@ define([
         // Mark for update UI ASAP
         this._chart.updateSelections();
 
-        this._vizHelper.showConfirm(
-            [
-              "infoExceededMaxSelectionItems",
-              filterSelectionMaxCount
-            ],
-            "SELECT_ITEM_LIMIT_REACHED");
+        if(typeof alert !== "undefined") {
+          alert([
+                "infoExceededMaxSelectionItems",
+                filterSelectionMaxCount,
+                "SELECT_ITEM_LIMIT_REACHED"
+              ]);
+        }
       }
 
       // Index with the keys of previous selections
@@ -1652,10 +1635,6 @@ define([
       }, this);
 
       return selection;
-    },
-
-    _message: function(msgId, args) {
-      return this._vizHelper.message(msgId, args);
     },
 
     _parseDisplayUnits: function(displayUnits) {
