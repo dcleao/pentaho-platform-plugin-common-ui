@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 (function() {
-  /* global requireCfg:true, CONTEXT_PATH:true, KARMA_RUN:true, SESSION_LOCALE:true */
+  /* global requireCfg:false, CONTEXT_PATH:false, KARMA_RUN:false, SESSION_LOCALE:false, active_theme:false */
   var basePath =
         // production
         (typeof CONTEXT_PATH !== "undefined") ? CONTEXT_PATH + "content/common-ui/resources/web" :
@@ -31,7 +31,7 @@
 
       // TODO: This fallback logic is temporary, and can be removed when the remaining
       //    parts of the system rename the "service" plugin id to "pentaho/service".
-      requireService = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = []);
+      requireService = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
 
   requirePaths["common-ui"  ] = basePath;
   requirePaths["common-repo"] = basePath + "/repo";
@@ -198,15 +198,17 @@
     (["myfootheme"].indexOf(active_theme) < 0 ? "default" : active_theme);
 
   // Visualizations Packages
-  function registerPackage(name, main) {
+  function registerVizPackage(name) {
     requireCfg.packages.push({
       "name": name,
-      "main": main
+      "main": "model"
     });
+
+    requireService[name] = "pentaho/type/base";
   }
 
-  registerPackage("pentaho/visual/base", "model");
-  registerPackage("pentaho/visual/ccc/abstract", "model");
-  registerPackage("pentaho/visual/ccc/bar", "model");
+  registerVizPackage("pentaho/visual/base");
+  registerVizPackage("pentaho/visual/ccc/abstract");
+  registerVizPackage("pentaho/visual/ccc/bar");
 
 }());
