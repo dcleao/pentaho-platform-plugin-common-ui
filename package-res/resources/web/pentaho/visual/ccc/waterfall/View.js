@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 define([
-  "../barNormalizedAbstract/View"
-], function(AbstractNormalizedBarChart) {
+  "../categoricalContinuousAbstract/View"
+], function(AbstractCategoricalContinuousChart) {
 
   "use strict";
 
-  return AbstractNormalizedBarChart.extend();
+  return AbstractCategoricalContinuousChart.extend({
+    _cccClass: "WaterfallChart"
+  });
 });

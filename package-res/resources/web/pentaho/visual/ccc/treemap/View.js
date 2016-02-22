@@ -14,25 +14,43 @@
  * limitations under the License.
  */
 define([
-  "../barAbstract/View"
-], function(AbstractBarChart) {
+  "../abstract/View"
+], function(AbstractChart) {
 
   "use strict";
 
-  return AbstractBarChart.extend({
+  return AbstractChart.extend({
+
+    _cccClass: "TreemapChart",
+
+    _roleToCccDimGroup: {
+      "multi": "multiChart",
+      "rows":  "category",
+      "size":  "size"
+    },
+
+    _discreteColorRole: "rows",
+
+    _useLabelColor: false,
+
     _options: {
-      valuesNormalized: true,
-      stacked: true
+      //rootCategoryLabel: Set in configure
+      valuesVisible: true
+      //valuesOptimizeLegibility: true
     },
 
     _configure: function() {
+
       this.base();
 
-      this.options.orthoAxisTickFormatter = formatTickPercent;
+      this.options.rootCategoryLabel = this._message("chartTreeMapRootCategoryLabel");
+    },
+
+    _getDiscreteColors: function() {
+      // Don't use memberPalette for now
+      // as the given colors don't match the members that
+      // are actually colored in this visual type.
+      return this._getDefaultDiscreteColors();
     }
   });
-
-  function formatTickPercent(v) {
-    return v + "%";
-  }
 });
