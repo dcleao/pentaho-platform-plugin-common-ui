@@ -29,15 +29,15 @@ define([
         id: "pentaho/visual/ccc/abstract/types/displayUnits",
         of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["UNITS_0", "UNITS_2", "UNITS_3", "UNITS_4", "UNITS_5", "UNITS_6"],
+        domain: ["units_0", "units_2", "units_3", "units_4", "units_5", "units_6"],
 
         scaleFactorOf: function(displayUnits) {
           if(displayUnits) {
-            var match = displayUnits.match(/^UNITS_(\d+)$/);
+            var match = displayUnits.match(/^UNITS_(\d+)$/i);
             if(match) {
-              // UNITS_0 -> 1
-              // UNITS_1 -> 100
-              // UNITS_2 -> 1000
+              // units_0 -> 1
+              // units_1 -> 100
+              // units_2 -> 1000
               // ...
               var exponent = +match[1]; // >= 0  // + <=> Number( . )  conversion
               if(exponent > 0) return Math.pow(10, exponent); // >= 100

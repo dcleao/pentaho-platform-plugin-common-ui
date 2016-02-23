@@ -408,9 +408,9 @@ define([
       var extPoints = options.extensionPoints;
 
       var value = model.getv("backgroundFill");
-      if(value && value !== "NONE") {
+      if(value && value !== "none") {
         var fillStyle;
-        if(value === "GRADIENT") {
+        if(value === "gradient") {
           if(this._hasMultiChartColumns) {
             // Use the first color with half of the saturation
             var bgColor = pv.color(model.getv("backgroundColor")).rgb();
@@ -451,7 +451,7 @@ define([
           extPoints.legendArea_fillStyle = value;
 
         value = model.getv("legendPosition");
-        if(value) options.legendPosition = value.toLowerCase();
+        if(value) options.legendPosition = value;
 
 
         if(model.getf("legendSize"))
@@ -472,26 +472,11 @@ define([
       if(value != null)
         options.multiChartColumnsMax = value;
 
-      value = model.getf("emptyCellMode");
-      if(value) {
-        switch(value) {
-          case "GAP":    value = "none";   break;
-          case "ZERO":   value = "zero";   break;
-          case "LINEAR": value = "linear"; break;
-        }
+      value = model.getv("emptyCellMode");
+      if(value) this._setNullInterpolationMode(options, value);
 
-        this._setNullInterpolationMode(options, value);
-      }
-
-      value = model.getf("multiChartRangeScope");
-      if(value) {
-        switch(value) {
-          case "GLOBAL": value = "global"; break;
-          case "CELL":   value = "cell";   break;
-        }
-
-        options.numericAxisDomainScope = value;
-      }
+      value = model.getv("multiChartRangeScope");
+      if(value) options.numericAxisDomainScope = value;
 
       value = model.getv("labelSize");
       if(value) {
@@ -506,7 +491,7 @@ define([
       }
 
       var sizeByNegativesMode = model.getv("sizeByNegativesMode");
-      options.sizeAxisUseAbs = sizeByNegativesMode === "USE_ABS";
+      options.sizeAxisUseAbs = sizeByNegativesMode === "useAbs";
     },
 
     _initData: function() {
@@ -821,6 +806,7 @@ define([
 
     _configure: function() {
       var options = this.options,
+          model = this.model,
           drawSpec = this._drawSpec;
 
       // By default hide overflow, otherwise,
@@ -845,14 +831,14 @@ define([
       options.axisFont = util.defaultFont(options.axisFont, 12);
       options.axisTitleFont = util.defaultFont(options.axisTitleFont, 12);
 
-      if(!this.model.getv("interactive")) {
+      if(!model.getv("interactive")) {
         options.interactive = false;
       } else {
         if(options.tooltipEnabled) this._configureTooltip();
 
         var selectable = options.selectable;
         if(selectable) {
-          selectable = drawSpec.selectable;
+          selectable = model.getv("selectable");
           selectable = (selectable == null || !!selectable);
         }
 
@@ -877,9 +863,8 @@ define([
           break;
 
         case "continuous":
-          options.colorScaleType = model.getv("pattern") === "GRADIENT" ? "linear" : "discrete";
-          var colorSet = model.getv("colorSet").toLowerCase();
-          options.colors = visualColorUtils.buildPalette(colorSet, model.getv("pattern"), model.getv("reverseColors"));
+          options.colorScaleType = model.getv("pattern") === "gradient" ? "linear" : "discrete";
+          options.colors = visualColorUtils.buildPalette(model.getv("colorSet"), model.getv("pattern"), model.getv("reverseColors"));
           break;
       }
     },
@@ -1023,9 +1008,8 @@ define([
     _configureTrends: function() {
       var options = this.options,
           model = this.model;
-          //drawSpec = this._drawSpec;
 
-      var trendType = (this._supportsTrends ? model.getf("trendType") : null) || "none";
+      var trendType = (this._supportsTrends ? model.getv("trendType") : null) || "none";
       switch(trendType) {
         case "none":
         case "linear":
@@ -1042,8 +1026,8 @@ define([
 
         options.trendLabel = trendName;
 
-        var value = drawSpec.trendLineWidth;
-        if(value !== undefined) {
+        var value = model.getv("trendLineWidth");
+        if(value != null) {
           var extPoints = options.extensionPoints;
 
           extPoints.trendLine_lineWidth  = +value;      // + -> to number
@@ -1054,8 +1038,9 @@ define([
     },
 
     _configureSorts: function() {
-      var sliceOrder = this._drawSpec.sliceOrder;
-      if(sliceOrder) this.options.sliceOrder = sliceOrder;
+      var value = this.model.getv("sliceOrder");
+
+      if(value) this.options.sliceOrder = value;
     },
 
     _configureFormats: function() {

@@ -25,13 +25,13 @@ define([
 
     return Refinement.extend({
 
-      meta: {
-        id: "pentaho/visual/ccc/abstract/types/colorSet",
+      meta:  {
+        id: "pentaho/visual/ccc/abstract/types/sliceOrder",
         of: "string",
-        facets: ["DiscreteDomain"],
-        domain: ["ryg", "ryb", "blue", "gray"]
+        facets: "DiscreteDomain",
+        domain: ["bySizeDescending", "bySizeAscending", "none"]
       }
     })
-    .implement({meta: bundle.structured["colorSet"]});
+    .implement({meta: bundle.structured["sliceOrder"]});
   };
 });

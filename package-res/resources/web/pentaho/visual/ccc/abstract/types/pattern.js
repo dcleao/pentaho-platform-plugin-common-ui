@@ -25,11 +25,11 @@ define([
 
     return Refinement.extend({
 
-      meta:  {
+      meta: {
         id: "pentaho/visual/ccc/abstract/types/pattern",
-        of:   "string",
+        of: "string",
         facets: ["DiscreteDomain"],
-        domain: ["GRADIENT", "3-COLOR", "5-COLOR"]
+        domain: ["gradient", "3_color", "5_color"]
       }
     })
     .implement({meta: bundle.structured["pattern"]});

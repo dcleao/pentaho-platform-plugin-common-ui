@@ -25,9 +25,9 @@ define([
 
     return Refinement.extend({
 
-      meta:  {
+      meta: {
         id: "pentaho/visual/ccc/abstract/types/lineWidth",
-        of:   "number",
+        of: "number",
         facets: ["DiscreteDomain"],
         domain: [1, 2, 3, 4, 5, 6, 7, 8]
       }

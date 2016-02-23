@@ -18,6 +18,7 @@ define([
   "pentaho/i18n!./i18n/model",
   "./types/color",
   "./types/colorSet",
+  "./types/backgroundFill",
   "./types/fontStyle",
   "./types/sides",
   "./types/emptyCellMode",
@@ -26,9 +27,11 @@ define([
   "./types/pattern",
   "./types/lineWidth",
   "./types/trendType",
+  "./types/sliceOrder",
   "./theme/model"
-], function(visualFactory, bundle, colorFactory, colorSetFactory, fontStyleFactory, sidesFactory, emptyCellModeFactory,
-    multiChartRangeScopeFactory, sizeByNegativesModeFactory, patternFactory, lineWidthFactory, trendTypeFactory) {
+], function(visualFactory, bundle, colorFactory, colorSetFactory, backgroundFillFactory, fontStyleFactory,
+    sidesFactory, emptyCellModeFactory, multiChartRangeScopeFactory, sizeByNegativesModeFactory, patternFactory,
+    lineWidthFactory, trendTypeFactory, sliceOrderFactory) {
 
   "use strict";
 
@@ -70,12 +73,7 @@ define([
           //region background fill
           {
             name: "backgroundFill",
-            type: {
-              base: "refinement",
-              of:   "string",
-              facets: ["DiscreteDomain"],
-              domain: ["NONE", "SOLID", "GRADIENT"]
-            },
+            type: backgroundFillFactory,
             required: true,
             value: "NONE"
           },
@@ -83,7 +81,7 @@ define([
             name: "backgroundColor",
             type: colorFactory,
             applicable: function() {
-              return this.getv("backgroundFill") !== "NONE";
+              return this.getv("backgroundFill") !== "none";
             },
             required: true
           },
@@ -91,7 +89,7 @@ define([
             name: "backgroundColorEnd",
             type: colorFactory,
             applicable: function() {
-              return this.getv("backgroundFill") === "GRADIENT";
+              return this.getv("backgroundFill") === "gradient";
             },
             required: true
           },
@@ -112,7 +110,7 @@ define([
             name: "labelStyle",
             type: fontStyleFactory,
             required: true,
-            value: "PLAIN"
+            value: "plain"
           },
           {
             name: "labelFontFamily",
@@ -132,7 +130,7 @@ define([
             type: sidesFactory,
             applicable: function() { return this.getv("showLegend"); },
             required: true,
-            value: "RIGHT"
+            value: "right"
           },
 
           {
@@ -158,7 +156,7 @@ define([
             type: fontStyleFactory,
             applicable: function() { return this.getv("showLegend"); },
             required: true,
-            value: "PLAIN"
+            value: "plain"
           },
           {
             name: "legendFontFamily",
@@ -169,7 +167,8 @@ define([
 
           {
             name: "lineWidth",
-            type: lineWidthFactory
+            type: lineWidthFactory,
+            required: true
           },
 
           //region Multi-Chart
@@ -187,7 +186,7 @@ define([
             name: "multiChartRangeScope",
             type: multiChartRangeScopeFactory,
             required: true,
-            value: "GLOBAL"
+            value: "global"
           },
           //endregion
 
@@ -195,14 +194,14 @@ define([
             name: "emptyCellMode",
             type: emptyCellModeFactory,
             required: true,
-            value: "GAP"
+            value: "gap"
           },
 
           { // HG, Scatter
             name: "sizeByNegativesMode",
             type: sizeByNegativesModeFactory,
             required: true,
-            value: "NEG_LOWEST"
+            value: "negLowest"
           },
 
           //region Pattern, Color Set and Reverse Colors
@@ -210,32 +209,49 @@ define([
           //Used by Scatter and HeatGrid
           {
             id: "pattern",
-            type: patternFactory
+            type: patternFactory,
+            required: true
           },
           {
             id: "colorSet",
-            type: colorSetFactory
+            type: colorSetFactory,
+            required: true
           },
           {
             id: "reverseColors",
-            type: "boolean"
+            type: "boolean",
+            required: true
           },
           //endregion
 
           //region Trends
           {
             id: "trendName",
-            type: "string"
+            type: "string",
+            required: true
           },
           {
             id: "trendType",
-            type: trendTypeFactory
+            type: trendTypeFactory,
+            required: true
           },
           {
             id: "trendLineWidth",
-            type: lineWidthFactory
-          }
+            type: lineWidthFactory,
+            required: true
+          },
           //endregion
+
+          {
+            name: "sliceOrder",
+            type: sliceOrderFactory,
+            required: true
+          },
+          {
+            name: "selectable",
+            type: "boolean",
+            value: true
+          }
         ]
       }
       

@@ -29,7 +29,7 @@ define([
         id: "pentaho/visual/ccc/abstract/types/trendType",
         of: "string",
         facets: "DiscreteDomain",
-        domain: ["NONE", "LINEAR"]
+        domain: ["none", "linear"]
       }
     })
     .implement({meta: bundle.structured["trendType"]});
