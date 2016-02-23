@@ -82,17 +82,16 @@ define([
     },
 
     _configureAxisRange: function(primary, axisType) {
-      var drawSpec = this._drawSpec,
-          suffix = primary ? "" : "Secondary";
+      var suffix = primary ? "" : "Secondary";
 
-      if(drawSpec["autoRange" + suffix] !== "true") {
-        var limit = drawSpec["valueAxisLowerLimit" + suffix];
+      if(!this.model.getv("autoRange" + suffix)) {
+        var limit = this.model.getv("valueAxisLowerLimit" + suffix);
         if(limit != null) {
           this.options[axisType + "AxisFixedMin"] = limit;
           this.options[axisType + "AxisOriginIsZero"] = false;
         }
 
-        limit = drawSpec["valueAxisUpperLimit" + suffix];
+        limit = this.model.getv("valueAxisUpperLimit" + suffix);
         if(limit != null) this.options[axisType + "AxisFixedMax"] = limit;
       }
     },
@@ -107,12 +106,12 @@ define([
       if(!allowFractional)
         this.options[axisType + "AxisTickExponentMin"] = 0; // 10^0 => 1
 
-      var text,
-          displayUnits = this._drawSpec["displayUnits" + (primary ? "" : "Secondary")],
-          scaleFactor  = this._parseDisplayUnits(displayUnits);
-      if(scaleFactor > 1) text = bundle.get("axis.displayUnits." + displayUnits);
+      var propName = "displayUnits" + (primary ? "" : "Secondary"),
+          displayUnitsElem = this.model.get(propName),
+          displayUnitsMeta = this.model.meta.get(propName).type,
+          scaleFactor = displayUnitsMeta.scaleFactorOf(displayUnitsElem.value);
 
-      this._cartesianAxesDisplayUnitsText[axisType] = text || "";
+      this._cartesianAxesDisplayUnitsText[axisType] = scaleFactor > 1 ? displayUnitsElem.toString() : "";
     }
   });
 });

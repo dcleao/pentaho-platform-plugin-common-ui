@@ -116,8 +116,8 @@ define([
       if(lineLabelsAnchor && lineLabelsAnchor !== "none") {
         options.plot2ValuesVisible = true;
         options.plot2ValuesAnchor = lineLabelsAnchor;
-        options.plot2ValuesFont = util.defaultFont(util.readFont(drawSpec, "label"));
-        options.extensionPoints.plot2Label_textStyle = drawSpec.labelColor;
+        options.plot2ValuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
+        options.extensionPoints.plot2Label_textStyle = this.model.getv("labelColor");
       }
     },
 

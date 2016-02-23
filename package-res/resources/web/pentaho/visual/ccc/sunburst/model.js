@@ -27,25 +27,10 @@ define([
 
     return Abstract.extend({
       meta: {
-        id: "pentaho/visual/ccc/cartesianAbstract",
+        id: "pentaho/visual/ccc/sunburst",
         props: [
-          // Primary axis
-          {name: "autoRange", type: "boolean", value: true},
-          {name: "valueAxisLowerLimit", type: "number"},
-          {name: "valueAxisUpperLimit", type: "number"},
           {
             name: "displayUnits",
-            type: displayUnitsFactory,
-            required: true,
-            value: "UNITS_0"
-          },
-
-          // Secondary axis
-          {name: "autoRangeSecondary", type: "boolean", value: true},
-          {name: "valueAxisLowerLimitSecondary", type: "number"},
-          {name: "valueAxisUpperLimitSecondary", type: "number"},
-          {
-            name: "displayUnitsSecondary",
             type: displayUnitsFactory,
             required: true,
             value: "UNITS_0"
@@ -53,6 +38,6 @@ define([
         ]
       }
     })
-    .implement({meta: bundle.structured["cartesianAbstract"]});
+    .implement({meta: bundle.structured["sunburst"]});
   };
 });

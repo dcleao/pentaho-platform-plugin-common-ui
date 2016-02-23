@@ -167,8 +167,8 @@ define([
     //endregion
 
     //region IVisual INTERFACE
-    draw: function(dataTable, drawSpec) {
-      this._dataTable = dataTable;
+    _render: function() {
+      this._dataTable = this.model.getv("data");
 
       // Ensure we have a plain data table
       // TODO: with nulls preserved, because of order...
@@ -188,7 +188,7 @@ define([
 
       this._prepareLayout(this.options);
 
-      this._render();
+      this._renderCore();
     },
 
     // Sets the items on the chart that should be highlighted
@@ -268,18 +268,18 @@ define([
 
     _initOptions: function(drawSpec) {
       // Make a copy
-      drawSpec = this._drawSpec = def.copy(drawSpec);
+      this._drawSpec = def.copy(drawSpec);
 
       // Store the current selections
-      this._selections = drawSpec.highlights;
+      this._selections = null; //drawSpec.highlights; // TODO: hookup model selections?
 
       // Recursively inherit this class' shared options
       var options = this.options = def.create(this._options);
       def.set(
           options,
           "canvas",          this._element,
-          "height",          drawSpec.height || 400,
-          "width",           drawSpec.width  || 400,
+          "height",          this.model.getv("height") || 400,
+          "width",           this.model.getv("width")  || 400,
           "dimensionGroups", {},
           "dimensions",      {},
           "visualRoles",     {},
@@ -403,17 +403,17 @@ define([
     _setNullInterpolationMode: function(options, value) {
     },
 
-    _readUserOptions: function(options, drawSpec) {
-      // Apply drawSpec to extension points and others
+    _readUserOptions: function(options) {
+      var model = this.model;
       var extPoints = options.extensionPoints;
 
-      var value = drawSpec.backgroundFill;
+      var value = model.getv("backgroundFill");
       if(value && value !== "NONE") {
         var fillStyle;
         if(value === "GRADIENT") {
           if(this._hasMultiChartColumns) {
             // Use the first color with half of the saturation
-            var bgColor = pv.color(drawSpec.backgroundColor).rgb();
+            var bgColor = pv.color(model.getv("backgroundColor")).rgb();
             bgColor = pv.rgb(
                 Math.floor((255 + bgColor.r) / 2),
                 Math.floor((255 + bgColor.g) / 2),
@@ -423,57 +423,56 @@ define([
             fillStyle = bgColor;
           } else {
             fillStyle = "linear-gradient(to top, " +
-                drawSpec.backgroundColor + ", " +
-                drawSpec.backgroundColorEnd + ")";
+                model.getv("backgroundColor") + ", " +
+                model.getv("backgroundColorEnd") + ")";
           }
         } else {
-          fillStyle = drawSpec.backgroundColor;
+          fillStyle = model.getv("backgroundColor");
         }
 
         extPoints.base_fillStyle = fillStyle;
       }
 
-      value = drawSpec.labelColor;
+      value = model.getv("labelColor");
       if(value !== undefined) {
         extPoints.axisLabel_textStyle = extPoints.axisTitleLabel_textStyle = value;
       }
 
-      value = ("" + drawSpec.showLegend) === "true";
-      options.legend = value;
+      options.legend = value = model.getv("showLegend");
       if(value) {
-        value = drawSpec.legendColor;
-        if(value !== undefined) extPoints.legendLabel_textStyle = value;
+        value = model.getv("legendColor");
+        if(value) extPoints.legendLabel_textStyle = value;
 
         // TODO: ignoring white color cause analyzer has no on-off for the legend bg color
         // and always send white. When the chart bg color is active it
         // would not show through the legend.
-        value = drawSpec.legendBackgroundColor;
+        value = model.getv("legendBackgroundColor");
         if(value && value.toLowerCase() !== "#ffffff")
           extPoints.legendArea_fillStyle = value;
 
-        value = drawSpec.legendPosition;
+        value = model.getv("legendPosition");
         if(value) options.legendPosition = value.toLowerCase();
 
 
-        if(drawSpec.legendSize)
-          options.legendFont = util.readFont(drawSpec, "legend");
+        if(model.getf("legendSize"))
+          options.legendFont = util.readFontModel(model, "legend");
       }
 
-      value = drawSpec.lineWidth;
-      if(value !== undefined) {
-        extPoints.line_lineWidth  = +value;      // + -> to number
-        var radius = 3 + 6 * ((+value) / 8); // 1 -> 8 => 3 -> 9,
+      value = model.getf("lineWidth");
+      if(value != null) {
+        extPoints.line_lineWidth = value;
+        var radius = 3 + 6 * (value / 8); // 1 -> 8 => 3 -> 9,
         extPoints.dot_shapeSize = radius * radius;
 
         extPoints.plot2Line_lineWidth = extPoints.line_lineWidth;
         extPoints.plot2Dot_shapeSize  = extPoints.dot_shapeSize;
       }
 
-      value = drawSpec.maxChartsPerRow;
-      if(value !== undefined)
-        options.multiChartColumnsMax = +value; // + -> to number
+      value = model.getf("maxChartsPerRow");
+      if(value != null)
+        options.multiChartColumnsMax = value;
 
-      value = drawSpec.emptyCellMode;
+      value = model.getf("emptyCellMode");
       if(value) {
         switch(value) {
           case "GAP":    value = "none";   break;
@@ -484,7 +483,7 @@ define([
         this._setNullInterpolationMode(options, value);
       }
 
-      value = drawSpec.multiChartRangeScope;
+      value = model.getf("multiChartRangeScope");
       if(value) {
         switch(value) {
           case "GLOBAL": value = "global"; break;
@@ -494,21 +493,19 @@ define([
         options.numericAxisDomainScope = value;
       }
 
-      // build style for pv
-      if(drawSpec.labelSize) {
-        var labelFont = util.readFont(drawSpec, "label");
+      value = model.getv("labelSize");
+      if(value) {
+        var labelFont = util.readFontModel(model, "label");
 
-        options.axisTitleFont =
-            options.axisFont = labelFont;
+        options.axisTitleFont = options.axisFont = labelFont;
 
         if(this._hasMultiChartColumns) {
-          var labelFontSize   = util.readFontSize(drawSpec, "label");
-          var labelFontFamily = util.readFontFamily(drawSpec, "label");
-          options.titleFont = (labelFontSize + 2) + "px " + labelFontFamily;
+          var labelFontFamily = model.getv("labelFontFamily");
+          options.titleFont = (value + 2) + "px " + labelFontFamily;
         }
       }
 
-      var sizeByNegativesMode = drawSpec.sizeByNegativesMode;
+      var sizeByNegativesMode = model.getv("sizeByNegativesMode");
       options.sizeAxisUseAbs = sizeByNegativesMode === "USE_ABS";
     },
 
@@ -1129,10 +1126,10 @@ define([
       if(valuesVisible) {
         this._configureLabelsAnchor(options, drawSpec);
 
-        options.valuesFont = util.defaultFont(util.readFont(drawSpec, "label"));
+        options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
 
         if(this._useLabelColor)
-          options.extensionPoints.label_textStyle = drawSpec.labelColor;
+          options.extensionPoints.label_textStyle = this.model.getv("labelColor");
       }
     },
 
@@ -1250,7 +1247,7 @@ define([
         options.width -= 17;
     },
 
-    _render: function() {
+    _renderCore: function() {
       while(this._element.firstChild)
         this._element.removeChild(this._element.firstChild);
 
@@ -1634,22 +1631,6 @@ define([
       }, this);
 
       return selection;
-    },
-
-    _parseDisplayUnits: function(displayUnits) {
-      if(displayUnits) {
-        var match = displayUnits.match(/^UNITS_(\d+)$/);
-        if(match) {
-          // UNITS_0 -> 1
-          // UNITS_1 -> 100
-          // UNITS_2 -> 1000
-          // ...
-          var exponent = +match[1]; // >= 0  // + <=> Number( . )  conversion
-          if(exponent > 0) return Math.pow(10, exponent); // >= 100
-        }
-      }
-
-      return 1;
     }
     //endregion
   }, /** @lends pentaho.visual.ccc.base.View */{

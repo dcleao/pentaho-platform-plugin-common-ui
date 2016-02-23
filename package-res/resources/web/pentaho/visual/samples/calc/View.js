@@ -19,12 +19,6 @@ define([
    * @param {pentaho.visual.samples.calc.Model} model The calculator's visualization `Model`.
    */
   return Visual.extend(/** @lends pentaho.visual.samples.calc.View */{
-    /* Base class constructor
-    constructor: function(element, model) {
-      this._element = element;
-      this.model   = model;
-    },
-    */
 
     /** @override */
     _init: function() {
@@ -43,8 +37,10 @@ define([
     },
 
     /** @override */
-    _resize: function(width, height) {
+    _resize: function() {
       // Center the span
+      var width  = this.model.getv("width");
+      var height = this.model.getv("height");
       this._numSpan.style.left = ((width  - this._numSpan.offsetWidth ) / 2) + "px";
       this._numSpan.style.top  = ((height - this._numSpan.offsetHeight) / 2) + "px";
     },

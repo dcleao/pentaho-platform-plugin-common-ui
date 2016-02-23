@@ -1,5 +1,5 @@
 define([
-  "pentaho/visual/base/modelFactory",
+  "pentaho/visual/base/model",
   "pentaho/i18n!model"
   //"./theme/model"
 ], function(visualFactory, bundle) {
@@ -20,7 +20,7 @@ define([
 
     return Visual.extend({
       meta: {
-        id: "pentaho/visual/samples/calcNew",
+        id: "pentaho/visual/samples/calc",
         v2Id: "sample_calc",
 
         view: "View", // relative to declaring type's `id` unless prefixed with '/'. When type is anonymous, it's global?
