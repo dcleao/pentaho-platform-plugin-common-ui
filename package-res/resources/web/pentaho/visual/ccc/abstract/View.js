@@ -869,7 +869,7 @@ define([
 
     _configureColor: function(colorScaleKind) {
       var options = this.options,
-          drawSpec = this._drawSpec;
+          model = this.model;
 
       switch(colorScaleKind) {
         case "discrete":
@@ -877,8 +877,9 @@ define([
           break;
 
         case "continuous":
-          options.colorScaleType = drawSpec.pattern === "GRADIENT" ? "linear" : "discrete";
-          options.colors = visualColorUtils.buildPalette(drawSpec.colorSet, drawSpec.pattern, drawSpec.reverseColors);
+          options.colorScaleType = model.getv("pattern") === "GRADIENT" ? "linear" : "discrete";
+          var colorSet = model.getv("colorSet").toLowerCase();
+          options.colors = visualColorUtils.buildPalette(colorSet, model.getv("pattern"), model.getv("reverseColors"));
           break;
       }
     },
@@ -1021,9 +1022,10 @@ define([
 
     _configureTrends: function() {
       var options = this.options,
-          drawSpec = this._drawSpec;
+          model = this.model;
+          //drawSpec = this._drawSpec;
 
-      var trendType = (this._supportsTrends ? drawSpec.trendType : null) || "none";
+      var trendType = (this._supportsTrends ? model.getf("trendType") : null) || "none";
       switch(trendType) {
         case "none":
         case "linear":
@@ -1034,7 +1036,7 @@ define([
 
       options.trendType = trendType;
       if(trendType !== "none") {
-        var trendName = drawSpec.trendName;
+        var trendName = model.getv("trendName");
         if(!trendName)
           trendName = bundle.get("trend.name." + trendType.toLowerCase(), trendType);
 

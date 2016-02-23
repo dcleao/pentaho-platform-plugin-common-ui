@@ -17,14 +17,18 @@ define([
   "pentaho/visual/base/modelFactory",
   "pentaho/i18n!./i18n/model",
   "./types/color",
+  "./types/colorSet",
   "./types/fontStyle",
   "./types/sides",
   "./types/emptyCellMode",
   "./types/multiChartRangeScope",
   "./types/sizeByNegativesMode",
+  "./types/pattern",
+  "./types/lineWidth",
+  "./types/trendType",
   "./theme/model"
-], function(visualFactory, bundle, colorFactory, fontStyleFactory, sidesFactory, emptyCellModeFactory,
-    multiChartRangeScopeFactory, sizeByNegativesModeFactory) {
+], function(visualFactory, bundle, colorFactory, colorSetFactory, fontStyleFactory, sidesFactory, emptyCellModeFactory,
+    multiChartRangeScopeFactory, sizeByNegativesModeFactory, patternFactory, lineWidthFactory, trendTypeFactory) {
 
   "use strict";
 
@@ -35,12 +39,12 @@ define([
     return Visual.extend({
       meta: {
         id: "pentaho/visual/ccc/abstract",
-        abstract: true,
+        "abstract": true,
         view: "View",
         styleClass: "",
 
         props: [
-          //region visual roles (Old data reqs)
+          //region Visual Roles
           {
             name: "rows",
             type: ["string"],
@@ -165,12 +169,7 @@ define([
 
           {
             name: "lineWidth",
-            type: {
-              base: "refinement",
-              of:   "number",
-              facets: ["DiscreteDomain"],
-              domain: [1, 2, 3, 4, 5, 6, 7, 8]
-            }
+            type: lineWidthFactory
           },
 
           //region Multi-Chart
@@ -204,7 +203,39 @@ define([
             type: sizeByNegativesModeFactory,
             required: true,
             value: "NEG_LOWEST"
+          },
+
+          //region Pattern, Color Set and Reverse Colors
+
+          //Used by Scatter and HeatGrid
+          {
+            id: "pattern",
+            type: patternFactory
+          },
+          {
+            id: "colorSet",
+            type: colorSetFactory
+          },
+          {
+            id: "reverseColors",
+            type: "boolean"
+          },
+          //endregion
+
+          //region Trends
+          {
+            id: "trendName",
+            type: "string"
+          },
+          {
+            id: "trendType",
+            type: trendTypeFactory
+          },
+          {
+            id: "trendLineWidth",
+            type: lineWidthFactory
           }
+          //endregion
         ]
       }
       

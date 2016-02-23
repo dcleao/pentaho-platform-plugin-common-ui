@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 define([
-  "../barAbstract/model",
-  "pentaho/i18n!../abstract/i18n/model",
-  "../abstract/themes"
-], function(visualFactory, bundle) {
+  "pentaho/i18n!../i18n/model"
+], function(bundle) {
 
   "use strict";
 
   return function(context) {
 
-    var Visual = context.get(visualFactory);
+    var Refinement = context.get("pentaho/type/refinement");
 
-    return Visual.extend({
-      meta: {
-        id: "pentaho/visual/ccc/bar",
-        v2id: "pentaho/visual/ccc/bar",
+    return Refinement.extend({
 
-        props: [
-
-        ]
+      meta:  {
+        id: "pentaho/visual/ccc/abstract/types/lineWidth",
+        of:   "number",
+        facets: ["DiscreteDomain"],
+        domain: [1, 2, 3, 4, 5, 6, 7, 8]
       }
-      
     })
-    .implement({meta: bundle.structured["bar"]});
+    .implement({meta: bundle.structured["lineWidth"]});
   };
 });
