@@ -58,7 +58,7 @@ define([
           return !util.isNullMember(scene.vars.category.value);
         };
 
-      eps.label_textStyle = drawSpec.labelColor;
+      eps.label_textStyle = this.model.getv("labelColor");
 
       // Determine whether to show values label
       if(drawSpec.labelsOption != "none" && this.axes.measure.boundRoles.size) {
@@ -130,16 +130,19 @@ define([
       this._configureDisplayUnits();
     },
 
-    _configureLabels: function(options, drawSpec) {
+    _configureLabels: function(options) {
       // Sunburst always shows category labels.
-      options.valuesFont = util.defaultFont(util.readFont(drawSpec, "label"));
-      options.extensionPoints.label_textStyle = drawSpec.labelColor;
+      options.valuesFont = util.defaultFont(util.readFontModel(this.model, "label"));
+      options.extensionPoints.label_textStyle = this.model.getv("labelColor");
     },
 
     _configureDisplayUnits: function() {
-      var scaleFactor = this._parseDisplayUnits(this._drawSpec.displayUnits);
+      var displayUnitsMeta = this.model.meta.get("displayUnits").type;
+      var displayUnits = this.model.getv("displayUnits");
+      var scaleFactor = displayUnitsMeta.scaleFactorOf(displayUnits);
       if(scaleFactor > 1) {
-        var dims = this.options.dimensions, dimSize = dims.size || (dims.size = {});
+        var dims = this.options.dimensions,
+            dimSize = dims.size || (dims.size = {});
 
         // Values returned by the server are already divided by scaleFactor.
         // The formatting, however is that of the original value.
