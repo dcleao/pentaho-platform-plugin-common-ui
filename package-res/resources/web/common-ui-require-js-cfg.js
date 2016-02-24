@@ -192,16 +192,26 @@
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
 
-  // CCC Theme
-  requireMap["*"]["pentaho/visual/ccc/abstract/themes"] = "pentaho/visual/ccc/abstract/themes/" +
-      (["myFooTheme"].indexOf(active_theme) < 0 ? "default" : active_theme);
-
   // Visualizations Packages
+
+  function mapTheme(mid, themes) {
+    var theme = (typeof active_theme !== "undefined") ? active_theme : null;
+    if(!theme || themes.indexOf(theme) < 0) theme = themes[0];
+
+    requireMap["*"][mid + "/theme"] = mid + "/themes/" + theme;
+  }
+
   function registerVizPackage(name) {
     requireCfg.packages.push({"name": name, "main": "model"});
 
-    requireService[name] = "pentaho/type/base";
+    requireService[name] = "pentaho/type/value";
   }
+
+  // CCC Theme
+  mapTheme("pentaho/visual/ccc/abstract", ["default"]);
+
+  // sample/calc theme
+  mapTheme("pentaho/visual/samples/calc", ["crystal"]);
 
   [
     // base visual

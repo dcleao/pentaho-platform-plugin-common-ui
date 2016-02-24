@@ -1,7 +1,7 @@
 define([
   "pentaho/visual/base/model",
-  "pentaho/i18n!model"
-  //"./theme/model"
+  "pentaho/i18n!model",
+  "./theme/model"
 ], function(visualFactory, bundle) {
 
   "use strict";

@@ -5,7 +5,7 @@ define([
 
   "use strict";
 
-  /*global document:true*/
+  /*global document:false*/
 
   /**
    * @name View
