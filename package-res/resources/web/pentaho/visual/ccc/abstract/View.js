@@ -166,7 +166,7 @@ define([
     _useLabelColor: true,
     //endregion
 
-    //region IVisual INTERFACE
+    //region VizAPI implementation
     _render: function() {
       this._dataTable = this.model.getv("data");
 
@@ -178,11 +178,11 @@ define([
 
       // ----------
 
-      this._initOptions(drawSpec);
+      this._initOptions();
 
       this._initData();
 
-      this._readUserOptions(this.options, drawSpec);
+      this._readUserOptions(this.options);
 
       this._configure();
 
@@ -191,6 +191,31 @@ define([
       this._renderCore();
     },
 
+    /** @override VizAPI */
+    _resize: function() {
+      // Resize event throttling
+      if(this._lastResizeTimeout != null)
+        clearTimeout(this._lastResizeTimeout);
+
+      this._lastResizeTimeout = setTimeout(function() {
+        this._lastResizeTimeout = null;
+        this._doResize();
+      }.bind(this), 50);
+    },
+
+    /** @override VizAPI */
+    dispose: function() {
+
+      this.base();
+
+      if(this._chart && this._chart.dispose) {
+        this._chart.dispose();
+        this._chart = null;
+      }
+    },
+    //endregion
+
+    //region Helpers
     // Sets the items on the chart that should be highlighted
     setHighlights: function(highlights) {
       this._selections = highlights;
@@ -208,56 +233,11 @@ define([
       }
     },
 
-    // TODO: what's this for? Column/Bar?
-    // Returns the output parameters of the chart.
-    getOutputParameters: function() {
-      var params = [];
-      if(this._cccClass == "PieChart") {
-        params.push([
-          this._dataTable.getColumnId(0),
-          true,
-          this._dataTable.getColumnId(0)
-        ]);
-      } else {
-        for(var j = 0 ; j < this._dataTable.getNumberOfColumns() ; j++) {
-          params.push([
-            this._dataTable.getColumnId(j),
-            true,
-            this._dataTable.getColumnId(j)
-          ]);
-        }
-      }
-
-      return params;
-    },
-
-    resize: function(width, height) {
-      // Resize event throttling
-      if(this._lastResizeTimeout != null)
-        clearTimeout(this._lastResizeTimeout);
-
-      this._lastResizeTimeout = setTimeout(function() {
-        this._lastResizeTimeout = null;
-        this._doResize(width, height);
-      }.bind(this), 50);
-    },
-
-    dispose: function() {
-
-      this.base();
-
-      if(this._chart && this._chart.dispose) {
-        this._chart.dispose();
-        this._chart = null;
-      }
-    },
-    //endregion
-
-    //region Helpers
-    _doResize: function(width, height) {
+    _doResize: function() {
       if(this._chart) {
+        var width  = this.model.getv("width");
+        var height = this.model.getv("height");
         var options = this._chart.options;
-
         def.set(options, "width", width, "height", height);
 
         this._prepareLayout(options);
@@ -864,7 +844,10 @@ define([
 
         case "continuous":
           options.colorScaleType = model.getv("pattern") === "gradient" ? "linear" : "discrete";
-          options.colors = visualColorUtils.buildPalette(model.getv("colorSet"), model.getv("pattern"), model.getv("reverseColors"));
+          options.colors = visualColorUtils.buildPalette(
+              model.getv("colorSet"),
+              model.getv("pattern"),
+              model.getv("reverseColors"));
           break;
       }
     },
