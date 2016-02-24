@@ -29,15 +29,13 @@ define([
           {
             name: "levels",
             type: ["string"],
-            required: true
+            required: true,
+            isVisualRole: true
           },
           {
             name: "measure",
-            //type: {
-            //  base: "role",
-            //  otherTypes: ["number"]
-            //},
-            required: true
+            required: true,
+            isVisualRole: true
           },
           {
             name: "operation",
