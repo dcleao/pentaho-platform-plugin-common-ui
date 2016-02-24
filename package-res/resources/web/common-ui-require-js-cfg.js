@@ -227,11 +227,11 @@
     "pentaho/visual/ccc/barAbstract",
     "pentaho/visual/ccc/barNormalizedAbstract",
     "pentaho/visual/ccc/barHorizontal",
-    "pentaho/visual/ccc/barHorizontalStacked",
-    "pentaho/visual/ccc/barHorizontalNormalized",
     "pentaho/visual/ccc/bar",
     "pentaho/visual/ccc/barStacked",
-    "pentaho/visual/ccc/barNormalized"
+    "pentaho/visual/ccc/barStackedHorizontal",
+    "pentaho/visual/ccc/barNormalized",
+    "pentaho/visual/ccc/barNormalizedHorizontal"
     /*
     "pentaho/visual/ccc/barLine",
     "pentaho/visual/ccc/waterfall",
