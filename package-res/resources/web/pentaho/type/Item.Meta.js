@@ -723,8 +723,17 @@ define([
       return value == null   ? null  :
              this.is(value)  ? value :
              this.create(value);
+    },
+
+    //region serialization
+    toSpec: function(keyArgs) {
+      return this._toSpec(keyArgs);
+    },
+    _toSpec: function(keyArgs) {
+      return {};
     }
-  }, /** @lends pentaho.type.Item.Meta */{
+    //endregion
+ }, /** @lends pentaho.type.Item.Meta */{
     //@override
     /**
      * See Base.js

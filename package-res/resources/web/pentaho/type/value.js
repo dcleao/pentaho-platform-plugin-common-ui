@@ -577,6 +577,16 @@ define([
          * @see pentaho.type.Value.Meta#validateInstance
          */
         _validate: function(value) {
+        },
+        //endregion
+
+        //region serialization
+        toSpec: function(keyArgs) {
+          var spec = this._toSpec(keyArgs);
+          return this.list ? [spec] : spec;
+        },
+        _toSpec: function(keyArgs) {
+          return {id: this.id};
         }
         //endregion
       }

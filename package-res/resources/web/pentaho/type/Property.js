@@ -562,6 +562,17 @@ define([
         this[name + "Eval"] = function(owner) {
           return this[namePrivEval].call(owner);
         };
+      },
+      //endregion
+
+      //region serialization
+      _toSpec: function(keyArgs) {
+        var spec = {
+          name: this.name,
+          type: this.type.toSpec(keyArgs)
+        };
+
+        return spec;
       }
       //endregion
     } // end instance meta:

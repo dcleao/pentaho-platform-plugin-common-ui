@@ -791,6 +791,19 @@ define([
           }, this);
 
           return errors;
+        },
+        //endregion
+
+        //region serialization
+        _toSpec: function(keyArgs) {
+          var spec = this.base(keyArgs);
+          spec.props = [];
+
+          this.each(function(prop) {
+            spec.props.push(prop.toSpec(keyArgs));
+          });
+
+          return spec;
         }
         //endregion
       }
