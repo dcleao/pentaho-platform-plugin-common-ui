@@ -246,6 +246,33 @@ define([
       },
       //endregion
 
+      toSpec: function(keyArgs) {
+        var spec = {
+          v: this.value,
+          f: this.formatted
+        };
+
+        var tmp = this.meta.toSpec();
+
+        if(keyArgs){
+          if(!keyArgs.returnFormattedValues && !keyArgs.inlineTypeSpec) {
+            return this.value;
+          }
+          if(keyArgs.inlineTypeSpec) {
+            spec['_'] = {
+              id: this.meta.id,
+              name: this.meta.label,
+              value: this.value,
+              formatted: this.formatted};
+          }
+          if(!keyArgs.returnFormattedValues) {
+            delete spec['f'];
+          }
+        }
+
+        return spec;
+      },
+
       type: /** pentaho.type.Simple.Type# */{
         id: module.id,
         isAbstract: true,

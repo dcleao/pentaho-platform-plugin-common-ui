@@ -65,6 +65,27 @@ define([
         }
       });
 
+      var Derived2 = Complex.meta.create({
+        _: {
+            label: "Derived2",
+            props: [
+              {name: "quantity", type: "number"},
+              "type",
+              {name: "noFormat", type: "number"},
+              {name: "anything", type: TestLevel1},
+              {
+                name: "sub",
+                type: {
+                  props: [
+                    {name: "truth", type: "boolean"},
+                    {name: "when", type: "date"}
+                  ]
+                }
+              }
+            ]
+          }
+      });
+
       var originalSpec = {
         quantity: {v: 20, f: "I'm a simple 20"},
         type: {v: "bar", f: "I'm a bar"},
@@ -85,16 +106,18 @@ define([
       };
 
       var value;
+      var value2;
 
       beforeEach(function() {
         value = new Derived(originalSpec);
+        value2 = Derived2.meta.create(originalSpec);
         console.log(value);
       });
 
       describe("values", function() {
         describe("default", function() {
           it("should return primitive value and formatted value when formatted", function() {
-            var spec = value.toSpec();
+            var spec = value._toSpec();
 
             expect(spec.quantity.v).toBe(originalSpec.quantity.v);
             expect(spec.quantity.f).toBe(originalSpec.quantity.f);
