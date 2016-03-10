@@ -39,33 +39,13 @@ define([
      * @name pentaho.type.Simple
      * @class
      * @extends pentaho.type.Element
-     * @amd pentaho/type/simple
+     * @amd {pentaho.type.Factory<pentaho.type.Simple>}  pentaho/type/simple
      *
      * @classDesc The base abstract class of un-structured, indivisible values.
      *
-     * ### AMD
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Simple>}.
-     *
-     * Module Id: `pentaho/type/simple`
-     *
-     * Simple type example:
-     * ```javascript
-     * define(["pentaho/type/simple"], function(simpleFactory) {
-     *
-     *   return function(context) {
-     *
-     *     var Simple = context.get(simpleFactory);
-     *
-     *     return Simple.extend({
-     *
-     *     });
-     *   };
-     * });
-     * ```
-     *
      * @description Creates a simple instance.
+     * @constructor
+     * @param {pentaho.type.spec.USimple} [instSpec] A simple specification.
      */
     var Simple = Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
 

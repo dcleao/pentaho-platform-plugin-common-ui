@@ -51,18 +51,12 @@ define([
      * @name pentaho.type.Complex
      * @class
      * @extends pentaho.type.Element
-     * @amd pentaho/type/complex
+     * @amd {pentaho.type.Factory<pentaho.type.Complex>} pentaho/type/complex
      *
      * @classDesc The base class of complex types.
      *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/complex`
-     *
-     * The AMD module returns the type's factory, a {@link pentaho.type.Factory<pentaho.type.Complex>}.
-     *
      * Example complex type:
-     * ```javascript
+     * ```js
      * define(["pentaho/type/complex"], function(complexFactory) {
      *
      *   return function(context) {
@@ -89,7 +83,7 @@ define([
      * the {@link pentaho.type.Complex#_clone} method should also be overridden to copy those properties.
      *
      * @constructor
-     * @param {object} spec The complex instance specification.
+     * @param {pentaho.type.spec.UComplex} [spec] A complex specification.
      */
     var Complex = Element.extend("pentaho.type.Complex", /** @lends pentaho.type.Complex# */{
 
