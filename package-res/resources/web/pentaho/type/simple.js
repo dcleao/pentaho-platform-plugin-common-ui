@@ -45,7 +45,7 @@ define([
      *
      * @description Creates a simple instance.
      * @constructor
-     * @param {pentaho.type.spec.USimple} [instSpec] A simple specification.
+     * @param {pentaho.type.spec.USimple} [spec] A simple specification.
      */
     var Simple = Element.extend("pentaho.type.Simple", /** @lends pentaho.type.Simple# */{
 

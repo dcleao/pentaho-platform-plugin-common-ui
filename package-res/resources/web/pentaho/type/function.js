@@ -36,6 +36,8 @@ define([
      * @classDesc A primitive JavaScript function type.
      *
      * @description Creates a function instance.
+     * @constructor
+     * @param {pentaho.type.spec.IFunction|function|string} [spec] A function specification.
      */
     return Simple.extend("pentaho.type.Function", {
       /**

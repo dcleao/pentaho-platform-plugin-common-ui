@@ -34,6 +34,8 @@ define([
      * @classDesc The class of a date value.
      *
      * @description Creates a date instance.
+     * @constructor
+     * @param {pentaho.type.spec.IDate|Date|string} [spec] A date specification.
      */
     return Simple.extend("pentaho.type.Date", {
       /**

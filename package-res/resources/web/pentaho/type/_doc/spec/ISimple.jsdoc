@@ -37,10 +37,16 @@
  *
  * Property [v]{@link pentaho.type.spec.ISimple#v} is an alias for this one.
  *
- * Cannot be {@link Nully}. Either `v` or `value` must be specified.
+ * One and only one of `v` or `value` must be specified, non-{@link Nully}.
+ *
+ * Unless otherwise specified,
+ * the JSON serialization of the underlying value is the value itself
+ * (a string is a JSON string, a number is a JSON number and boolean is a JSON boolean).
+ * Other data types naturally need to be serialized to JSON in some custom way
+ * and document that format.
  *
  * Check the specification documentation of subtypes of this one,
- * for information about supported, specialized value formats.
+ * for information about supported, specialized input and output value formats.
  *
  * @name value
  * @memberOf pentaho.type.spec.ISimple#
