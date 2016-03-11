@@ -15,12 +15,16 @@
  */
 
 /**
- * The `spec.ITypeMeta` interface represents the metadata used to
- * define a type.
+ * The `spec.ITypeMeta` interface represents the metadata used to define a type.
  *
  * @name pentaho.type.spec.ITypeMeta
- *
  * @interface
+ */
+
+/**
+ * The id of the corresponding AMD module, if any.
  *
- * @property {string} [id] The id of the corresponding AMD module, if any.
+ * @name id
+ * @memberOf pentaho.type.spec.ITypeMeta#
+ * @type {string}
  */

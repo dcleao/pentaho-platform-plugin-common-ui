@@ -42,7 +42,7 @@
  * ```
  *
  * However, note that _array form_ can only be used if
- * the [inline type]{@link pentaho.type.spec.IValue#"_"} property can, in fact, be omitted.
+ * the [inline type]{@link pentaho.type.spec.IValue#_} property can, in fact, be omitted.
  *
  * A list of complex values can be written in array form,
  * and its complex elements be written in array form,

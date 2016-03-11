@@ -30,8 +30,10 @@
  * @extends pentaho.type.spec.IValue
  *
  * @see pentaho.type.spec.USimple
- *
- * @property {!any} [value] The underlying JavaScript value.
+ */
+
+/**
+ * The underlying JavaScript value.
  *
  * Property [v]{@link pentaho.type.spec.ISimple#v} is an alias for this one.
  *
@@ -40,14 +42,37 @@
  * Check the specification documentation of subtypes of this one,
  * for information about supported, specialized value formats.
  *
- * @property {?string} [formatted] The formatted value.
+ * @name value
+ * @memberOf pentaho.type.spec.ISimple#
+ * @type {?any}
+ */
+
+/**
+ * The formatted value.
+ *
  * When unspecified, or specified as a {@link Nully} or empty value, it is taken to be `null`.
  *
  * Property [f]{@link pentaho.type.spec.ISimple#f} is an alias for this one.
  *
  * Only one of `f` or `formatted` can be specified.
  *
- * @property {!any} [v] An alias for [value]{@link pentaho.type.spec.ISimple#value}.
+ * @name formatted
+ * @memberOf pentaho.type.spec.ISimple#
+ * @type {?string}
+ */
 
- * @property {?string} [f] An alias for [formatted]{@link pentaho.type.spec.ISimple#formatted}.
+/**
+ * An alias for [value]{@link pentaho.type.spec.ISimple#value}.
+ *
+ * @name v
+ * @memberOf pentaho.type.spec.ISimple#
+ * @type {?any}
+ */
+
+/**
+ * An alias for [formatted]{@link pentaho.type.spec.ISimple#formatted}.
+ *
+ * @name f
+ * @memberOf pentaho.type.spec.ISimple#
+ * @type {?string}
  */

@@ -22,6 +22,11 @@
  * @interface
  *
  * @see pentaho.type.spec.UValue
- *
- * @property {pentaho.type.spec.UTypeReference} [_] An inline type reference of the value's type.
+ */
+
+/**
+ * An inline type reference of the value's type.
+ * @name _
+ * @memberOf pentaho.type.spec.IValue#
+ * @type {pentaho.type.spec.UTypeReference}
  */

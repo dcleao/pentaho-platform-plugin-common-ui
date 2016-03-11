@@ -36,6 +36,12 @@
  * @extends pentaho.type.spec.IValue
  *
  * @see pentaho.type.spec.UList
+ */
+
+/**
+ * The list's _data_, or elements, array.
  *
- * @property {Array.<!pentaho.type.spec.UValue>} [d] The list's _data_, or elements, array.
+ * @name d
+ * @memberOf pentaho.type.spec.IList#
+ * @type {Array.<!pentaho.type.spec.UValue>}
  */
