@@ -23,10 +23,10 @@
  * </caption>
  *
  * {
- *   "_": ["my/product"],
- *   "d": [
- *     {"product": "boeing-737",  "price": 1500}
- *     {"product": "airbus-A320", "price": 1000}
+ *   _: ["my/product"],
+ *   d: [
+ *     {product: "boeing-737",  price: 1500}
+ *     {product: "airbus-A320", price: 1000}
  *   ]
  * }
  *

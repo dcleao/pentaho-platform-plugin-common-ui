@@ -29,8 +29,8 @@
  *
  * ```js
  * {
- *   "_": {base: "list", of: "number"},
- *   "d: [1, 2, 3]
+ *   _: {base: "list", of: "number"},
+ *   d: [1, 2, 3]
  * }
  * ```
  *
