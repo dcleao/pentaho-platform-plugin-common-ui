@@ -252,18 +252,12 @@ define([
           f: this.formatted
         };
 
-        var tmp = this.meta.toSpec();
-
         if(keyArgs){
           if(!keyArgs.returnFormattedValues && !keyArgs.inlineTypeSpec) {
             return this.value;
           }
           if(keyArgs.inlineTypeSpec) {
-            spec['_'] = {
-              id: this.meta.id,
-              name: this.meta.label,
-              value: this.value,
-              formatted: this.formatted};
+            spec['_'] = this.meta.toSpec();
           }
           if(!keyArgs.returnFormattedValues) {
             delete spec['f'];

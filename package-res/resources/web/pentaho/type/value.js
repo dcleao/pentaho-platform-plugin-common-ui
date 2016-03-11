@@ -616,16 +616,7 @@ define([
           return this.list ? [spec] : spec;
         },
         _toSpec: function(keyArgs) {
-          var spec = {
-            id: this.id
-          };
-          if(this._props) {
-            this._props.forEach(function (prop) {
-              prop._toSpec(keyArgs);
-            });
-          }
-
-          return spec;
+          return {id: this.id};
         }
         //endregion
       }
