@@ -26,6 +26,7 @@ define([
    * @name pentaho.type.Item
    * @class
    * @abstract
+   * @amd pentaho/type/Item
    *
    * @classDesc The base **instance class** of types in the Pentaho Client Metadata Model.
    *

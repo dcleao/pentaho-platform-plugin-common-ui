@@ -65,6 +65,7 @@ define([
      * @name Event
      * @memberOf pentaho.lang
      * @class
+     * @amd pentaho/lang/Event
      *
      * @description Creates an event of a given type, source and cancelable.
      * @constructor

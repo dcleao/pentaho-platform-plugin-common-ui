@@ -283,12 +283,6 @@ define([
      *
      * @type {String | any}
      */
-    _resetLabel: function() {
-      if(this !== _itemMeta) {
-        delete this._label;
-      }
-    },
-
     get label() {
       return this._label;
     },
@@ -299,6 +293,12 @@ define([
         this._resetLabel();
       } else {
         this._label = String(value);
+      }
+    },
+
+    _resetLabel: function() {
+      if(this !== _itemMeta) {
+        delete this._label;
       }
     },
     //endregion

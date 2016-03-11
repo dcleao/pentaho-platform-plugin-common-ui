@@ -31,16 +31,9 @@ define([
      * @name pentaho.type.Object
      * @class
      * @extends pentaho.type.Simple
-     * @amd pentaho/type/object
+     * @amd {pentaho.type.Factory<pentaho.type.Object>} pentaho/type/object
      *
      * @classDesc A primitive JavaScript object type.
-     *
-     * ### AMD
-     *
-     * Module Id: `pentaho/type/object`
-     *
-     * The AMD module returns the type's factory, a
-     * {@link pentaho.type.Factory<pentaho.type.Object>}.
      *
      * @description Creates an object instance.
      */
@@ -69,6 +62,7 @@ define([
        * @type object
        * @readonly
        */
+
       meta: {
         id: module.id,
         styleClass: "pentaho-type-object",

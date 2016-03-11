@@ -22,6 +22,8 @@ define([
   /**
    * @name pentaho.type.SpecificationScope
    * @class
+   * @amd pentaho/type/SpecificationScope
+   *
    * @classDesc A `SpecificationScope` object holds information that is
    * shared during the serialization (or conversion to specification) of a value or type.
    *
