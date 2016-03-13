@@ -27,7 +27,7 @@ define([
       var Complex = context.get("pentaho/type/complex");
 
       var TestLevel1 = Complex.extend("TestLevel1", {
-        meta: {
+        type: {
           label: "TestLevel1",
           props: [
             "type"
@@ -36,7 +36,7 @@ define([
       });
 
       var TestLevel2 = TestLevel1.extend("TestLevel2", {
-        meta: {
+        type: {
           label: "TestLevel2",
           props: [
             "name"
@@ -45,7 +45,7 @@ define([
       });
 
       var Derived = Complex.extend({
-        meta: {
+        type: {
           label: "Derived",
           props: [
             {name: "quantity", type: "number"},
@@ -230,7 +230,7 @@ define([
 
             expect(spec.anything._).toBeDefined();
             // TODO: What to compare?
-            expect(spec.anything._).toBe(TestLevel2.meta);
+            expect(spec.anything._).toBe(TestLevel2.type);
           });
 
           it("should not inline type spec every other case", function() {
@@ -246,7 +246,7 @@ define([
 
             expect(spec._).toBeDefined();
             // TODO: What to compare?
-            expect(spec._).toBe(Derived.meta);
+            expect(spec._).toBe(Derived.type);
           });
 
           it("should propagate and inline type spec", function() {
@@ -254,7 +254,7 @@ define([
 
             expect(spec.sub._).toBeDefined();
             // TODO: What to compare?
-            expect(spec.sub._.id).toBe(Complex.meta.id);
+            expect(spec.sub._.id).toBe(Complex.type.id);
           });
         });
       });

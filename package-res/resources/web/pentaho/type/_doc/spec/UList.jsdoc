@@ -22,7 +22,7 @@
  * The _object form_ conforms to {@link pentaho.type.spec.IList}.
  *
  * List values support an additional form of value specification, the **array form**:
- * an array of {@link pentaho.type.spec.UItem},
+ * an array of {@link pentaho.type.spec.UInstance},
  * each the specification of the corresponding element of the list.
  *
  * Take the following example of a number list in _object form_:
@@ -42,7 +42,7 @@
  * ```
  *
  * However, note that _array form_ can only be used if
- * the [inline type]{@link pentaho.type.spec.IItem#_} property can, in fact, be omitted.
+ * the [inline type]{@link pentaho.type.spec.IInstance#_} property can, in fact, be omitted.
  *
  * A list of complex values can be written in array form,
  * and its complex elements be written in array form,
@@ -61,5 +61,5 @@
  * null
  * ```
  *
- * @typedef {pentaho.type.spec.IList|Array.<pentaho.type.spec.UItem>|Nully} pentaho.type.spec.UList
+ * @typedef {pentaho.type.spec.IList|Array.<pentaho.type.spec.UInstance>|Nully} pentaho.type.spec.UList
  */

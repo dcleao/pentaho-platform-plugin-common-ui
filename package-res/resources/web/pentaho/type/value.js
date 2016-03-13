@@ -15,11 +15,11 @@
  */
 define([
   "module",
-  "./Item",
+  "./Instance",
   "./valueHelper",
   "../i18n!types",
   "../util/error"
-], function(module, Item, valueHelper, bundle, error) {
+], function(module, Instance, valueHelper, bundle, error) {
 
   "use strict";
 
@@ -32,14 +32,14 @@ define([
     var Refinement = null;
 
     /**
-     * @name pentaho.type.Value.Meta
+     * @name pentaho.type.Value.Type
      * @class
-     * @extends pentaho.type.Item.Meta
+     * @extends pentaho.type.Type
      * @implements pentaho.lang.ISpecifiable
      *
      * @classDesc The base type class of value types.</br>
-     * Value types can be singular or plural ({@link pentaho.type.Value.Meta#isList|isList}).</br>
-     * A Value type should not be instantiated if it is {@link pentaho.type.Value.Meta#isAbstract|abstract}.
+     * Value types can be singular or plural ({@link pentaho.type.Value.Type#isList|isList}).</br>
+     * A Value type should not be instantiated if it is {@link pentaho.type.Value.Type#isAbstract|abstract}.
      *
      * For more information see {@link pentaho.type.Value}.
      */
@@ -48,7 +48,7 @@ define([
      * @name pentaho.type.Value
      * @abstract
      * @class
-     * @extends pentaho.type.Item
+     * @extends pentaho.type.Instance
      * @implements pentaho.lang.IConfigurable
      * @implements pentaho.lang.ISpecifiable
      * @amd {pentaho.type.Factory<pentaho.type.Value>} pentaho/type/value
@@ -59,9 +59,9 @@ define([
      *
      * @description Creates a value instance.
      * @constructor
-     * @param {pentaho.type.spec.UItem} [spec] A value specification.
+     * @param {pentaho.type.spec.UInstance} [spec] A value specification.
      */
-    var Value = Item.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
+    var Value = Instance.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
       /**
        * Gets the key of the value.
@@ -72,11 +72,11 @@ define([
        *
        * If two values have the same concrete type and their
        * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Meta#areEqual}
+       * {@link pentaho.type.Value.Type#areEqual}
        * returns `true` when given the two values.
        * The opposite should be true as well.
        * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Meta#areEqual} should return `false`.
+       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default implementation returns the result of calling `toString()`.
        *
@@ -101,7 +101,7 @@ define([
        * The given value **must** be of the same concrete type (or the result is undefined).
        *
        * To test equality for any two arbitrary values,
-       * in a robust way, use {@link pentaho.type.Value.Meta#areEqual}.
+       * in a robust way, use {@link pentaho.type.Value.Type#areEqual}.
        *
        * If two values are equal, they must have an equal {@link pentaho.type.Value#key}.
        * Otherwise, if they are different, they must have a different `key`.
@@ -139,7 +139,7 @@ define([
        * @see pentaho.type.Value#isValid
        */
       validate: function() {
-        return valueHelper.normalizeErrors(this.meta._validate(this));
+        return valueHelper.normalizeErrors(this.type._validate(this));
       },
       //endregion
 
@@ -174,7 +174,7 @@ define([
        *
        * This method creates a new {@link pentaho.type.SpecificationScope} for describing
        * this value, and others it references,
-       * and then delegates the actual work to {@link pentaho.type.Item#toSpecInner}.
+       * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInner}.
        *
        * @name pentaho.type.Value#toSpec
        * @method
@@ -195,19 +195,19 @@ define([
        *
        * The array form of a complex value cannot be used when its type must be inlined.
        *
-       * @return {!pentaho.type.spec.UItem} A specification of this value.
+       * @return {!pentaho.type.spec.UInstance} A specification of this value.
        */
       //endregion
 
       /**
        * Gets the type of this instance.
        *
-       * @type pentaho.type.Value.Meta
+       * @type pentaho.type.Value.Type
        * @readonly
        */
-      meta: /** @lends pentaho.type.Value.Meta# */{
-        // Note: constructor/_init only called on sub-classes of Value.Meta,
-        // and not on Value.Meta itself.
+      type: /** @lends pentaho.type.Value.Type# */{
+        // Note: constructor/_init only called on sub-classes of Value.Type,
+        // and not on Value.Type itself.
         _init: function() {
           this.base.apply(this, arguments);
 
@@ -226,7 +226,7 @@ define([
          * The `Value` class return `undefined`.
          *
          * @name isList
-         * @memberOf pentaho.type.Value.Meta#
+         * @memberOf pentaho.type.Value.Type#
          * @type boolean
          * @readOnly
          */
@@ -240,7 +240,7 @@ define([
          * The `Value` class return `undefined`.
          *
          * @name isRefinement
-         * @memberOf pentaho.type.Value.Meta#
+         * @memberOf pentaho.type.Value.Type#
          * @type boolean
          * @readOnly
          */
@@ -266,8 +266,8 @@ define([
         // @type boolean
         // -> boolean, Optional(false)
 
-        // Default value is for `Value.Meta` only.
-        // @see Value.Meta#constructor.
+        // Default value is for `Value.Type` only.
+        // @see Value.Type#constructor.
         _isAbstract: true,
 
         /**
@@ -298,12 +298,12 @@ define([
          * If the specified instance specification does not contain an inline type reference
          * the type is assumed to be this type.
          *
-         * @see pentaho.type.Item.Meta#isSubtypeOf
+         * @see pentaho.type.Type#isSubtypeOf
          * @see pentaho.type.Context#get
          *
          * @example
          * <caption>
-         *   Create a complex instance from a specification that carries inline type metadata.
+         *   Create a complex instance from a specification that contains the type inline.
          * </caption>
          *
          * require(["pentaho/type/Context"], function(Context) {
@@ -311,7 +311,7 @@ define([
          *   var context = new Context({container: "data-explorer-101"});
          *   var Value   = context.get("value");
          *
-         *   var product = Value.meta.create({
+         *   var product = Value.type.create({
          *         _: {
          *           props: ["id", "name", {name: "price", type: "number"}]
          *         },
@@ -327,7 +327,7 @@ define([
          *
          * @example
          * <caption>
-         *   Create a list instance from a specification that carries inline type metadata.
+         *   Create a list instance from a specification that contains the type inline.
          * </caption>
          *
          * require(["pentaho/type/Context"], function(Context) {
@@ -335,7 +335,7 @@ define([
          *   var context = new Context({container: "data-explorer-101"});
          *   var Value   = context.get("value");
          *
-         *   var productList = Value.meta.create({
+         *   var productList = Value.type.create({
          *         _: [{
          *           props: ["id", "name", {name: "price", type: "number"}]
          *         }],
@@ -352,7 +352,7 @@ define([
          *
          * @example
          * <caption>
-         *   Create an instance from a specification that <b>does not</b> carry inline type metadata.
+         *   Create an instance from a specification that <b>does not</b> contain the type inline.
          * </caption>
          *
          * require(["pentaho/type/Context"], function(Context) {
@@ -367,7 +367,7 @@ define([
          *         }]);
          *
          *   // Provide the default type, in case the instance spec doesn't provide one.
-         *   var productList = ProductList.meta.create(
+         *   var productList = ProductList.type.create(
          *          [
          *            {id: "mpma", name: "Principia Mathematica", price: 1200},
          *            {id: "flot", name: "The Laws of Thought",   price:  500}
@@ -377,7 +377,7 @@ define([
          *
          * });
          *
-         * @param {pentaho.type.spec.UItem} [instSpec] An instance specification.
+         * @param {pentaho.type.spec.UInstance} [instSpec] An instance specification.
          *
          * @return {!pentaho.type.Value} The created instance.
          *
@@ -385,22 +385,22 @@ define([
          * that refers to a type that is not a subtype of this one.
          *
          * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-         * is an [abstract]{@link pentaho.type.Value.Meta#isAbstract} type.
+         * is an [abstract]{@link pentaho.type.Value.Type#isAbstract} type.
          */
         create: function(instSpec) {
           // All value types have own constructors.
           // So it is safe to override the base method with a constructor-type only version.
 
-          var Type = this._getTypeOfInstSpec(instSpec);
+          var Instance = this._getTypeOfInstSpec(instSpec);
 
-          return new Type(instSpec);
+          return new Instance(instSpec);
         },
 
         /**
          * Determines the instance constructor that should be used to build the specified
          * instance specification.
          *
-         * @param {pentaho.type.spec.UItem} instSpec An instance specification.
+         * @param {pentaho.type.spec.UInstance} instSpec An instance specification.
          *
          * @return {!Class.<pentaho.type.Value>} The instance constructor.
          *
@@ -417,14 +417,14 @@ define([
          * @ignore
          */
         _getTypeOfInstSpec: function(instSpec) {
-          var Type, typeSpec;
+          var Instance, typeSpec;
 
-          // If it is a plain Object, does it have the inline metadata property, "_"?
+          // If it is a plain Object, does it have the inline type property, "_"?
           if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
 
-            Type = this.context.get(typeSpec);
+            Instance = this.context.get(typeSpec);
 
-            if(this._assertSubtype(Type.meta).isAbstract) Type.meta._throwAbstractType();
+            if(this._assertSubtype(Instance.type).isAbstract) Instance.type._throwAbstractType();
 
             // ugly but "efficient"
             delete instSpec._;
@@ -432,31 +432,31 @@ define([
           } else {
             if(this.isAbstract) this._throwAbstractType();
 
-            Type = this.mesa.constructor;
+            Instance = this.instance.constructor;
           }
 
-          return Type;
+          return Instance;
         },
 
         /**
          * Asserts that a given type is a subtype of this type.
          *
-         * @param {!pentaho.type.Value.Meta} typeMeta The subtype to assert.
+         * @param {!pentaho.type.Value.Type} subtype The subtype to assert.
          *
-         * @return {!pentaho.type.Value.Meta} The subtype `typeMeta`.
+         * @return {!pentaho.type.Value.Type} The subtype `subtype`.
          *
-         * @throws {pentaho.lang.OperationInvalidError} When `typeMeta` is not a subtype of this.
+         * @throws {pentaho.lang.OperationInvalidError} When `subtype` is not a subtype of this.
          *
          * @private
          * @ignore
          */
-        _assertSubtype: function(typeMeta) {
-          if(!typeMeta.isSubtypeOf(this)) {
+        _assertSubtype: function(subtype) {
+          if(!subtype.isSubtypeOf(this)) {
             throw error.operInvalid(
                 bundle.format(bundle.structured.errors.value.notOfExpectedBaseType, [this._getErrorLabel()]));
           }
 
-          return typeMeta;
+          return subtype;
         },
 
         /**
@@ -510,11 +510,11 @@ define([
         /**
          * Determines if a value is a **valid instance** of this type.
          *
-         * This method calls [validate]{@link pentaho.type.Value.Meta#validate} and
+         * This method calls [validate]{@link pentaho.type.Value.Type#validate} and
          * returns a boolean value indicating if it returned no errors.
          *
          * The `isValid` method can be seen as a stronger version
-         * of {@link pentaho.type.Value.Meta#is}.
+         * of {@link pentaho.type.Value.Type#is}.
          *
          * @param {any} value The value to validate.
          *
@@ -529,18 +529,18 @@ define([
          *
          * Validation of `value` proceeds as follows:
          * 1. If it is {@link Nully}, an error is returned
-         * 2. If it does not satisfy [is]{@link pentaho.type.Value.Meta#is}, an error is returned
-         * 3. Validation is delegated to [validateInstance]{@link pentaho.type.Value.Meta#validateInstance}.
+         * 2. If it does not satisfy [is]{@link pentaho.type.Value.Type#is}, an error is returned
+         * 3. Validation is delegated to [validateInstance]{@link pentaho.type.Value.Type#validateInstance}.
          *
          * Use this method when you know nothing about a value.
          * Otherwise, if you know that a value is an instance of this type,
-         * you can call [validateInstance]{@link pentaho.type.Value.Meta#validateInstance} instead.
+         * you can call [validateInstance]{@link pentaho.type.Value.Type#validateInstance} instead.
          *
          * @param {?any} value The value to validate.
          *
          * @return {?Array.<!Error>} A non-empty array of `Error` or `null`.
          *
-         * @see pentaho.type.Value.Meta#isValid
+         * @see pentaho.type.Value.Type#isValid
          */
         validate: function(value) {
           // 1. Is of type
@@ -561,7 +561,7 @@ define([
          *
          * Thus, `this.is(value)` must be true.
          *
-         * This method ensures that the value's actual type, `value.meta`,
+         * This method ensures that the value's actual type, `value.type`,
          * is called to validate it,
          * whatever the relation that this type has with the actual type.
          *
@@ -570,7 +570,7 @@ define([
          * This is the case with [refinement types]{@link pentaho.type.Refinement}.
          *
          * The default implementation calls `value.validate()`
-         * (which in turns calls [_validate]{@link pentaho.type.Value.Meta#_validate}).
+         * (which in turns calls [_validate]{@link pentaho.type.Value.Type#_validate}).
          *
          * @param {!pentaho.type.Value} value The value to validate.
          *
@@ -579,8 +579,8 @@ define([
          * @overridable
          *
          * @see pentaho.type.Value#validate
-         * @see pentaho.type.Value.Meta#validate
-         * @see pentaho.type.Value.Meta#_validate
+         * @see pentaho.type.Value.Type#validate
+         * @see pentaho.type.Value.Type#_validate
          */
         validateInstance: function(value) {
           return value.validate();
@@ -603,8 +603,8 @@ define([
          * @protected
          * @overridable
          *
-         * @see pentaho.type.Value.Meta#validate
-         * @see pentaho.type.Value.Meta#validateInstance
+         * @see pentaho.type.Value.Type#validate
+         * @see pentaho.type.Value.Type#validateInstance
          */
         _validate: function(value) {
         }
@@ -615,16 +615,16 @@ define([
       /**
        * Creates a refinement type that refines this one.
        *
-       * @see pentaho.type.Refinement.Meta#facets
-       * @see pentaho.type.Refinement.Meta#of
+       * @see pentaho.type.Refinement.Type#facets
+       * @see pentaho.type.Refinement.Type#of
        *
        * @param {string} [name] A name of the refinement type used for debugging purposes.
        * @param {Object} [instSpec] The refined type instance specification.
-       * The available _meta_ attributes are those defined by any specified refinement facet classes.
+       * The available _type_ attributes are those defined by any specified refinement facet classes.
        *
        * @return {Class.<pentaho.type.Refinement>} The refinement type's instance class.
        *
-       * @throws {pentaho.lang.ArgumentInvalidError} When `instSpec` contains any properties other than `meta`.
+       * @throws {pentaho.lang.ArgumentInvalidError} When `instSpec` contains any properties other than `type`.
        * The instance interface of refinement types cannot be specified.
        */
       refine: function(name, instSpec) {
@@ -636,12 +636,12 @@ define([
 
         // Ugly but effective.
         if(!instSpec) {
-          instSpec = {meta: {}};
-        } else if(!instSpec.meta) {
-          instSpec.meta = {};
+          instSpec = {type: {}};
+        } else if(!instSpec.type) {
+          instSpec.type = {};
         }
 
-        instSpec.meta.of = this.meta;
+        instSpec.type.of = this.type;
 
         // Resolved on first use to break cyclic dependency.
         if(!Refinement) {
@@ -654,7 +654,7 @@ define([
     /*keyArgs:*/{
       isRoot: true
     }).implement({
-      meta: bundle.structured.value
+      type: bundle.structured.value
     });
 
     return Value;

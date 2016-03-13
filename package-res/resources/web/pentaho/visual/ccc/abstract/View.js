@@ -280,7 +280,7 @@ define([
           .forEach(function(roleName) {
             if(this[roleName]) {
               var value = model.getv(roleName);
-              visualMap[roleName] = model.meta.get(roleName).isList
+              visualMap[roleName] = model.type.get(roleName).isList
                   ? value.toArray(function(elem) { return elem.value; })
                   : [value];
             }

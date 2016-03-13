@@ -27,7 +27,7 @@
  * @name pentaho.type.spec.ISimple
  *
  * @interface
- * @extends pentaho.type.spec.IItem
+ * @extends pentaho.type.spec.IInstance
  *
  * @see pentaho.type.spec.USimple
  */
