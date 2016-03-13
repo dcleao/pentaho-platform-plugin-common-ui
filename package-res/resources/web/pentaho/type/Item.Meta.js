@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 define([
+  "./SpecificationScope",
   "../i18n!types",
   "../lang/Base",
   "../lang/_AnnotatableLinked",
@@ -21,11 +22,12 @@ define([
   "../util/arg",
   "../util/object",
   "../util/promise"
-], function(bundle, Base, AnnotatableLinked, error, arg, O, promiseUtil) {
+], function(SpecificationScope, bundle, Base, AnnotatableLinked, error, arg, O, promiseUtil) {
   "use strict";
 
   // Unique item class id exposed through Item.Meta#uid and used by Context instances.
   var _nextUid = 1,
+      _extractShortId = /^pentaho\/type\/(\w+)$/i,
       _itemMeta = null,
       O_isProtoOf = Object.prototype.isPrototypeOf;
 
@@ -33,44 +35,42 @@ define([
    * @name pentaho.type.Item.Meta
    * @class
    *
-   * @classDesc The base **type metadata class** of types in the Pentaho Client Metadata Model.
+   * @classDesc The base **type metadata class** of the types of the Pentaho Client Metadata Model.
    *
-   * For more information see {@link pentaho.type.Item}.
+   * For additional information, see the class of item instances, {@link pentaho.type.Item}.
    *
    * @description _Initializes_ the type's singleton metadata object.
-   * @param {Object} instSpec The specification of this type.
+   * @param {Object} spec The specification of this type.
    * @param {!Object} keyArgs Keyword arguments.
-   * @param {!pentaho.type.Item} keyArgs.mesa _Prototype_ of the class used for representing the data of this type.
-   * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
+   * @param {!pentaho.type.Item} keyArgs.mesa The _prototype_ of the class used to represent the instances of this type.
+   * @param {boolean} [keyArgs.isRoot=false] Indicates if the type is a _root_ type.
    *
    */
-  var ItemMeta = Base.extend("pentaho.type.Item.Meta",
-      /** @lends pentaho.type.Item.Meta# */{
+  var ItemMeta = Base.extend("pentaho.type.Item.Meta", /** @lends pentaho.type.Item.Meta# */{
 
-    constructor: function(instSpec, keyArgs) {
-      if(!instSpec) instSpec = {};
+    constructor: function(spec, keyArgs) {
+      if(!spec) spec = {};
 
-      this._init(instSpec, keyArgs);
+      this._init(spec, keyArgs);
 
-      this.extend(instSpec);
+      this.extend(spec);
 
-      this._postInit(instSpec, keyArgs);
+      this._postInit(spec, keyArgs);
     },
 
     /**
-     * Performs initialization tasks that take place before the instance is
-     * extended with its spec.
+     * Performs initialization tasks that take place before the instance is extended with its specification.
      *
-     * This method is typically overridden to block inheritance of attributes.
+     * This method is typically overridden to block the inheritance of certain attributes.
      *
-     * @param {Object} instSpec The specification of this type.
+     * @param {!Object} spec The specification of this type.
      * @param {!Object} keyArgs Keyword arguments.
-     * @param {!pentaho.type.Item} keyArgs.mesa _Prototype_ of the class used for representing the data of this type.
+     * @param {!pentaho.type.Item} keyArgs.mesa The _prototype_ of the class used to represent instances of this type.
      * @param {boolean} [keyArgs.isRoot=false] If `true`, creates a _root_ type.
      * @protected
      * @overridable
      */
-    _init: function(instSpec, keyArgs) {
+    _init: function(spec, keyArgs) {
 
       O.setConst(this, "uid", _nextUid++);
 
@@ -84,27 +84,28 @@ define([
 
       // Block inheritance, with default values
       this._id         = null;
+      this._shortId    = undefined;
       this._styleClass = null;
     },
 
     /**
-     * Performs initialization tasks that take place after the instance is
-     * extended with its spec.
+     * Performs initialization tasks that take place after the instance is extended with its specification.
      *
      * This method is typically overridden to validate the values of the attributes.
+     *
      * The default implementation does nothing.
      *
-     * @param {Object} instSpec The specification of this type.
-     * @param {Object} keyArgs Keyword arguments.
+     * @param {!Object} spec The specification of this type.
+     * @param {!Object} keyArgs Keyword arguments.
      * @protected
      * @overridable
      */
-    _postInit: function(instSpec, keyArgs) {
+    _postInit: function(spec, keyArgs) {
     },
 
     //region uid property
     /**
-     * Gets the unique id of this type
+     * Gets the unique id of this type.
      *
      * Unique type ids are auto-generated, in each session.
      *
@@ -241,8 +242,40 @@ define([
     },
 
     set id(value) {
+      value = nonEmptyString(value);
+
+      // Is it a temporary id? If so, ignore it.
+      if(value && value[0] === "_") value = null;
+
       // Can only be set once or throws.
-      O.setConst(this, "_id", nonEmptyString(value));
+      O.setConst(this, "_id", value);
+    },
+
+    /**
+     * Gets the short id of this type.
+     *
+     * When a type is one of the standard types,
+     * and, thus, it is a direct sub-module of the `pentaho/type` module,
+     * its short id is its _local module id_,
+     * like `"string"` or `"boolean"`.
+     *
+     * Otherwise, the short id is equal to the id.
+     *
+     * @type {?nonEmptyString}
+     * @readOnly
+     * @see pentaho.type.Item.Meta#id
+     */
+    get shortId() {
+      var shortId = this._shortId, id, m;
+      if(shortId === undefined) {
+        if((id = this._id) && (m = _extractShortId.exec(id))) {
+          shortId = m[1];
+        } else {
+          shortId = null;
+        }
+      }
+
+      return shortId;
     },
 
     _buildRelativeId: function(value) {
@@ -261,6 +294,7 @@ define([
         var id = this.id;
         value = (id ? (id + "/") : "") + value;
       }
+
       return value;
     },
     //endregion
@@ -281,18 +315,20 @@ define([
      * or to a {@link Nully} value causes the attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where the label is `null`.
      *
-     * @type {String | any}
+     * @type {?nonEmptyString}
      */
     get label() {
       return this._label;
     },
 
     set label(value) {
+      value = nonEmptyString(value);
+
       // null or "" -> undefined conversion
-      if(value == null || value === "") {
+      if(value == null) {
         this._resetLabel();
       } else {
-        this._label = String(value);
+        this._label = value;
       }
     },
 
@@ -435,8 +471,8 @@ define([
     /**
      * Gets or sets the `isBrowsable` attribute of this type.
      *
-     * Browsable items are exposed to the end user.
-     * Set this attribute to `false` to prevent exposing the item in a user interface.
+     * Browsable types are exposed to the end user.
+     * Set this attribute to `false` to prevent exposing the type in a user interface.
      *
      * Setting to a {@link Nully} value causes this attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where the attribute is `true`.
@@ -510,9 +546,14 @@ define([
     /**
      * Gets or sets the CSS class associated with this type.
      *
-     * This attribute is typically used to associate an icon with this item type.
+     * This attribute is typically used to associate an icon with an item type.
      *
-     * @type {nonEmptyString}
+     * Attempting to set to a non-string value type implicitly
+     * converts the value to a string before assignment.
+     *
+     * An empty string or `undefined` value is interpreted as `null`.
+     *
+     * @type {?nonEmptyString}
      */
     get styleClass() {
       return this._styleClass;
@@ -542,12 +583,13 @@ define([
 
     /**
      * Gets or sets the ordinal associated with this type.
+     *
      * The ordinal is used to disambiguate the order with which an item is shown in a user interface.
      *
      * Setting to a {@link Nully} value causes this attribute to use the inherited value,
      * except for the root type _Item_ (which has no ancestor), where the attribute is `0`.
      *
-     * @type {integer}
+     * @type {number}
      * @see pentaho.type.Item.Meta#isBrowsable
      * @see pentaho.type.Item.Meta#category
      */
@@ -582,25 +624,28 @@ define([
    /**
     * Gets or sets the default view for items of this type.
     *
-    *
-    * Setting to a string defines the id of the view's module.
-    * If the string starts with `/`, `xyz:` or ends with `.js`,
+    * When a string,
+    * it is the id of the view's AMD module.
+    * If the string starts with `/` or `xyz:`, or ends with `.js`,
     * the id is considered to be absolute,
-    * otherwise it is considered to be relative to the type's id folder.
-
+    * otherwise,
+    * it is relative to this type's id folder, and converted to an absolute id.
+    *
     * Setting to `undefined` causes the view to be inherited from the ancestor type,
     * except for the root type _Item_ (which has no ancestor), where the attribute is `null`.
     *
     * Setting to a _falsy_ value (like `null` or an empty string),
     * clears the value of the attribute and sets it to `null`, ignoring any inherited value.
     *
-    * Attempting to set to some other value is interpreted as the intention to set
-    * the class or factory of the view.
-    * It will normally be a function, but this is not ensured.
+    * When a function,
+    * it is the class or factory of the view.
     *
-    * @type string | function | object
-    * @readOnly
     * @see pentaho.type.Item.Meta#viewClass
+    *
+    * @type {string | function}
+
+    * @throws {pentaho.lang.ArgumentInvalidTypeError} When the set value is not
+    * a string, a function or {@link Nully}.
     */
     get view() {
       return this._view && this._view.value;
@@ -616,11 +661,13 @@ define([
         if(!this._view || this._view.value !== value) {
           this._view = {value: value, promise: null};
         }
-      } else {
+      } else if(typeof value === "function") {
         // Assume it is the View class itself, already fulfilled.
         if(!this._view || this._view.value !== value) {
           this._view = {value: value, promise: Promise.resolve(value)};
         }
+      } else {
+        throw error.argInvalidType("view", ["nully", "string", "function"], typeof value);
       }
     },
 
@@ -631,15 +678,20 @@ define([
     },
 
     /**
-     * Gets a promise for the default view class, or `null` if no view is defined.
+     * Gets a promise for the default view class or factory, if any, or `null`.
      *
-     * @type ?Promise.<!(function|object)>
+     * A default view exists if property {@link pentaho.type.Item.Meta#view}
+     * has a non-null value.
+     *
+     * @type Promise.<?function>
      * @readOnly
      * @see pentaho.type.Item.Meta#view
      */
     get viewClass() {
       var view = this._view;
-      return view && (view.promise || (view.promise = promiseUtil.require(view.value)));
+      return view
+          ? (view.promise || (view.promise = promiseUtil.require(view.value)))
+          : Promise.resolve(null);
     },
     //endregion
 
@@ -652,18 +704,18 @@ define([
      * Do not use this method directly.
      * Use {@link pentaho.type.Item#extendProto} instead.
      *
-     * @param {object} instSpec The type specification.
+     * @param {object} spec The type specification.
      * @param {object} keyArgs Keyword arguments.
      * @param {pentaho.type.Item} keyArgs.mesa The instances prototype of the type.
      *
      * @return {pentaho.type.Item.Meta} The new type.
      * @ignore
      */
-    _extendProto: function(instSpec, keyArgs) {
+    _extendProto: function(spec, keyArgs) {
       var subMeta = Object.create(this);
 
       // NOTE: `subMeta.constructor` is still the "base" constructor.
-      subMeta.constructor(instSpec, keyArgs);
+      subMeta.constructor(spec, keyArgs);
 
       return subMeta;
     },
@@ -726,14 +778,96 @@ define([
     },
 
     //region serialization
+    /**
+     * Creates a top-level specification that describes this type.
+     *
+     * This method creates a new {@link pentaho.type.SpecificationScope} for describing
+     * this type, and any other instances and types it references,
+     * and then delegates the actual work to {@link pentaho.type.Item.Meta#toSpecInner}.
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.IItemMeta} A specification of this type.
+     */
     toSpec: function(keyArgs) {
-      return this._toSpec(keyArgs);
+      if(!keyArgs) keyArgs = {};
+
+      var scope = new SpecificationScope();
+      var spec = this.toSpecInner(scope, keyArgs);
+
+      scope.dispose();
+
+      return spec;
     },
-    _toSpec: function(keyArgs) {
-      return {};
+
+    /**
+     * Creates a specification that describes this type under a given scope.
+     *
+     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+     * @param {!Object} keyArgs - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!any} A specification of this instance.
+     *
+     * @abstract
+     *
+     * @see pentaho.type.Item#toSpec
+     */
+    toSpecInner: function(scope, keyArgs) {
+      // The type's id or the temporary id in this scope.
+      var spec = {id: this.shortId || scope.add(this)};
+
+      var base = this.ancestor;
+      if(base) scope.base = base;
+
+      // label, description, category, ...
+
+      return spec;
+    },
+
+    // "list" | "[element]" | ["element"],
+    // ["string"] | [] |  "[string]"
+
+    /**
+     * Returns a _reference_ to this type.
+     *
+     * This method returns a reference to this type that is appropriate
+     * to be the value of an [inline type]{@link pentaho.type.spec.IItem#_} property
+     * that is included on a specification of an instance of this type.
+     *
+     * When a type is not anonymous, the cheapest reference,
+     * the [id]{@link pentaho.type.Item.Meta#id}, is returned.
+     *
+     * For anonymous types, a temporary, serialization-only id is generated.
+     * In the first occurrence in the given scope,
+     * that id is returned, within a full specification of the type,
+     * obtained by calling [toSpecInner]{@link pentaho.type.Item.Meta#toSpecInner}.
+     * In following occurrences, only the previously used temporary id is returned.
+     *
+     * Some standard types have a special reference syntax,
+     * e.g. [List.Meta#toReference]{@link pentaho.type.List.Meta#toReference}.
+     *
+     * @see pentaho.type.Item.Meta#toSpec
+     *
+     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+     * @param {!Object} keyArgs - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
+     */
+    toReference: function(scope, keyArgs) {
+      return this._id || scope.getIdOf(this) || this.toSpecInner(scope, keyArgs);
     }
     //endregion
  }, /** @lends pentaho.type.Item.Meta */{
+
     //@override
     /**
      * See Base.js

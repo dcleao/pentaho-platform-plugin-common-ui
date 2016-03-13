@@ -33,7 +33,7 @@
  * @name pentaho.type.spec.IList
  *
  * @interface
- * @extends pentaho.type.spec.IValue
+ * @extends pentaho.type.spec.IItem
  *
  * @see pentaho.type.spec.UList
  */
@@ -43,5 +43,5 @@
  *
  * @name d
  * @memberOf pentaho.type.spec.IList#
- * @type {Array.<!pentaho.type.spec.UValue>}
+ * @type {Array.<!pentaho.type.spec.UItem>}
  */

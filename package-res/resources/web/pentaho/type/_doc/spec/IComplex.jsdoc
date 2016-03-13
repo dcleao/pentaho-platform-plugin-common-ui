@@ -31,7 +31,7 @@
  * ```
  *
  * To include the type of the instance,
- * the special [inline type]{@link pentaho.type.spec.IValue#_} property is used:
+ * the special [inline type]{@link pentaho.type.spec.IItem#_} property is used:
  *
  * ```js
  * {
@@ -42,13 +42,13 @@
  * ```
  *
  * Apart from the special inline type property,
- * the _object form_ is of type `Object.<string, pentaho.type.spec.UValue>`.
+ * the _object form_ is of type `Object.<string, pentaho.type.spec.UItem>`.
  *
  * @name pentaho.type.spec.IComplex
  *
  * @interface
- * @extends pentaho.type.spec.IValue
+ * @extends pentaho.type.spec.IItem
  *
  * @see pentaho.type.spec.UComplex
- * @see pentaho.type.spec.UValue
+ * @see pentaho.type.spec.UItem
  */

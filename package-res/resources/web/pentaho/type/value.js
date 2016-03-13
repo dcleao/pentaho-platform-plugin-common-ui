@@ -16,11 +16,10 @@
 define([
   "module",
   "./Item",
-  "./SpecificationScope",
   "./valueHelper",
   "../i18n!types",
   "../util/error"
-], function(module, Item, SpecificationScope, valueHelper, bundle, error) {
+], function(module, Item, valueHelper, bundle, error) {
 
   "use strict";
 
@@ -60,7 +59,7 @@ define([
      *
      * @description Creates a value instance.
      * @constructor
-     * @param {pentaho.type.spec.UValue} [spec] A value specification.
+     * @param {pentaho.type.spec.UItem} [spec] A value specification.
      */
     var Value = Item.extend("pentaho.type.Value", /** @lends pentaho.type.Value# */{
 
@@ -173,19 +172,20 @@ define([
       /**
        * Creates a top-level specification that describes this value.
        *
-       * This method creates a new {@link pentaho.type.SpecificationScope} for describing this value
-       * and delegates the actual work to {@link pentaho.type.Value#toSpecInner}.
+       * This method creates a new {@link pentaho.type.SpecificationScope} for describing
+       * this value, and others it references,
+       * and then delegates the actual work to {@link pentaho.type.Item#toSpecInner}.
        *
-       * @param {Object} [keyArgs] Keyword arguments.
-       * Passed to every nested value and type whose `toSpec` method is called.
+       * @name pentaho.type.Value#toSpec
+       * @method
        *
-       * Please see the documentation of `Value` subclasses for information on additional supported arguments.
+       * @param {Object} [keyArgs] - The keyword arguments object.
+       * Passed to every value and type serialized within this scope.
+       *
+       * Please see the documentation of value subclasses for information on additional, supported keyword arguments.
        *
        * @param {boolean} [keyArgs.omitFormatted=false] - Omits the formatted value
        * on [Simple]{@link pentaho.type.Simple} values' specifications.
-       *
-       * @param {boolean} [keyArgs.omitRootType=false] - Omits the inline type property, `_`,
-       * on the root (`this`) value specification.
        *
        * @param {boolean} [keyArgs.includeDefaults=false] - Includes the value of all properties of
        * [Complex]{@link pentaho.type.Complex} values, even when equal to their default values.
@@ -195,41 +195,8 @@ define([
        *
        * The array form of a complex value cannot be used when its type must be inlined.
        *
-       * @return {!pentaho.type.spec.UValue} A specification of this value.
+       * @return {!pentaho.type.spec.UItem} A specification of this value.
        */
-      toSpec: function(keyArgs) {
-        if(!keyArgs) keyArgs = {};
-
-        var scope = new SpecificationScope();
-        var requireType = !keyArgs.omitRootType;
-        var spec = this.toSpecInner(scope, requireType, keyArgs);
-
-        // Delete the id property of specs of anonymous types that occur only once.
-        scope.dispose();
-
-        return spec;
-      },
-
-      /**
-       * Creates a specification that describes this value under a given scope.
-       *
-       * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
-       * @param {boolean} requireType - Requires inlining the type of this value in the specification.
-       * @param {!Object} keyArgs - The keyword arguments object.
-       * Passed to every nested value whose `toSpec` method is called.
-       *
-       * For information on additional supported arguments,
-       * see the documentation of `Value` subclasses.
-       *
-       * @return {!pentaho.type.spec.UValue} A specification of this value.
-       *
-       * @abstract
-       *
-       * @see pentaho.type.Value#toSpec
-       */
-      toSpecInner: function(scope, requireType, keyArgs) {
-        throw error.notImplemented();
-      },
       //endregion
 
       /**
@@ -410,15 +377,15 @@ define([
          *
          * });
          *
-         * @param {pentaho.type.spec.UValue} [instSpec] A value instance specification.
+         * @param {pentaho.type.spec.UItem} [instSpec] An instance specification.
          *
          * @return {!pentaho.type.Value} The created instance.
          *
          * @throws {pentaho.lang.OperationInvalidError} When `instSpec` contains an inline type reference
-         * that refers to a type that is not a subtype of this type.
+         * that refers to a type that is not a subtype of this one.
          *
          * @throws {pentaho.lang.OperationInvalidError} When the determined type for the specified `instSpec`
-         * is not an [abstract]{@link pentaho.type.Value.Meta#isAbstract} type.
+         * is an [abstract]{@link pentaho.type.Value.Meta#isAbstract} type.
          */
         create: function(instSpec) {
           // All value types have own constructors.
@@ -433,7 +400,7 @@ define([
          * Determines the instance constructor that should be used to build the specified
          * instance specification.
          *
-         * @param {pentaho.type.spec.UValue} instSpec A value instance specification.
+         * @param {pentaho.type.spec.UItem} instSpec An instance specification.
          *
          * @return {!Class.<pentaho.type.Value>} The instance constructor.
          *
@@ -640,16 +607,6 @@ define([
          * @see pentaho.type.Value.Meta#validateInstance
          */
         _validate: function(value) {
-        },
-        //endregion
-
-        //region serialization
-        toSpec: function(keyArgs) {
-          var spec = this._toSpec(keyArgs);
-          return this.list ? [spec] : spec;
-        },
-        _toSpec: function(keyArgs) {
-          return {id: this.id};
         }
         //endregion
       }

@@ -15,18 +15,18 @@
  */
 
 /**
- * The `spec.IValue` interface describes a value instance in a generic, _object_ form.
+ * The `spec.IItem` interface describes a value instance in a generic, _object_ form.
  *
- * @name pentaho.type.spec.IValue
+ * @name pentaho.type.spec.IItem
  *
  * @interface
  *
- * @see pentaho.type.spec.UValue
+ * @see pentaho.type.spec.UItem
  */
 
 /**
  * An inline type reference of the value's type.
  * @name _
- * @memberOf pentaho.type.spec.IValue#
+ * @memberOf pentaho.type.spec.IItem#
  * @type {pentaho.type.spec.UTypeReference}
  */

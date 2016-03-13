@@ -15,10 +15,11 @@
  */
 define([
   "./Item.Meta",
+  "./SpecificationScope",
   "../lang/Base",
   "../util/error",
   "../util/object"
-], function(ItemMeta, Base, error, O) {
+], function(ItemMeta, SpecificationScope, Base, error, O) {
 
   "use strict";
 
@@ -115,6 +116,57 @@ define([
     set meta(config) {
       // Class.implement essentially just calls Class#extend.
       if(config) this.meta.extend(config);
+    },
+    //endregion
+
+    //region serialization
+    /**
+     * Creates a top-level specification that describes this instance.
+     *
+     * This method creates a new {@link pentaho.type.SpecificationScope} for describing
+     * this instance, and any other instances and types it references,
+     * and then delegates the actual work to {@link pentaho.type.Item#toSpecInner}.
+     *
+     * @param {Object} [keyArgs] - The keyword arguments object.
+     * Passed to every instance and type serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @param {boolean} [keyArgs.omitRootType=false] - Omits the inline type property, `_`,
+     * on the root (`this`) value specification.
+     *
+     * @return {!any} A specification of this instance.
+     */
+    toSpec: function(keyArgs) {
+      if(!keyArgs) keyArgs = {};
+
+      var scope = new SpecificationScope();
+      var requireType = !keyArgs.omitRootType;
+      var spec = this.toSpecInner(scope, requireType, keyArgs);
+
+      scope.dispose();
+
+      return spec;
+    },
+
+    /**
+     * Creates a specification that describes this instance under a given scope.
+     *
+     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+     * @param {boolean} requireType - Requires inlining the type of this instance in the specification.
+     * @param {!Object} keyArgs - The keyword arguments object.
+     * Passed to every instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {!any} A specification of this instance.
+     *
+     * @abstract
+     *
+     * @see pentaho.type.Item#toSpec
+     */
+    toSpecInner: function(scope, requireType, keyArgs) {
+      throw error.notImplemented();
     }
     //endregion
   }, /** @lends pentaho.type.Item */{

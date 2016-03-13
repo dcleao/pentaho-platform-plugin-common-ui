@@ -22,7 +22,7 @@
  *
  * ##### A _type id_ string
  *
- * A type's [id]{@link pentaho.type.Value.Meta#id},
+ * A type's [id]{@link pentaho.type.Item.Meta#id},
  * that must the id of a defined module in the AMD module system.
  *
  * If the id does not contain any "/" character,
@@ -60,7 +60,7 @@
  * The functions that create instance constructors of value types,
  * each time they are called,
  * for a given [context]{@link pentaho.type.Context}.
- * They have the signature {@link pentaho.type.Factory.<pentaho.type.Value>}.
+ * They have the signature {@link pentaho.type.Factory.<pentaho.type.Item>}.
  *
  * The AMD module under the id of a value type _must_ return a type factory function.
  * A type factory can thus be obtained by requiring the AMD module that has the type's id:
@@ -75,7 +75,7 @@
  * ```
  *
  * In practice, a type factory _reference_ is seldom needed,
- * and is only used for getting the base type of a type being defined:
+ * and is only used for obtaining the base type of a type being defined:
  *
  * ```js
  * // In a file accessible through module id "my/derived/type"
@@ -103,7 +103,7 @@
  *
  * ##### A _type_ object
  *
- * A type's metadata singleton object,
+ * A type's singleton object,
  * like `Number.meta`, where _Number_ is [Number]{@link pentaho.type.Number}.
  *
  * Example:
@@ -123,16 +123,16 @@
  * });
  * ```
  *
- * ##### A _generic type metadata specification_ object
+ * ##### A _generic type specification_ object
  *
  * A plain {@link Object} specification used to generically
  * describe the metadata of a type.
- * Satisfies the interface [spec.ITypeMeta]{@link pentaho.type.spec.ITypeMeta}.
+ * Satisfies the interface [spec.IItemMeta]{@link pentaho.type.spec.IItemMeta}.
  *
  * The special `base` attribute allows specifying the base type
  * and defaults to `"pentaho/type/complex"`.
- * Additional supported attributes are determined and processed by
- * the base value type's {@link pentaho.type.Value.Meta.extend} method.
+ * Any additional attributes are determined and processed by
+ * each type's {@link pentaho.type.Item.Meta.extend} method.
  *
  * Example:
  *
@@ -200,12 +200,12 @@
  * });
  * ```
  *
- * @typedef {string|
- *           pentaho.type.Factory|
- *           pentaho.type.Value.Meta|
- *           Class.<pentaho.type.Value>|
+ * @typedef {nonEmptyString|
+ *           pentaho.type.Factory<pentaho.type.Item>|
+ *           pentaho.type.Item.Meta|
+ *           Class.<pentaho.type.Item>|
  *           Array.<pentaho.type.spec.UTypeReference>|
- *           pentaho.type.spec.ITypeMeta} pentaho.type.spec.UTypeReference
+ *           pentaho.type.spec.IItemMeta} pentaho.type.spec.UTypeReference
  */
 
 

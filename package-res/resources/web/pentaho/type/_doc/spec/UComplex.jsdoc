@@ -22,7 +22,7 @@
  * The _object form_ conforms to {@link pentaho.type.spec.IComplex}.
  *
  * Complex values support an additional form of value specification, the **array form**:
- * an array of {@link pentaho.type.spec.UValue},
+ * an array of {@link pentaho.type.spec.UItem},
  * each the specification of the value of one of a complex's properties,
  * in property definition order,
  * according to [Property.Meta#index]{@link pentaho.type.Property.Meta#index}.
@@ -44,7 +44,7 @@
  * ```
  *
  * However, note that _array form_ can only be used if
- * the [inline type]{@link pentaho.type.spec.IValue#_} property can, in fact, be omitted.
+ * the [inline type]{@link pentaho.type.spec.IItem#_} property can, in fact, be omitted.
  *
  * When a complex value is absent, it can be described with a {@link Nully} JavaScript value:
  *
@@ -52,5 +52,5 @@
  * null
  * ```
  *
- * @typedef {pentaho.type.spec.IComplex|Array.<pentaho.type.spec.UValue>|Nully} pentaho.type.spec.UComplex
+ * @typedef {pentaho.type.spec.IComplex|Array.<pentaho.type.spec.UItem>|Nully} pentaho.type.spec.UComplex
  */
