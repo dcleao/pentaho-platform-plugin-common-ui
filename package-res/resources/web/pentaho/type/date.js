@@ -45,7 +45,7 @@ define([
        * @readonly
        */
 
-      meta: {
+      type: {
         id: module.id,
 
         styleClass: "pentaho-type-date",
@@ -55,7 +55,7 @@ define([
         }
       }
     }).implement({
-      meta: bundle.structured["date"]
+      type: bundle.structured["date"]
     });
   };
 });

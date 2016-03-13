@@ -47,13 +47,13 @@ define([
        * @readonly
        */
 
-      meta: {
+      type: {
         id: module.id,
         styleClass: "pentaho-type-function",
         cast: castFun
       }
     }).implement({
-      meta: bundle.structured["object"]
+      type: bundle.structured["object"]
     });
   };
 

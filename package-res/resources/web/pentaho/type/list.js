@@ -33,9 +33,9 @@ define([
         _listNextUid = 1;
 
     /**
-     * @name pentaho.type.List.Meta
+     * @name pentaho.type.List.Type
      * @class
-     * @extends pentaho.type.Value.Meta
+     * @extends pentaho.type.Value.Type
      *
      * @classDesc The base type class of *plural*, list value types.
      *
@@ -131,11 +131,11 @@ define([
        *
        * If two values have the same concrete type and their
        * keys are equal, then it must also be the case that
-       * {@link pentaho.type.Value.Meta#areEqual}
+       * {@link pentaho.type.Value.Type#areEqual}
        * returns `true` when given the two values.
        * The opposite should be true as well.
        * If two values of the same concrete type have distinct keys,
-       * then {@link pentaho.type.Value.Meta#areEqual} should return `false`.
+       * then {@link pentaho.type.Value.Type#areEqual} should return `false`.
        *
        * The default list implementation, returns the value of the
        * list instance's {@link pentaho.type.List#uid}.
@@ -370,7 +370,7 @@ define([
        * @protected
        */
       _cast: function(valueSpec) {
-        return this.meta._elemType.to(valueSpec);
+        return this.type._elemType.to(valueSpec);
       },
 
       //region Change tracking
@@ -550,7 +550,7 @@ define([
       },
       //endregion
 
-      meta: /** @lends pentaho.type.List.Meta# */{
+      type: /** @lends pentaho.type.List.Type# */{
 
         _postInit: function() {
 
@@ -596,12 +596,12 @@ define([
         //endregion
 
         //region of
-        _elemType: Element.meta,
+        _elemType: Element.type,
 
         /**
          * Gets the type of the elements that this list can contain.
          *
-         * @type {pentaho.type.Element.Meta}
+         * @type {pentaho.type.Element.Type}
          * @readonly
          */
         get of() {
@@ -619,7 +619,7 @@ define([
           //  it cannot be validated that a set is ok as long as the set value does not change.
 
           var ElemInstance = this.context.get(value),
-              elemType = ElemInstance.meta,
+              elemType = ElemInstance.type,
               baseElemType = this._elemType;
 
           // Can't use O.setConst cause the configurable: false is inherited
@@ -650,7 +650,7 @@ define([
          * Thus, `this.is(value)` must be true.
          *
          * The default implementation validates each element against the
-         * list's [element type]{@link pentaho.type.List.Meta#of}
+         * list's [element type]{@link pentaho.type.List.Type#of}
          * and collects and returns any reported errors.
          *
          * @param {!pentaho.type.List} value The list value to validate.
@@ -660,8 +660,8 @@ define([
          * @protected
          * @overridable
          *
-         * @see pentaho.type.Value.Meta#validate
-         * @see pentaho.type.Value.Meta#validateInstance
+         * @see pentaho.type.Value.Type#validate
+         * @see pentaho.type.Value.Type#validateInstance
          */
         _validate: function(value) {
           var elemType = this.of;
@@ -673,7 +673,7 @@ define([
         //endregion
       }
     }).implement({
-      meta: bundle.structured["list"]
+      type: bundle.structured["list"]
     });
 
     return List;

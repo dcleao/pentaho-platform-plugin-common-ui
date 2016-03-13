@@ -15,18 +15,14 @@
  */
 
 /**
- * The `spec.IItem` interface describes a value instance in a generic, _object_ form.
+ * A `spec.UPropertyType` represents the union of JS types that can be used to
+ * define a property of a complex type.
  *
- * @name pentaho.type.spec.IItem
+ * When the value is a string,
+ * it's taken to represent a property
+ * whose {@link pentaho.type.spec.IPropertyType#name} is that string
+ * and
+ * whose {@link pentaho.type.spec.IPropertyType#type} is {@link pentaho.type.string}.
  *
- * @interface
- *
- * @see pentaho.type.spec.UItem
- */
-
-/**
- * An inline type reference of the value's type.
- * @name _
- * @memberOf pentaho.type.spec.IItem#
- * @type {pentaho.type.spec.UTypeReference}
+ * @typedef {string|pentaho.type.spec.IPropertyType} pentaho.type.spec.UPropertyType
  */

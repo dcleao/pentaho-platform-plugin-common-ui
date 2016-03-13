@@ -24,12 +24,12 @@ define([
   var context = new Context();
   var Complex = context.get("pentaho/type/complex");
 
-  describe("pentaho.type.Complex.Meta -", function() {
+  describe("pentaho.type.Complex.Type -", function() {
 
     describe("#validate(value) -", function() {
       it("should call each property's validate with the owner complex", function() {
         var Derived = Complex.extend({
-          meta: {
+          type: {
             props: [
               {name: "x", type: "number" },
               {name: "y", type: "string" },
@@ -40,15 +40,15 @@ define([
 
         var derived = new Derived({x: 5, y: "a", z: true});
 
-        var xPropType = derived.meta.get("x");
-        var yPropType = derived.meta.get("y");
-        var zPropType = derived.meta.get("z");
+        var xPropType = derived.type.get("x");
+        var yPropType = derived.type.get("y");
+        var zPropType = derived.type.get("z");
 
         spyOn(xPropType, "validate");
         spyOn(yPropType, "validate");
         spyOn(zPropType, "validate");
 
-        Derived.meta.validate(derived);
+        Derived.type.validate(derived);
 
         expect(xPropType.validate).toHaveBeenCalledWith(derived);
         expect(yPropType.validate).toHaveBeenCalledWith(derived);
@@ -57,5 +57,5 @@ define([
 
     });// end #validate(value)
 
-  }); // pentaho.type.Complex.Meta
+  }); // pentaho.type.Complex.Type
 });

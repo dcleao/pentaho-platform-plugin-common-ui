@@ -24,16 +24,16 @@ define([
   /*global describe:true, it:true, expect:true, beforeEach:true, jasmine:true*/
 
   var context = new Context(),
-      PropertyMeta = Property.Meta,
-      Boolean = context.get("pentaho/type/boolean"),
+      PropertyType = Property.Type,
+      PentahoBoolean = context.get("pentaho/type/boolean"),
       Complex = context.get("pentaho/type/complex"),
-      String  = context.get("pentaho/type/string"),
-      Number  = context.get("pentaho/type/number");
+      PentahoString = context.get("pentaho/type/string"),
+      PentahoNumber  = context.get("pentaho/type/number");
 
-  describe("pentaho.type.Property.Meta -", function() {
+  describe("pentaho.type.Property.Type -", function() {
 
     it("is a function", function() {
-      expect(typeof PropertyMeta).toBe("function");
+      expect(typeof PropertyType).toBe("function");
     });
 
     describe("define a root property -", function() {
@@ -44,14 +44,14 @@ define([
         return Property.extendProto(
             null,
             {
-              meta: typeSpec
+              type: typeSpec
             },
             {
-              declaringMeta: Derived.meta,
+              declaringType: Derived.type,
               index: 1,
-              mesa: Derived.prototype,
+              instance: Derived.prototype,
               isRoot: true
-            }).meta;
+            }).type;
       }
 
       beforeEach(function() {
@@ -65,12 +65,12 @@ define([
           propType = createRootPropType("fooBarGuru");
         });
 
-        it("should build a property meta instance", function() {
-          expect(propType instanceof PropertyMeta).toBe(true);
+        it("should build a property type object", function() {
+          expect(propType instanceof PropertyType).toBe(true);
         });
 
         it("should have `declaringType` equal to containing Complex type instance", function() {
-          expect(propType.declaringType).toBe(Derived.meta);
+          expect(propType.declaringType).toBe(Derived.type);
         });
 
         it("should have `root` equal to itself", function() {
@@ -91,7 +91,7 @@ define([
         });
 
         it("should have `type` string", function() {
-          expect(propType.type).toBe(String.meta);
+          expect(propType.type).toBe(PentahoString.type);
         });
 
         it("should have `isList=false`", function() {
@@ -111,12 +111,12 @@ define([
           propType = createRootPropType({name: "foo"});
         });
 
-        it("should build a property meta instance", function() {
-          expect(propType instanceof PropertyMeta).toBe(true);
+        it("should build a property type object", function() {
+          expect(propType instanceof PropertyType).toBe(true);
         });
 
         it("should have `declaringType` equal to containing Complex type instance", function() {
-          expect(propType.declaringType).toBe(Derived.meta);
+          expect(propType.declaringType).toBe(Derived.type);
         });
 
         it("should have `root` equal to itself", function() {
@@ -128,7 +128,7 @@ define([
         });
       }); // end when spec is an object
 
-      //region Item.Meta Attributes
+      //region Type Attributes
       // TODO: unify with value tests
       describe("label - ", function() {
         it("should default to the capitalization of `name`", function() {
@@ -373,15 +373,15 @@ define([
 
         it("should default to String", function() {
           var propType = createRootPropType({name: "foo"});
-          expect(propType.type).toBe(String.meta);
+          expect(propType.type).toBe(PentahoString.type);
         });
 
         it("should resolve the specified spec value", function() {
           var propType = createRootPropType({name: "foo1", type: "string"});
-          expect(propType.type).toBe(String.meta);
+          expect(propType.type).toBe(PentahoString.type);
 
           propType = createRootPropType({name: "foo2", type: "boolean"});
-          expect(propType.type).toBe(Boolean.meta);
+          expect(propType.type).toBe(PentahoBoolean.type);
         });
 
         it("should throw if the specified spec value is the id of an unloaded module", function() {
@@ -394,12 +394,12 @@ define([
         it("should respect change to any type", function() {
           var propType = createRootPropType({name: "foo1", type: "number"});
 
-          var Integer = Number.extend();
-          propType.type = Integer.meta;
-          expect(propType.type).toBe(Integer.meta);
+          var Integer = PentahoNumber.extend();
+          propType.type = Integer.type;
+          expect(propType.type).toBe(Integer.type);
 
-          propType.type = String.meta;
-          expect(propType.type).toBe(String.meta);
+          propType.type = PentahoString.type;
+          expect(propType.type).toBe(PentahoString.type);
         });
       }); // end type
 
@@ -438,7 +438,7 @@ define([
       //region Dynamic Attributes
       describe("isRequired - ", function() {
         it("should be immutable", function() {
-          var propType = Property.meta;
+          var propType = Property.type;
           var isRequired = propType.isRequired;
           propType.isRequired = true;
           expect(propType.isRequired).toBe(isRequired);
@@ -551,7 +551,7 @@ define([
 
       describe("countMin - ", function() {
         it("should be immutable", function() {
-          var propType = Property.meta;
+          var propType = Property.type;
           var countMin = propType.countMin;
           propType.countMin = 42;
           expect(propType.countMin).toBe(countMin);
@@ -647,7 +647,7 @@ define([
 
       describe("countMax - ", function() {
         it("should be immutable", function() {
-          var propType = Property.meta;
+          var propType = Property.type;
           var countMax = propType.countMax;
           propType.countMax = 42;
           expect(propType.countMax).toBe(countMax);
@@ -748,7 +748,7 @@ define([
 
       describe("isApplicable - ", function() {
         it("should be immutable", function() {
-          var propType = Property.meta;
+          var propType = Property.type;
           var isApplicable = propType.isApplicable;
           propType.isApplicable = false;
           expect(propType.isApplicable).toBe(isApplicable);
@@ -833,7 +833,7 @@ define([
 
       describe("isReadOnly - ", function() {
         it("should be immutable", function() {
-          var propType = Property.meta;
+          var propType = Property.type;
           var isReadOnly = propType.isReadOnly;
           propType.isReadOnly = true;
           expect(propType.isReadOnly).toBe(isReadOnly);
@@ -1019,74 +1019,74 @@ define([
 
     describe("override a property -", function() {
 
-      function extendProp(declaringMeta, propName, subPropMetaSpec) {
-        var basePropMeta = declaringMeta.ancestor.get(propName);
+      function extendProp(declaringType, propName, subPropTypeSpec) {
+        var basePropType = declaringType.ancestor.get(propName);
 
         return Property.extendProto(
-            basePropMeta.mesa, {
-              meta: subPropMetaSpec
+            basePropType.instance, {
+              type: subPropTypeSpec
             },
             {
-              declaringMeta: declaringMeta,
-              mesa: declaringMeta.mesa
-            }).meta;
+              declaringType: declaringType,
+              instance: declaringType.instance
+            }).type;
       }
 
       it("should throw if spec.name is not the name of the base property", function() {
         var Base = Complex.extend();
 
-        Base.meta.add({name: "baseStr"});
+        Base.type.add({name: "baseStr"});
 
         var Derived = Base.extend();
 
         expect(function() {
-          extendProp(Derived.meta, "baseStr", {name: "baseStr2"});
+          extendProp(Derived.type, "baseStr", {name: "baseStr2"});
         }).toThrow(errorMatch.argInvalid("name"));
       });
 
       describe("basic characteristics -", function() {
-        var propType, basePropMeta, Derived;
+        var propType, basePropType, Derived;
 
         beforeEach(function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           Derived = Base.extend();
 
-          basePropMeta = Base.meta.get("baseStr");
+          basePropType = Base.type.get("baseStr");
 
-          propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
         });
 
-        it("should be an instance of `PropertyMeta`", function() {
-          expect(propType instanceof PropertyMeta).toBe(true);
+        it("should be an instance of `PropertyType`", function() {
+          expect(propType instanceof PropertyType).toBe(true);
         });
 
         it("should have the overridden property as `ancestor`", function() {
-          expect(propType).not.toBe(basePropMeta);
-          expect(propType.ancestor).toBe(basePropMeta);
+          expect(propType).not.toBe(basePropType);
+          expect(propType.ancestor).toBe(basePropType);
         });
 
         it("should have `declaringType` equal to the derived class' instance", function() {
-          expect(propType.declaringType).toBe(Derived.meta);
+          expect(propType.declaringType).toBe(Derived.type);
         });
 
         it("should have `root` equal to the base property", function() {
-          expect(propType.root).toBe(basePropMeta);
+          expect(propType.root).toBe(basePropType);
         });
       });
 
-      //region Item.Meta attributes
+      //region Type attributes
       describe("label -", function() {
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", label: "FooABC"});
+          Base.type.add({name: "foo", label: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.label).toBe("FooABC");
         });
@@ -1094,11 +1094,11 @@ define([
         it("should respect the spec value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", label: "FooABC"});
+          Base.type.add({name: "foo", label: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", label: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", label: "XYZ"});
 
           expect(propType.label).toBe("XYZ");
         });
@@ -1106,11 +1106,11 @@ define([
         it("should respect a set value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", label: "ABC"});
+          Base.type.add({name: "foo", label: "ABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", label: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", label: "XYZ"});
 
           expect(propType.label).toBe("XYZ");
 
@@ -1123,11 +1123,11 @@ define([
           var Base = Complex.extend();
 
           var baseLabel = "ABC";
-          Base.meta.add({name: "foo", label: baseLabel});
+          Base.type.add({name: "foo", label: baseLabel});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", label: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", label: "XYZ"});
 
           expect(propType.label).toBe("XYZ");
           propType.label = null;
@@ -1153,11 +1153,11 @@ define([
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", description: "FooABC"});
+          Base.type.add({name: "foo", description: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.description).toBe("FooABC");
         });
@@ -1165,11 +1165,11 @@ define([
         it("should inherit the base value if spec is undefined", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", description: "FooABC"});
+          Base.type.add({name: "foo", description: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", description: undefined});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", description: undefined});
 
           expect(propType.description).toBe("FooABC");
         });
@@ -1177,11 +1177,11 @@ define([
         it("should respect the spec null value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", description: "FooABC"});
+          Base.type.add({name: "foo", description: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", description: null});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", description: null});
 
           expect(propType.description).toBe(null);
         });
@@ -1189,11 +1189,11 @@ define([
         it("should respect the spec value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", description: "FooABC"});
+          Base.type.add({name: "foo", description: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", description: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           expect(propType.description).toBe("XYZ");
         });
@@ -1201,11 +1201,11 @@ define([
         it("should respect a set null value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", description: "ABC"});
+          Base.type.add({name: "foo", description: "ABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", description: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           propType.description = null;
 
@@ -1215,11 +1215,11 @@ define([
         it("should respect a set value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", description: "ABC"});
+          Base.type.add({name: "foo", description: "ABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", description: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           expect(propType.description).toBe("XYZ");
 
@@ -1232,11 +1232,11 @@ define([
           var Base = Complex.extend();
 
           var baseDesc = "ABC";
-          Base.meta.add({name: "foo", description: baseDesc});
+          Base.type.add({name: "foo", description: baseDesc});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", description: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", description: "XYZ"});
 
           expect(propType.description).toBe("XYZ");
 
@@ -1250,11 +1250,11 @@ define([
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", category: "FooABC"});
+          Base.type.add({name: "foo", category: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.category).toBe("FooABC");
         });
@@ -1262,11 +1262,11 @@ define([
         it("should inherit the base value if spec is undefined", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", category: "FooABC"});
+          Base.type.add({name: "foo", category: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", category: undefined});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", category: undefined});
 
           expect(propType.category).toBe("FooABC");
         });
@@ -1274,11 +1274,11 @@ define([
         it("should respect the spec null value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", category: "FooABC"});
+          Base.type.add({name: "foo", category: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", category: null});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", category: null});
 
           expect(propType.category).toBe(null);
         });
@@ -1286,11 +1286,11 @@ define([
         it("should respect the spec value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", category: "FooABC"});
+          Base.type.add({name: "foo", category: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", category: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           expect(propType.category).toBe("XYZ");
         });
@@ -1298,11 +1298,11 @@ define([
         it("should respect a set null value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", category: "ABC"});
+          Base.type.add({name: "foo", category: "ABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", category: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           propType.category = null;
 
@@ -1312,11 +1312,11 @@ define([
         it("should respect a set value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", category: "ABC"});
+          Base.type.add({name: "foo", category: "ABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", category: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           expect(propType.category).toBe("XYZ");
 
@@ -1329,11 +1329,11 @@ define([
           var Base = Complex.extend();
 
           var baseValue = "ABC";
-          Base.meta.add({name: "foo", category: baseValue});
+          Base.type.add({name: "foo", category: baseValue});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", category: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", category: "XYZ"});
 
           expect(propType.category).toBe("XYZ");
 
@@ -1347,11 +1347,11 @@ define([
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", helpUrl: "FooABC"});
+          Base.type.add({name: "foo", helpUrl: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.helpUrl).toBe("FooABC");
         });
@@ -1359,11 +1359,11 @@ define([
         it("should inherit the base value if spec is undefined", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", helpUrl: "FooABC"});
+          Base.type.add({name: "foo", helpUrl: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", helpUrl: undefined});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: undefined});
 
           expect(propType.helpUrl).toBe("FooABC");
         });
@@ -1371,11 +1371,11 @@ define([
         it("should respect the spec null value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", helpUrl: "FooABC"});
+          Base.type.add({name: "foo", helpUrl: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", helpUrl: null});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: null});
 
           expect(propType.helpUrl).toBe(null);
         });
@@ -1383,11 +1383,11 @@ define([
         it("should respect the spec value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", helpUrl: "FooABC"});
+          Base.type.add({name: "foo", helpUrl: "FooABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           expect(propType.helpUrl).toBe("XYZ");
         });
@@ -1395,11 +1395,11 @@ define([
         it("should respect a set null value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", helpUrl: "ABC"});
+          Base.type.add({name: "foo", helpUrl: "ABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           propType.helpUrl = null;
 
@@ -1409,11 +1409,11 @@ define([
         it("should respect a set value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", helpUrl: "ABC"});
+          Base.type.add({name: "foo", helpUrl: "ABC"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           expect(propType.helpUrl).toBe("XYZ");
 
@@ -1426,11 +1426,11 @@ define([
           var Base = Complex.extend();
 
           var baseValue = "ABC";
-          Base.meta.add({name: "foo", helpUrl: baseValue});
+          Base.type.add({name: "foo", helpUrl: baseValue});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", helpUrl: "XYZ"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", helpUrl: "XYZ"});
 
           expect(propType.helpUrl).toBe("XYZ");
 
@@ -1444,11 +1444,11 @@ define([
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: false});
+          Base.type.add({name: "foo", isBrowsable: false});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1456,11 +1456,11 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: true});
+          Base.type.add({name: "foo", isBrowsable: true});
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isBrowsable).toBe(true);
         });
@@ -1468,11 +1468,11 @@ define([
         it("should inherit the base value if spec is nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: false});
+          Base.type.add({name: "foo", isBrowsable: false});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: undefined});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: undefined});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1480,11 +1480,11 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: false});
+          Base.type.add({name: "foo", isBrowsable: false});
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: null});
+          propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: null});
 
           expect(propType.isBrowsable).toBe(false);
         });
@@ -1492,11 +1492,11 @@ define([
         it("should respect the spec value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: true});
+          Base.type.add({name: "foo", isBrowsable: true});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: false});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: false});
 
           expect(propType.isBrowsable).toBe(false);
         });
@@ -1504,11 +1504,11 @@ define([
         it("should respect a set value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: true});
+          Base.type.add({name: "foo", isBrowsable: true});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isBrowsable).toBe(true);
 
@@ -1520,11 +1520,11 @@ define([
         it("should inherit the base value when set to nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: true});
+          Base.type.add({name: "foo", isBrowsable: true});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: false});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: false});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1536,11 +1536,11 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isBrowsable: true});
+          Base.type.add({name: "foo", isBrowsable: true});
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "foo", {name: "foo", isBrowsable: false});
+          propType = extendProp(Derived.type, "foo", {name: "foo", isBrowsable: false});
 
           expect(propType.isBrowsable).toBe(false);
 
@@ -1554,11 +1554,11 @@ define([
         it("should inherit the base value, by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: false});
+          Base.type.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isAdvanced).toBe(false);
 
@@ -1566,11 +1566,11 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: true});
+          Base.type.add({name: "foo", isAdvanced: true});
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isAdvanced).toBe(true);
         });
@@ -1578,11 +1578,11 @@ define([
         it("should inherit the base value if spec is nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: true});
+          Base.type.add({name: "foo", isAdvanced: true});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: undefined});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: undefined});
 
           expect(propType.isAdvanced).toBe(true);
 
@@ -1590,11 +1590,11 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: true});
+          Base.type.add({name: "foo", isAdvanced: true});
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: null});
+          propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: null});
 
           expect(propType.isAdvanced).toBe(true);
         });
@@ -1602,11 +1602,11 @@ define([
         it("should respect the spec value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: false});
+          Base.type.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: true});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: true});
 
           expect(propType.isAdvanced).toBe(true);
         });
@@ -1614,11 +1614,11 @@ define([
         it("should respect a set value if not nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: false});
+          Base.type.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo"});
+          var propType = extendProp(Derived.type, "foo", {name: "foo"});
 
           expect(propType.isAdvanced).toBe(false);
 
@@ -1630,11 +1630,11 @@ define([
         it("should inherit the base value when set to nully", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: false});
+          Base.type.add({name: "foo", isAdvanced: false});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: true});
+          var propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: true});
 
           expect(propType.isAdvanced).toBe(true);
 
@@ -1646,11 +1646,11 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "foo", isAdvanced: false});
+          Base.type.add({name: "foo", isAdvanced: false});
 
           Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "foo", {name: "foo", isAdvanced: true});
+          propType = extendProp(Derived.type, "foo", {name: "foo", isAdvanced: true});
 
           expect(propType.isAdvanced).toBe(true);
 
@@ -1668,11 +1668,11 @@ define([
         beforeEach(function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
         });
 
         it("should have the same name", function() {
@@ -1697,60 +1697,60 @@ define([
         it("should inherit base type value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseNum", type: Number});
+          Base.type.add({name: "baseNum", type: PentahoNumber});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseNum", {name: "baseNum"});
+          var propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
 
-          expect(propType.type).toBe(Number.meta);
+          expect(propType.type).toBe(PentahoNumber.type);
         });
 
         it("should accept a spec type that is a sub-type of the base property's type", function() {
-          var PostalCode = String.extend();
+          var PostalCode = PentahoString.extend();
 
           var Base = Complex.extend();
 
-          Base.meta.add({name: "postalCode", type: String});
+          Base.type.add({name: "postalCode", type: PentahoString});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "postalCode", {name: "postalCode", type: PostalCode});
+          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode", type: PostalCode});
 
-          expect(propType.type).toBe(PostalCode.meta);
+          expect(propType.type).toBe(PostalCode.type);
         });
 
         it("should accept a _set_ type that is a sub-type of the base property's type", function() {
-          var PostalCode1 = String.extend();
-          var PostalCode2 = String.extend();
+          var PostalCode1 = PentahoString.extend();
+          var PostalCode2 = PentahoString.extend();
 
           // ----
 
           var Base = Complex.extend();
 
-          Base.meta.add({name: "postalCode", type: String});
+          Base.type.add({name: "postalCode", type: PentahoString});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "postalCode", {name: "postalCode"});
+          var propType = extendProp(Derived.type, "postalCode", {name: "postalCode"});
 
           propType.type = PostalCode1;
-          expect(propType.type).toBe(PostalCode1.meta);
+          expect(propType.type).toBe(PostalCode1.type);
 
           propType.type = PostalCode2;
-          expect(propType.type).toBe(PostalCode2.meta);
+          expect(propType.type).toBe(PostalCode2.type);
         });
 
         it("should throw on a spec type that is not a sub-type of the base property's type", function() {
 
           var Base = Complex.extend();
 
-          Base.meta.add({name: "num", type: String});
+          Base.type.add({name: "num", type: PentahoString});
 
           var Derived = Base.extend();
 
           expect(function() {
-            extendProp(Derived.meta, "num", {name: "num", type: Number});
+            extendProp(Derived.type, "num", {name: "num", type: PentahoNumber});
           }).toThrow(errorMatch.argInvalid("type"));
         });
 
@@ -1758,14 +1758,14 @@ define([
 
           var Base = Complex.extend();
 
-          Base.meta.add({name: "num", type: String});
+          Base.type.add({name: "num", type: PentahoString});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "num", {name: "num"});
+          var propType = extendProp(Derived.type, "num", {name: "num"});
 
           expect(function() {
-            propType.type = Number;
+            propType.type = PentahoNumber;
           }).toThrow(errorMatch.argInvalid("type"));
         });
       });
@@ -1776,11 +1776,11 @@ define([
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.isRequired).toBe(undefined);
         });
@@ -1788,11 +1788,11 @@ define([
         it("should evaluate to the base value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", isRequired: true});
+          Base.type.add({name: "baseStr", isRequired: true});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -1802,11 +1802,11 @@ define([
         it("should respect the specified value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: false});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: false});
 
           expect(propType.isRequired).toBe(false);
         });
@@ -1819,14 +1819,14 @@ define([
           var baseIndex = -1;
           var baseSpy = jasmine.createSpy().and.callFake(function() { baseIndex = index++; return false; });
 
-          Base.meta.add({name: "baseStr", isRequired: baseSpy});
+          Base.type.add({name: "baseStr", isRequired: baseSpy});
 
           var Derived = Base.extend();
 
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return false; });
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           var owner = {};
 
@@ -1840,13 +1840,13 @@ define([
 
           var baseSpy = jasmine.createSpy().and.returnValue(true);
 
-          Base.meta.add({name: "baseStr", isRequired: baseSpy});
+          Base.type.add({name: "baseStr", isRequired: baseSpy});
 
           var Derived = Base.extend();
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           var owner = {};
 
@@ -1858,13 +1858,13 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", isRequired: true});
+          Base.type.add({name: "baseStr", isRequired: true});
 
           Derived = Base.extend();
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isRequired: subSpy});
+          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isRequired: subSpy});
 
           owner = {};
 
@@ -1877,11 +1877,11 @@ define([
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.countMin).toBe(undefined);
         });
@@ -1889,11 +1889,11 @@ define([
         it("should evaluate to the base value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", countMin: 1});
+          Base.type.add({name: "baseStr", countMin: 1});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -1903,11 +1903,11 @@ define([
         it("should respect the specified value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMin: 2});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: 2});
 
           var owner = {};
 
@@ -1922,14 +1922,14 @@ define([
           var baseIndex = -1;
           var baseSpy = jasmine.createSpy().and.callFake(function() { baseIndex = index++; return 1; });
 
-          Base.meta.add({name: "baseStr", countMin: baseSpy});
+          Base.type.add({name: "baseStr", countMin: baseSpy});
 
           var Derived = Base.extend();
 
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return 1; });
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMin: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
 
           var owner = {};
 
@@ -1943,13 +1943,13 @@ define([
 
           var baseSpy = jasmine.createSpy().and.returnValue(1);
 
-          Base.meta.add({name: "baseStr", countMin: baseSpy});
+          Base.type.add({name: "baseStr", countMin: baseSpy});
 
           var Derived = Base.extend();
 
           var subSpy = jasmine.createSpy().and.returnValue(3);
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMin: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
 
           var owner = {};
 
@@ -1961,13 +1961,13 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", countMin: 2});
+          Base.type.add({name: "baseStr", countMin: 2});
 
           Derived = Base.extend();
 
           subSpy = function() { return 1; };
 
-          propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMin: subSpy});
+          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMin: subSpy});
 
           owner = {};
 
@@ -1979,11 +1979,11 @@ define([
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.countMax).toBe(undefined);
         });
@@ -1991,11 +1991,11 @@ define([
         it("should evaluate to the base value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", countMax: 5});
+          Base.type.add({name: "baseStr", countMax: 5});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2005,11 +2005,11 @@ define([
         it("should respect the specified value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMax: 2});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: 2});
 
           var owner = {};
 
@@ -2024,14 +2024,14 @@ define([
           var baseIndex = -1;
           var baseSpy = jasmine.createSpy().and.callFake(function() { baseIndex = index++; return 1; });
 
-          Base.meta.add({name: "baseStr", countMax: baseSpy});
+          Base.type.add({name: "baseStr", countMax: baseSpy});
 
           var Derived = Base.extend();
 
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return 1; });
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMax: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
 
           var owner = {};
 
@@ -2045,13 +2045,13 @@ define([
 
           var baseSpy = jasmine.createSpy().and.returnValue(1);
 
-          Base.meta.add({name: "baseStr", countMax: baseSpy});
+          Base.type.add({name: "baseStr", countMax: baseSpy});
 
           var Derived = Base.extend();
 
           var subSpy = jasmine.createSpy().and.returnValue(3);
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMax: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
 
           var owner = {};
 
@@ -2063,13 +2063,13 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", countMax: 2});
+          Base.type.add({name: "baseStr", countMax: 2});
 
           Derived = Base.extend();
 
           subSpy = function() { return 1; };
 
-          propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", countMax: subSpy});
+          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", countMax: subSpy});
 
           owner = {};
 
@@ -2081,11 +2081,11 @@ define([
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.isApplicable).toBe(undefined);
         });
@@ -2093,11 +2093,11 @@ define([
         it("should evaluate to the base value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", isApplicable: false});
+          Base.type.add({name: "baseStr", isApplicable: false});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2107,11 +2107,11 @@ define([
         it("should respect the specified value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isApplicable: false});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: false});
 
           expect(propType.isApplicable).toBe(false);
         });
@@ -2124,14 +2124,14 @@ define([
           var baseIndex = -1;
           var baseSpy = jasmine.createSpy().and.callFake(function() { baseIndex = index++; return true; });
 
-          Base.meta.add({name: "baseStr", isApplicable: baseSpy});
+          Base.type.add({name: "baseStr", isApplicable: baseSpy});
 
           var Derived = Base.extend();
 
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return true; });
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isApplicable: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
 
           var owner = {};
 
@@ -2145,13 +2145,13 @@ define([
 
           var baseSpy = jasmine.createSpy().and.returnValue(false);
 
-          Base.meta.add({name: "baseStr", isApplicable: baseSpy});
+          Base.type.add({name: "baseStr", isApplicable: baseSpy});
 
           var Derived = Base.extend();
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isApplicable: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
 
           var owner = {};
 
@@ -2163,13 +2163,13 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", isApplicable: false});
+          Base.type.add({name: "baseStr", isApplicable: false});
 
           Derived = Base.extend();
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isApplicable: subSpy});
+          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isApplicable: subSpy});
 
           owner = {};
 
@@ -2182,11 +2182,11 @@ define([
         it("should default to an unset local value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           expect(propType.isReadOnly).toBe(undefined);
         });
@@ -2194,11 +2194,11 @@ define([
         it("should evaluate to the base value by default", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", isReadOnly: true});
+          Base.type.add({name: "baseStr", isReadOnly: true});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr"});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr"});
 
           var owner = {};
 
@@ -2208,11 +2208,11 @@ define([
         it("should respect the specified value", function() {
           var Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr"});
+          Base.type.add({name: "baseStr"});
 
           var Derived = Base.extend();
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: false});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: false});
 
           expect(propType.isReadOnly).toBe(false);
         });
@@ -2225,14 +2225,14 @@ define([
           var baseIndex = -1;
           var baseSpy = jasmine.createSpy().and.callFake(function() { baseIndex = index++; return false; });
 
-          Base.meta.add({name: "baseStr", isReadOnly: baseSpy});
+          Base.type.add({name: "baseStr", isReadOnly: baseSpy});
 
           var Derived = Base.extend();
 
           var subIndex = -1;
           var subSpy = jasmine.createSpy().and.callFake(function() { subIndex = index++; return false; });
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           var owner = {};
 
@@ -2246,13 +2246,13 @@ define([
 
           var baseSpy = jasmine.createSpy().and.returnValue(true);
 
-          Base.meta.add({name: "baseStr", isReadOnly: baseSpy});
+          Base.type.add({name: "baseStr", isReadOnly: baseSpy});
 
           var Derived = Base.extend();
 
           var subSpy = jasmine.createSpy().and.returnValue(true);
 
-          var propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: subSpy});
+          var propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           var owner = {};
 
@@ -2264,13 +2264,13 @@ define([
 
           Base = Complex.extend();
 
-          Base.meta.add({name: "baseStr", isReadOnly: true});
+          Base.type.add({name: "baseStr", isReadOnly: true});
 
           Derived = Base.extend();
 
           subSpy = jasmine.createSpy().and.returnValue(true);
 
-          propType = extendProp(Derived.meta, "baseStr", {name: "baseStr", isReadOnly: subSpy});
+          propType = extendProp(Derived.type, "baseStr", {name: "baseStr", isReadOnly: subSpy});
 
           owner = {};
 
@@ -2283,10 +2283,10 @@ define([
         var propType;
         beforeEach(function(){
           var Base = Complex.extend();
-          Base.meta.add({name: "baseNum", type: Number});
+          Base.type.add({name: "baseNum", type: PentahoNumber});
           var Derived = Base.extend();
 
-          propType = extendProp(Derived.meta, "baseNum", {name: "baseNum"});
+          propType = extendProp(Derived.type, "baseNum", {name: "baseNum"});
         });
 
         it("should be null by default", function() {
@@ -2314,5 +2314,5 @@ define([
 
     // TODO: toValue
 
-  }); // pentaho.type.Property.Meta
+  }); // pentaho.type.Property.Type
 });

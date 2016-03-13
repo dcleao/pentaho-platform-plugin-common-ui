@@ -57,7 +57,7 @@ define([
      *
      * If the given type is anonymous and also hasn't been added to this scope, `null` is returned.
      *
-     * @param {pentaho.type.Item.Meta} type The type.
+     * @param {pentaho.type.Type} type The type.
      *
      * @return {?nonEmptyString} The id of the type within this scope, or `null`.
      */
@@ -74,7 +74,7 @@ define([
      * Else, the anonymous type is added to the scope
      * and a temporary id is generated for it and returned.
      *
-     * @param {pentaho.type.Item.Meta} type The type to add.
+     * @param {pentaho.type.Type} type The type to add.
      *
      * @return {nonEmptyString} The id of the type within this scope.
      */

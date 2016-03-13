@@ -15,9 +15,9 @@
  */
 
 /**
- * The `spec.IItemMeta` interface represents the metadata of a type.
+ * The `spec.IType` interface represents the specification of a type.
  *
- * @name pentaho.type.spec.IItemMeta
+ * @name pentaho.type.spec.IType
  * @interface
  */
 
@@ -33,7 +33,7 @@
  * Temporary ids are ignored after type construction.
  *
  * @name id
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?string}
  */
 
@@ -47,7 +47,7 @@
  * the label is inherited from the base type.
  *
  * @name label
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?nonEmptyString | any}
  */
 
@@ -65,14 +65,14 @@
  * ignoring any inherited value.
  *
  * @name description
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?nonEmptyString | any}
  */
 
 /**
  * The category associated with the type.
  *
- * The category is used primarily to group similar items in a user interface.
+ * The category is used primarily to group similar types (or instances of) in a user interface.
  *
  * When non-{@link Nully} and not a string,
  * it is taken instead to be the result of calling its `toString` method.
@@ -85,10 +85,10 @@
  * ignoring any inherited value.
  *
  * @name category
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?nonEmptyString | any}
- * @see pentaho.type.spec.IItemMeta#isBrowsable
- * @see pentaho.type.spec.IItemMeta#ordinal
+ * @see pentaho.type.spec.IType#isBrowsable
+ * @see pentaho.type.spec.IType#ordinal
  */
 
 /**
@@ -105,7 +105,7 @@
  * ignoring any inherited value.
  *
  * @name helpUrl
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?nonEmptyString | any}
  */
 
@@ -120,7 +120,7 @@
  * The root value is `true`.
  *
  * @name isBrowsable
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?boolean | any}
  */
 
@@ -135,7 +135,7 @@
  * The root value is `false`.
  *
  * @name isAdvanced
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?boolean | any}
  */
 
@@ -145,25 +145,25 @@
  * This attribute is typically used to associate an icon with a type.
  *
  * @name styleClass
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?nonEmptyString | any}
  */
 
 /**
  * The ordinal associated with the type.
  *
- * The ordinal is used to disambiguate the order with which an item is shown in a user interface.
+ * The ordinal is used to disambiguate the order with which a type (or an instance of it) is shown in a user interface.
  *
  * When {@link Nully},
  * the ordinal is inherited from the base type, if any.
  * The root value is `0`.
  *
  * @name ordinal
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?number | any}
  *
- * @see pentaho.type.spec.IItemMeta#isBrowsable
- * @see pentaho.type.spec.IItemMeta#category
+ * @see pentaho.type.spec.IType#isBrowsable
+ * @see pentaho.type.spec.IType#category
  */
 
 /**
@@ -187,6 +187,6 @@
  * it is the class or factory of the view.
  *
  * @name view
- * @memberOf pentaho.type.spec.IItemMeta#
+ * @memberOf pentaho.type.spec.IType#
  * @type {?string | function}
  */

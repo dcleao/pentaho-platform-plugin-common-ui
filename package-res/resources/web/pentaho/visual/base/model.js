@@ -41,7 +41,7 @@ define([
      * @param {pentaho.visual.base.spec.IModel} modelSpec A plain object containing the model specification.
      */
     var Model = Complex.extend({
-          meta: {
+          type: {
             id: "pentaho/visual/base",
             view: "View",
             isAbstract: true,
@@ -69,7 +69,7 @@ define([
             ]
           }
         })
-        .implement({meta: bundle.structured});
+        .implement({type: bundle.structured});
 
     return Model;
   };
