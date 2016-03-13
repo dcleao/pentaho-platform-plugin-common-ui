@@ -30,7 +30,7 @@ define([
   return function(context) {
 
     var Value = context.get("pentaho/type/value"),
-        _refinementMeta;
+        _refinementType;
 
     /**
      * @name pentaho.type.Refinement.Meta
@@ -261,8 +261,8 @@ define([
 
       // Constructor always returns a mesa instance of `of`.
       constructor: function() {
-        var refinedMeta = this.meta.of;
-        return refinedMeta.create.apply(refinedMeta, arguments);
+        var refinedType = this.meta.of;
+        return refinedType.create.apply(refinedType, arguments);
       },
 
       // TODO: implement inheritedStyleClasses
@@ -369,12 +369,12 @@ define([
           if(value == null) throw error.argRequired("of");
 
           // Value returns refinement === undefined...
-          var ofMeta = this.context.get(value).meta;
-          if(ofMeta.isRefinement !== false)
+          var ofType = this.context.get(value).meta;
+          if(ofType.isRefinement !== false)
             throw error.argInvalidType("of", ["pentaho/type/element", "pentaho/type/list"]);
 
           // Throws when set again with a different value.
-          O.setConst(this, "_of", ofMeta);
+          O.setConst(this, "_of", ofType);
         },
         //endregion
 
@@ -456,7 +456,7 @@ define([
         },
 
         _resetLabel: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -471,7 +471,7 @@ define([
         },
 
         _resetDescription: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -486,7 +486,7 @@ define([
         },
 
         _resetCategory: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -501,7 +501,7 @@ define([
         },
 
         _resetHelpUrl: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -516,7 +516,7 @@ define([
         },
 
         _resetIsBrowsable: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -531,7 +531,7 @@ define([
         },
 
         _resetIsAdvanced: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -551,7 +551,7 @@ define([
         },
 
         _resetOrdinal: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -566,7 +566,7 @@ define([
         },
 
         _resetView: function() {
-          if(this !== _refinementMeta) {
+          if(this !== _refinementType) {
             this.base();
           }
         },
@@ -684,7 +684,7 @@ define([
       isRoot: true
     });
 
-    _refinementMeta = Refinement.meta;
+    _refinementType = Refinement.meta;
 
     return Refinement;
   };

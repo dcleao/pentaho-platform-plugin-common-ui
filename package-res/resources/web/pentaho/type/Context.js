@@ -513,8 +513,8 @@ define([
       id = toAbsTypeId(id);
 
       // Check if id is already present.
-      var Type = O.getOwn(this._byTypeId, id);
-      if(Type) return this._return(Type, sync);
+      var InstCtor = O.getOwn(this._byTypeId, id);
+      if(InstCtor) return this._return(InstCtor, sync);
 
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
@@ -547,7 +547,7 @@ define([
      * (e.g. [Value.Meta]{@link pentaho.type.Value.Meta}).
      *
      * @throws {Error} Other errors,
-     * thrown by {@link pentaho.type.Context#_getByType} and {@link pentaho.type.Context#_getByFactory}.
+     * thrown by {@link pentaho.type.Context#_getByInstCtor} and {@link pentaho.type.Context#_getByFactory}.
      *
      * @private
      * @ignore
@@ -556,7 +556,7 @@ define([
       var proto = fun.prototype;
 
       if(proto instanceof Item)
-        return this._getByType(fun, sync);
+        return this._getByInstCtor(fun, sync);
 
       if(proto instanceof Item.Meta)
         return this._error(error.argInvalid("typeRef", "Type constructor is not supported."), sync);
@@ -566,7 +566,7 @@ define([
     },
 
     /**
-     * Gets a configured instance constructor of a type,
+     * Gets a _configured_ instance constructor of a type,
      * given the instance constructor of that type.
      *
      * This method works for anonymous types as well -
@@ -584,7 +584,7 @@ define([
      * and `factoryUid` (when specified) in corresponding maps,
      * and is returned immediately (modulo sync).
      *
-     * @param {!Class.<pentaho.type.Value>} Type An instance constructor.
+     * @param {!Class.<pentaho.type.Value>} InstCtor An instance constructor.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      * @param {?number} [factoryUid] The factory unique id, when `Type` was created by one.
      *
@@ -602,15 +602,15 @@ define([
      * @private
      * @ignore
      */
-    _getByType: function(Type, sync, factoryUid) {
-      var meta = Type.meta;
+    _getByInstCtor: function(InstCtor, sync, factoryUid) {
+      var meta = InstCtor.meta;
       if(meta.context !== this)
         return this._error(error.argInvalid("typeRef", "Type is from a different context."), sync);
 
       // Check if already present, by uid.
-      var TypeExisting = O.getOwn(this._byTypeUid, meta.uid);
+      var InstCtorExisting = O.getOwn(this._byTypeUid, meta.uid);
       /* istanbul ignore else */
-      if(!TypeExisting) {
+      if(!InstCtorExisting) {
         // Not present yet.
         var id = meta.id;
         if(id) {
@@ -620,21 +620,21 @@ define([
           /* istanbul ignore if : until config is implemented */
           if(config) meta.constructor.implement(config);
 
-          this._byTypeId[id] = Type;
+          this._byTypeId[id] = InstCtor;
         }
 
-        this._byTypeUid[meta.uid] = Type;
+        this._byTypeUid[meta.uid] = InstCtor;
 
-      } else if(Type !== TypeExisting) {
+      } else if(InstCtor !== InstCtorExisting) {
         // Pathological case, only possible if the result of an exploit.
         return this._error(error.argInvalid("typeRef", "Duplicate type class uid."), sync);
       }
 
       if(factoryUid != null) {
-        this._byFactoryUid[factoryUid] = Type;
+        this._byFactoryUid[factoryUid] = InstCtor;
       }
 
-      return this._return(Type, sync);
+      return this._return(InstCtor, sync);
     },
 
     /**
@@ -672,30 +672,30 @@ define([
     _getByFactory: function(typeFactory, sync) {
       var factoryUid = getFactoryUid(typeFactory);
 
-      var Type = O.getOwn(this._byFactoryUid, factoryUid);
-      if(Type)
-        return this._return(Type, sync);
+      var InstCtor = O.getOwn(this._byFactoryUid, factoryUid);
+      if(InstCtor)
+        return this._return(InstCtor, sync);
 
-      Type = typeFactory(this);
-      if(!F.is(Type) || !(Type.prototype instanceof Item))
+      InstCtor = typeFactory(this);
+      if(!F.is(InstCtor) || !(InstCtor.prototype instanceof Item))
         return this._error(error.operInvalid("Type factory must return a sub-class of 'pentaho/type/Item'."), sync);
 
-      return this._getByType(Type, sync, factoryUid);
+      return this._getByInstCtor(InstCtor, sync, factoryUid);
     },
 
     // Inline type spec: {[base: "complex", ] ... }
     _getByObjectSpec: function(typeSpec, sync) {
       if(typeSpec instanceof Item.Meta)
-        return this._getByType(typeSpec.mesa.constructor, sync);
+        return this._getByInstCtor(typeSpec.mesa.constructor, sync);
 
       if(typeSpec instanceof Item)
         return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
       var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
           resolveSync = (function() {
-              var BaseType = this._get(baseTypeSpec, /*sync:*/true),
-                  Type = BaseType.extend({meta: typeSpec});
-              return this._getByType(Type, /*sync:*/true);
+              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true),
+                  InstCtor = BaseInstCtor.extend({meta: typeSpec});
+              return this._getByInstCtor(InstCtor, /*sync:*/true);
             }).bind(this);
 
       // When sync, it should be the case that every referenced id is already loaded,
@@ -736,8 +736,8 @@ define([
     },
     //endregion
 
-    _return: function(Type, sync) {
-      return sync ? Type : Promise.resolve(Type);
+    _return: function(InstCtor, sync) {
+      return sync ? InstCtor : Promise.resolve(InstCtor);
     },
 
     _error: function(ex, sync) {

@@ -774,14 +774,14 @@ define([
           }
         });
 
-        var subSubMeta = SubItem.extendProto().meta;
-        spyOn(subSubMeta, "create").and.callThrough();
+        var subSubType = SubItem.extendProto().meta;
+        spyOn(subSubType, "create").and.callThrough();
 
         var value = {};
-        subSubMeta.to(value);
+        subSubType.to(value);
 
         expect(createSpy).not.toHaveBeenCalled();
-        expect(subSubMeta.create).toHaveBeenCalledWith(value);
+        expect(subSubType.create).toHaveBeenCalledWith(value);
       });
 
       it("casts a nully into `null`", function() {

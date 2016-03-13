@@ -314,8 +314,8 @@ define([
         var context = new Context();
         var promise = callGet(context, sync, "string");
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/string");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.meta.id).toBe("pentaho/type/string");
         });
       }));
 
@@ -323,8 +323,8 @@ define([
         var context = new Context();
         var promise = callGet(context, sync, "pentaho/type/string");
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/string");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.meta.id).toBe("pentaho/type/string");
         });
       }));
 
@@ -333,8 +333,8 @@ define([
         var valueFactory = require("pentaho/type/value");
         var promise = callGet(context, sync, valueFactory);
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.meta.id).toBe("pentaho/type/value");
         });
       }));
 
@@ -349,8 +349,8 @@ define([
         var Value   = context.get("pentaho/type/value");
         var promise = callGet(context, sync, Value);
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.meta.id).toBe("pentaho/type/value");
         });
       }));
 
@@ -359,8 +359,8 @@ define([
         var Value   = context.get("pentaho/type/value");
         var promise = callGet(context, sync, Value.meta);
 
-        return promise.then(function(Type) {
-          expect(Type.meta.id).toBe("pentaho/type/value");
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.meta.id).toBe("pentaho/type/value");
         });
       }));
 
@@ -375,14 +375,14 @@ define([
         var context = new Context();
         var promise = callGet(context, sync, {base: "complex", props: ["a", "b"]});
 
-        return promise.then(function(Type) {
+        return promise.then(function(InstCtor) {
           var Complex = context.get("pentaho/type/complex");
 
-          expect(Type.meta.isSubtypeOf(Complex.meta)).toBe(true);
+          expect(InstCtor.meta.isSubtypeOf(Complex.meta)).toBe(true);
 
-          expect(Type.ancestor).toBe(Complex);
-          expect(Type.meta.has("a")).toBe(true);
-          expect(Type.meta.has("b")).toBe(true);
+          expect(InstCtor.ancestor).toBe(Complex);
+          expect(InstCtor.meta.has("a")).toBe(true);
+          expect(InstCtor.meta.has("b")).toBe(true);
         });
       }));
 
@@ -390,14 +390,14 @@ define([
         var context = new Context();
         var promise = callGet(context, sync, {props: ["a", "b"]});
 
-        return promise.then(function(Type) {
+        return promise.then(function(InstCtor) {
           var Complex = context.get("pentaho/type/complex");
 
-          expect(Type.meta.isSubtypeOf(Complex.meta)).toBe(true);
+          expect(InstCtor.meta.isSubtypeOf(Complex.meta)).toBe(true);
 
-          expect(Type.ancestor).toBe(Complex);
-          expect(Type.meta.has("a")).toBe(true);
-          expect(Type.meta.has("b")).toBe(true);
+          expect(InstCtor.ancestor).toBe(Complex);
+          expect(InstCtor.meta.has("a")).toBe(true);
+          expect(InstCtor.meta.has("b")).toBe(true);
         });
       }));
 
@@ -408,14 +408,14 @@ define([
             of:   {props: ["a", "b"]}
           });
 
-        return promise.then(function(Type) {
-          expect(Type.prototype instanceof context.get("list")).toBe(true);
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
 
-          var ofMeta = Type.meta.of;
-          expect(ofMeta.mesa instanceof context.get("complex")).toBe(true);
-          expect(ofMeta.count).toBe(2);
-          expect(ofMeta.has("a")).toBe(true);
-          expect(ofMeta.has("b")).toBe(true);
+          var ofType = InstCtor.meta.of;
+          expect(ofType.mesa instanceof context.get("complex")).toBe(true);
+          expect(ofType.count).toBe(2);
+          expect(ofType.has("a")).toBe(true);
+          expect(ofType.has("b")).toBe(true);
         });
       }));
 
@@ -425,14 +425,14 @@ define([
           {props: ["a", "b"]}
         ]);
 
-        return promise.then(function(Type) {
-          expect(Type.prototype instanceof context.get("list")).toBe(true);
+        return promise.then(function(InstCtor) {
+          expect(InstCtor.prototype instanceof context.get("list")).toBe(true);
 
-          var ofMeta = Type.meta.of;
-          expect(ofMeta.mesa instanceof context.get("complex")).toBe(true);
-          expect(ofMeta.count).toBe(2);
-          expect(ofMeta.has("a")).toBe(true);
-          expect(ofMeta.has("b")).toBe(true);
+          var ofType = InstCtor.meta.of;
+          expect(ofType.mesa instanceof context.get("complex")).toBe(true);
+          expect(ofType.count).toBe(2);
+          expect(ofType.has("a")).toBe(true);
+          expect(ofType.has("b")).toBe(true);
         });
       }));
 
@@ -449,11 +449,11 @@ define([
           of:   "number"
         });
 
-        return promise.then(function(Type) {
+        return promise.then(function(InstCtor) {
           var Refinement = context.get("refinement");
-          expect(Type.meta.isSubtypeOf(Refinement.meta)).toBe(true);
+          expect(InstCtor.meta.isSubtypeOf(Refinement.meta)).toBe(true);
 
-          expect(Type.ancestor).toBe(Refinement);
+          expect(InstCtor.ancestor).toBe(Refinement);
         });
       }));
 
@@ -486,8 +486,8 @@ define([
               var context = new Context();
               return callGet(context, sync, mid);
             })
-            .then(function(Type) {
-              expect(Type.meta.id).toBe(mid);
+            .then(function(InstCtor) {
+              expect(InstCtor.meta.id).toBe(mid);
               require.undef(mid);
             });
       }));
@@ -592,12 +592,12 @@ define([
         };
 
         return context.getAsync(spec)
-            .then(function(Type) {
-              expect(Type.meta.get("foo1").type.id).toBe("pentaho/foo/dudu1");
-              expect(Type.meta.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
-              expect(Type.meta.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
-              expect(Type.meta.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
-              expect(Type.meta.get("foo8").type.facets[0]).toBe(require("pentaho/foo/facets/Mixin3"));
+            .then(function(InstCtor) {
+              expect(InstCtor.meta.get("foo1").type.id).toBe("pentaho/foo/dudu1");
+              expect(InstCtor.meta.get("foo2").type.ancestor.id).toBe("pentaho/foo/dudu2");
+              expect(InstCtor.meta.get("foo3").type.of.id).toBe("pentaho/foo/dudu3");
+              expect(InstCtor.meta.get("foo7").type.get("a").type.id).toBe("pentaho/foo/dudu4");
+              expect(InstCtor.meta.get("foo8").type.facets[0]).toBe(require("pentaho/foo/facets/Mixin3"));
 
               require.undef("pentaho/foo/dudu1");
               require.undef("pentaho/foo/dudu2");

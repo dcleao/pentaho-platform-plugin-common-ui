@@ -25,7 +25,7 @@ define([
 
   return function(context) {
 
-    var _elemMeta = null;
+    var _elemType = null;
 
     /**
      * @name pentaho.type.Element.Meta
@@ -100,7 +100,7 @@ define([
 
         set format(value) {
           if(value == null) {
-            if(this !== _elemMeta) {
+            if(this !== _elemType) {
               delete this._format;
             }
           } else {
@@ -137,7 +137,7 @@ define([
       meta: bundle.structured.element
     });
 
-    _elemMeta = Element.meta;
+    _elemType = Element.meta;
 
     return Element;
   };

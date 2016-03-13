@@ -35,14 +35,14 @@ define([
     });
 
     describe("Meta -", function() {
-      var ElemMeta = Element.Meta;
+      var ElemType = Element.Meta;
 
       it("should be a function", function() {
-        expect(typeof ElemMeta).toBe("function");
+        expect(typeof ElemType).toBe("function");
       });
 
       it("should be a sub-class of `Value.Meta`", function() {
-        expect(ElemMeta.prototype instanceof Value.Meta).toBe(true);
+        expect(ElemType.prototype instanceof Value.Meta).toBe(true);
       });
 
       describe("#isList -", function() {

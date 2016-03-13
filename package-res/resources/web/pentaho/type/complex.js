@@ -93,15 +93,15 @@ define([
       // NOTE 2: keep the constructor code synced with #clone !
       constructor: function(spec) {
         // Create `Property` instances.
-        var pMetas = this.meta._getProps(),
-            i = pMetas.length,
+        var pTypes = this.meta._getProps(),
+            i = pTypes.length,
             nameProp = !spec ? undefined : (Array.isArray(spec) ? "index" : "name"),
-            pMeta,
+            pType,
             values = {};
 
         while(i--) {
-          pMeta = pMetas[i];
-          values[pMeta.name] = pMeta.toValue( nameProp && spec[pMeta[nameProp]] );
+          pType = pTypes[i];
+          values[pType.name] = pType.toValue( nameProp && spec[pType[nameProp]] );
         }
 
         this._values = values;
@@ -130,16 +130,16 @@ define([
        */
       _clone: function(clone) {
         // All properties are copied except lists, which are shallow cloned.
-        var pMetas = this.meta._getProps(),
-            i = pMetas.length,
+        var pTypes = this.meta._getProps(),
+            i = pTypes.length,
             values = this._values,
             cloneValues = {},
-            pMeta, v;
+            pType, v;
 
         while(i--) {
-          pMeta = pMetas[i];
-          v = values[pMeta.name];
-          cloneValues[pMeta.name] = v && pMeta.isList ? v.clone() : v;
+          pType = pTypes[i];
+          v = values[pType.name];
+          cloneValues[pType.name] = v && pType.isList ? v.clone() : v;
         }
 
         clone._values = cloneValues;
@@ -201,8 +201,8 @@ define([
        * name `name` is not defined.
        */
       get: function(name, sloppy) {
-        var pMeta = this.meta.get(name, sloppy);
-        return pMeta ? this._values[pMeta.name] : undefined;
+        var pType = this.meta.get(name, sloppy);
+        return pType ? this._values[pType.name] : undefined;
       },
 
       /**
@@ -337,16 +337,16 @@ define([
        * @throws {pentaho.lang.ArgumentInvalidError} When a property with name `name` is not defined.
        */
       set: function(name, valueSpec) {
-        var pMeta  = this.meta.get(name),
-            value0 = this._values[pMeta.name];
+        var pType  = this.meta.get(name),
+            value0 = this._values[pType.name];
 
-        if(pMeta.isList) {
+        if(pType.isList) {
           value0.set(valueSpec);
         } else {
-          var value1 = pMeta.toValue(valueSpec);
-          if(!pMeta.type.areEqual(value0, value1)) {
+          var value1 = pType.toValue(valueSpec);
+          if(!pType.type.areEqual(value0, value1)) {
             // TODO: change event
-            this._values[pMeta.name] = value1;
+            this._values[pType.name] = value1;
           }
         }
       },
@@ -431,11 +431,11 @@ define([
        * name `name` is not defined.
        */
       count: function(name, sloppy) {
-        var pMeta = this.meta.get(name, sloppy);
-        if(!pMeta) return 0;
+        var pType = this.meta.get(name, sloppy);
+        if(!pType) return 0;
 
-        var value = this._values[pMeta.name];
-        return pMeta.isList ? value.count :
+        var value = this._values[pType.name];
+        return pType.isList ? value.count :
                value      ? 1 : 0;
       },
 
@@ -468,15 +468,15 @@ define([
        * name `name` is not defined.
        */
       at: function(name, index, sloppy) {
-        var pMeta = this.meta.get(name, sloppy);
+        var pType = this.meta.get(name, sloppy);
 
         if(index == null) throw error.argRequired("index");
 
-        if(!pMeta) return undefined;
+        if(!pType) return undefined;
 
-        var pValue = this._values[pMeta.name];
+        var pValue = this._values[pType.name];
 
-        if(pMeta.isList) return /* assert pValue */pValue.at(index || 0);
+        if(pType.isList) return /* assert pValue */pValue.at(index || 0);
 
         return pValue && !index ? pValue : null;
       },
@@ -696,10 +696,10 @@ define([
          */
         at: function(index, sloppy) {
           if(index == null) throw error.argRequired("index");
-          var pMeta = this._at(index);
-          if(!pMeta && !sloppy)
+          var pType = this._at(index);
+          if(!pType && !sloppy)
             throw error.argRange("index");
-          return pMeta;
+          return pType;
         },
 
         _at: function(index) {
@@ -780,8 +780,8 @@ define([
         _validate: function(value) {
           var errors = null;
 
-          this.each(function(pMeta) {
-            errors = valueHelper.combineErrors(errors, pMeta.validate(value));
+          this.each(function(pType) {
+            errors = valueHelper.combineErrors(errors, pType.validate(value));
           }, this);
 
           return errors;

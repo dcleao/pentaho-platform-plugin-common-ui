@@ -40,19 +40,19 @@ define([
 
         var derived = new Derived({x: 5, y: "a", z: true});
 
-        var xPropMeta = derived.meta.get("x");
-        var yPropMeta = derived.meta.get("y");
-        var zPropMeta = derived.meta.get("z");
+        var xPropType = derived.meta.get("x");
+        var yPropType = derived.meta.get("y");
+        var zPropType = derived.meta.get("z");
 
-        spyOn(xPropMeta, "validate");
-        spyOn(yPropMeta, "validate");
-        spyOn(zPropMeta, "validate");
+        spyOn(xPropType, "validate");
+        spyOn(yPropType, "validate");
+        spyOn(zPropType, "validate");
 
         Derived.meta.validate(derived);
 
-        expect(xPropMeta.validate).toHaveBeenCalledWith(derived);
-        expect(yPropMeta.validate).toHaveBeenCalledWith(derived);
-        expect(zPropMeta.validate).toHaveBeenCalledWith(derived);
+        expect(xPropType.validate).toHaveBeenCalledWith(derived);
+        expect(yPropType.validate).toHaveBeenCalledWith(derived);
+        expect(zPropType.validate).toHaveBeenCalledWith(derived);
       });
 
     });// end #validate(value)

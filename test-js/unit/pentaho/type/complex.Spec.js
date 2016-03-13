@@ -212,10 +212,10 @@ define([
 
           var derived = new Derived({x: "1"});
 
-          var pMeta = Derived.meta.get("x");
-          expect(pMeta instanceof Property.Meta).toBe(true);
+          var pType = Derived.meta.get("x");
+          expect(pType instanceof Property.Meta).toBe(true);
 
-          var value = derived.get(pMeta);
+          var value = derived.get(pType);
 
           expect(value instanceof Value).toBe(true);
           expect(value.value).toBe("1");

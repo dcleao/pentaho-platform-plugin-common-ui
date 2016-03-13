@@ -391,9 +391,9 @@ define([
           // All value types have own constructors.
           // So it is safe to override the base method with a constructor-type only version.
 
-          var Type = this._getTypeOfInstSpec(instSpec);
+          var Instance = this._getTypeOfInstSpec(instSpec);
 
-          return new Type(instSpec);
+          return new Instance(instSpec);
         },
 
         /**
@@ -417,14 +417,14 @@ define([
          * @ignore
          */
         _getTypeOfInstSpec: function(instSpec) {
-          var Type, typeSpec;
+          var Instance, typeSpec;
 
           // If it is a plain Object, does it have the inline metadata property, "_"?
           if(instSpec && typeof instSpec === "object" && (typeSpec = instSpec._) && instSpec.constructor === Object) {
 
-            Type = this.context.get(typeSpec);
+            Instance = this.context.get(typeSpec);
 
-            if(this._assertSubtype(Type.meta).isAbstract) Type.meta._throwAbstractType();
+            if(this._assertSubtype(Instance.meta).isAbstract) Instance.meta._throwAbstractType();
 
             // ugly but "efficient"
             delete instSpec._;
@@ -432,31 +432,31 @@ define([
           } else {
             if(this.isAbstract) this._throwAbstractType();
 
-            Type = this.mesa.constructor;
+            Instance = this.mesa.constructor;
           }
 
-          return Type;
+          return Instance;
         },
 
         /**
          * Asserts that a given type is a subtype of this type.
          *
-         * @param {!pentaho.type.Value.Meta} typeMeta The subtype to assert.
+         * @param {!pentaho.type.Value.Meta} subtype The subtype to assert.
          *
-         * @return {!pentaho.type.Value.Meta} The subtype `typeMeta`.
+         * @return {!pentaho.type.Value.Meta} The subtype `subtype`.
          *
-         * @throws {pentaho.lang.OperationInvalidError} When `typeMeta` is not a subtype of this.
+         * @throws {pentaho.lang.OperationInvalidError} When `subtype` is not a subtype of this.
          *
          * @private
          * @ignore
          */
-        _assertSubtype: function(typeMeta) {
-          if(!typeMeta.isSubtypeOf(this)) {
+        _assertSubtype: function(subtype) {
+          if(!subtype.isSubtypeOf(this)) {
             throw error.operInvalid(
                 bundle.format(bundle.structured.errors.value.notOfExpectedBaseType, [this._getErrorLabel()]));
           }
 
-          return typeMeta;
+          return subtype;
         },
 
         /**

@@ -255,21 +255,21 @@ define([
     });
 
     describe(".Meta -", function() {
-      var ElemMeta = Simple.Meta;
+      var ElemType = Simple.Meta;
 
       it("should be a function", function() {
-        expect(typeof ElemMeta).toBe("function");
+        expect(typeof ElemType).toBe("function");
       });
 
       it("should be a sub-class of `Element.Meta`", function() {
-        expect(ElemMeta.prototype instanceof Element.Meta).toBe(true);
+        expect(ElemType.prototype instanceof Element.Meta).toBe(true);
       });
 
       describe("#cast -", function() {
-        var SimpleMeta, Derived;
+        var SimpleType, Derived;
 
         beforeEach(function() {
-          SimpleMeta = Simple.meta;
+          SimpleType = Simple.meta;
           Derived = Simple.extend({meta: {
             cast: function (value) {
               var n = parseFloat(value);
@@ -287,25 +287,25 @@ define([
 
         it("Default cast should return the value unchanged", function() {
           var original = 123;
-          var final = SimpleMeta.cast(original);
+          var final = SimpleType.cast(original);
 
           expect(original).toBe(final);
         });
 
         it("Cannot cast null values", function() {
-          expectCastError(SimpleMeta, null, errorMatch.argRequired("value"));
+          expectCastError(SimpleType, null, errorMatch.argRequired("value"));
         });
 
         it("Top cast function should throw an error message when cast function returns nully (null or undefined).", function() {
-          SimpleMeta.cast = function(value) {
+          SimpleType.cast = function(value) {
             return value === 0 ? null : value;
           };
-          expectCastError(SimpleMeta, 0, errorMatch.argInvalid("value"));
+          expectCastError(SimpleType, 0, errorMatch.argInvalid("value"));
 
-          SimpleMeta.cast = function(value) {
+          SimpleType.cast = function(value) {
             return value === 0 ? undefined : value;
           };
-          expectCastError(SimpleMeta, 0, errorMatch.argInvalid("value"));
+          expectCastError(SimpleType, 0, errorMatch.argInvalid("value"));
         });
 
         it("Should have changed the default cast behaviour and return an error if not a number", function() {

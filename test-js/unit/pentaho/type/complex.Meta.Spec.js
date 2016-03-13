@@ -25,7 +25,7 @@ define([
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
   var context = new Context();
-  var PropertyMeta = Property.Meta;
+  var PropertyType = Property.Meta;
   var Value = context.get("pentaho/type/value");
   var Complex = context.get("pentaho/type/complex");
   var String = context.get("pentaho/type/string");
@@ -109,30 +109,30 @@ define([
           });
 
           describe("the single property meta", function() {
-            var propMeta = Derived.meta.at(0);
+            var propType = Derived.meta.at(0);
 
             it("should have `label` derived by 'capitalization' of name", function() {
-              expect(propMeta.label).toBe("Foo Bar");
+              expect(propType.label).toBe("Foo Bar");
             });
 
             it("should have `type` string", function() {
-              expect(propMeta.type).toBe(String.meta);
+              expect(propType.type).toBe(String.meta);
             });
 
             it("should have `declaringType` equal to containing ComplexMeta class", function() {
-              expect(propMeta.declaringType).toBe(Derived.meta);
+              expect(propType.declaringType).toBe(Derived.meta);
             });
 
             it("should have `isList=false`", function() {
-              expect(propMeta.isList).toBe(false);
+              expect(propType.isList).toBe(false);
             });
 
             it("should have `root` equal to itself", function() {
-              expect(propMeta.root).toBe(propMeta);
+              expect(propType.root).toBe(propType);
             });
 
             it("should have `ancestor` equal to `null`", function() {
-              expect(propMeta.ancestor).toBe(null);
+              expect(propType.ancestor).toBe(null);
             });
           });
         });
@@ -259,8 +259,8 @@ define([
             });
 
             expect(A.meta.count).toBe(2);
-            expect(A.meta.get("fooBar", true) instanceof PropertyMeta).toBe(true);
-            expect(A.meta.get("guru",   true) instanceof PropertyMeta).toBe(true);
+            expect(A.meta.get("fooBar", true) instanceof PropertyType).toBe(true);
+            expect(A.meta.get("guru",   true) instanceof PropertyType).toBe(true);
             expect(A.meta.get("dada",   true)).toBe(null);
             expect(A.meta.get("babah",  true)).toBe(null);
           });
@@ -325,8 +325,8 @@ define([
       });
 
       it("should return true when given the metadata of one of its properties", function() {
-        var propMeta = Derived.meta.at(0);
-        expect(Derived.meta.has(propMeta)).toBe(true);
+        var propType = Derived.meta.at(0);
+        expect(Derived.meta.has(propType)).toBe(true);
       });
 
       it("should return false when given the metadata of a property from a different complex type", function() {
@@ -336,9 +336,9 @@ define([
           }
         });
 
-        var otherPropMeta = OtherDerived.meta.at(0);
+        var otherPropType = OtherDerived.meta.at(0);
 
-        expect(Derived.meta.has(otherPropMeta)).toBe(false);
+        expect(Derived.meta.has(otherPropType)).toBe(false);
       });
 
       it("should return true for an inherited named property", function() {
@@ -381,16 +381,16 @@ define([
       });
 
       it("should return a property metadata instance", function() {
-        var propMeta = Derived.meta.at(0);
-        expect(propMeta instanceof PropertyMeta).toBe(true);
+        var propType = Derived.meta.at(0);
+        expect(propType instanceof PropertyType).toBe(true);
       });
 
       it("should return the property metadata instance of the specified index", function() {
-        var propMeta = Derived.meta.at(0);
-        expect(propMeta.name).toBe("foo");
+        var propType = Derived.meta.at(0);
+        expect(propType.name).toBe("foo");
 
-        propMeta = Derived.meta.at(1);
-        expect(propMeta.name).toBe("bar");
+        propType = Derived.meta.at(1);
+        expect(propType.name).toBe("bar");
       });
     });
 
@@ -448,10 +448,10 @@ define([
       });
 
       describe("when given a property metadata that it contains", function() {
-        var propMeta = Derived.meta.at(0);
-        var result = propMeta;
+        var propType = Derived.meta.at(0);
+        var result = propType;
 
-        sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, [propMeta], result);
+        sloppyModeUtil.itShouldReturnValueWhateverTheSloppyValue(getter, [propType], result);
       });
 
       describe("when given a property metadata from a different complex type", function() {
@@ -461,11 +461,11 @@ define([
           }
         });
 
-        var otherPropMeta = OtherDerived.meta.at(0);
+        var otherPropType = OtherDerived.meta.at(0);
         var strictError = errorMatch.argInvalid("name");
         var sloppyResult = null;
 
-        sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, [otherPropMeta], sloppyResult, strictError);
+        sloppyModeUtil.itShouldBehaveStrictlyUnlessSloppyIsTrue(getter, [otherPropType], sloppyResult, strictError);
       });
     });
 

@@ -25,7 +25,7 @@ define([
 
   var context = new Context(),
       Value = context.get("pentaho/type/value"),
-      Number = context.get("pentaho/type/number");
+      PentahoNumber = context.get("pentaho/type/number");
 
   describe("pentaho/type/value -", function() {
 
@@ -38,7 +38,7 @@ define([
     });
 
     describe(".Meta -", function() {
-      var valueMeta;
+      var valueType;
       var Value;
       var myContext;
 
@@ -46,7 +46,7 @@ define([
         // making sure that we have a new Value definition for each test
         myContext = new Context();
         Value = myContext.get("pentaho/type/value");
-        valueMeta = Value.meta;
+        valueType = Value.meta;
       });
 
       it("should be a function", function() {
@@ -54,12 +54,12 @@ define([
       });
 
       it("should be a sub-class of `Item.Meta`", function() {
-        expect(valueMeta instanceof Item.Meta).toBe(true);
+        expect(valueType instanceof Item.Meta).toBe(true);
       });
 
       it("should have an `uid`", function() {
-        expect(valueMeta.uid != null).toBe(true);
-        expect(typeof valueMeta.uid).toBe("number");
+        expect(valueType.uid != null).toBe(true);
+        expect(typeof valueType.uid).toBe("number");
       });
 
       describe("#context()", function() {
@@ -73,20 +73,20 @@ define([
 
       describe("#isList", function() {
         it("should have default `isList` equal to `undefined`", function () {
-          expect(valueMeta.isList).toBe(undefined);
+          expect(valueType.isList).toBe(undefined);
         });
       }); // end #isList
 
       describe("#isAbstract", function() {
         it("should have default `isAbstract` equal to `true`", function () {
-          expect(valueMeta.isAbstract).toBe(true);
+          expect(valueType.isAbstract).toBe(true);
         });
 
         it("should allow changing `isAbstract` value", function () {
-          valueMeta.isAbstract = false;
-          expect(valueMeta.isAbstract).toBe(false);
-          valueMeta.isAbstract = true;
-          expect(valueMeta.isAbstract).toBe(true);
+          valueType.isAbstract = false;
+          expect(valueType.isAbstract).toBe(false);
+          valueType.isAbstract = true;
+          expect(valueType.isAbstract).toBe(true);
         });
       }); // end #isAbstract
 
@@ -119,7 +119,7 @@ define([
         it("should return `false` when given values with different constructors and not call their #equals methods",
         function() {
           var va = new Value();
-          var vb = new Number(1);
+          var vb = new PentahoNumber(1);
 
           spyOn(va, "equals").and.callThrough();
           spyOn(vb, "equals").and.callThrough();

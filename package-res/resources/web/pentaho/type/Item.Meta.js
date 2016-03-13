@@ -28,7 +28,7 @@ define([
   // Unique item class id exposed through Item.Meta#uid and used by Context instances.
   var _nextUid = 1,
       _extractShortId = /^pentaho\/type\/(\w+)$/i,
-      _itemMeta = null,
+      _itemType = null,
       O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
@@ -333,7 +333,7 @@ define([
     },
 
     _resetLabel: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._label;
       }
     },
@@ -371,7 +371,7 @@ define([
     },
 
     _resetDescription: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._description;
       }
     },
@@ -415,7 +415,7 @@ define([
     },
 
     _resetCategory: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._category;
       }
     },
@@ -455,7 +455,7 @@ define([
     },
 
     _resetHelpUrl: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._helpUrl;
       }
     },
@@ -492,7 +492,7 @@ define([
     },
 
     _resetIsBrowsable: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._isBrowsable;
       }
     },
@@ -530,7 +530,7 @@ define([
     },
 
     _resetIsAdvanced: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._isAdvanced;
       }
     },
@@ -606,7 +606,7 @@ define([
     },
 
     _resetOrdinal: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._ordinal;
       }
     },
@@ -672,7 +672,7 @@ define([
     },
 
     _resetView: function() {
-      if(this !== _itemMeta) {
+      if(this !== _itemType) {
         delete this._view;
       }
     },
@@ -712,12 +712,12 @@ define([
      * @ignore
      */
     _extendProto: function(spec, keyArgs) {
-      var subMeta = Object.create(this);
+      var subType = Object.create(this);
 
-      // NOTE: `subMeta.constructor` is still the "base" constructor.
-      subMeta.constructor(spec, keyArgs);
+      // NOTE: `subType.constructor` is still the "base" constructor.
+      subType.constructor(spec, keyArgs);
 
-      return subMeta;
+      return subType;
     },
 
     // TODO: Now that Property instances are never created,
@@ -900,7 +900,7 @@ define([
   })
   .implement(AnnotatableLinked);
 
-  _itemMeta = ItemMeta.prototype;
+  _itemType = ItemMeta.prototype;
 
   return ItemMeta;
 

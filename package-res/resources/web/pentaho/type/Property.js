@@ -27,7 +27,7 @@ define([
 
   "use strict";
 
-  var _propertyMeta;
+  var _propType;
   /**
    * @name pentaho.type.Property
    *
@@ -120,7 +120,7 @@ define([
           if(!this._name) this.name = null; // throws...
 
           // Force assuming default values
-          if(!this._typeMeta) this.type = null;
+          if(!this._type) this.type = null;
           if(!this._label)    this._resetLabel();
         }
       },
@@ -249,7 +249,7 @@ define([
        * @readonly
        */
       get isList() {
-        return this._typeMeta.isList;
+        return this._type.isList;
       },
       //endregion
 
@@ -269,7 +269,7 @@ define([
        * @readonly
        */
       get elemType() {
-        var type = this._typeMeta;
+        var type = this._type;
         return type.isList ? type.of : type;
       },
       //endregion
@@ -282,7 +282,7 @@ define([
        * @readonly
        */
       get type() {
-        return this._typeMeta;
+        return this._type;
       },
 
       /**
@@ -294,26 +294,26 @@ define([
       set type(value) {
         // Resolves types synchronously.
         if(this.isRoot) {
-          this._typeMeta = this.context.get(value).meta;
+          this._type = this.context.get(value).meta;
         } else {
           // Can be changed
 
           // Delete any inherited value.
-          delete this._typeMeta;
+          delete this._type;
 
           if(value != null) {
-            var typeMeta = this.context.get(value).meta,
-                baseMeta = this._typeMeta;
+            var type = this.context.get(value).meta,
+                baseType = this._type;
 
             // Hierarchy/PreviousValue consistency
             // Validate that it is a sub-type of the base property's type
             // or a refinement type whose `of` is the base type.
-            // (which can only happen if baseMeta itself is not a refinement type).
-            if(typeMeta !== baseMeta) {
-              if(!typeMeta.isSubtypeOf(baseMeta))
+            // (which can only happen if baseType itself is not a refinement type).
+            if(type !== baseType) {
+              if(!type.isSubtypeOf(baseType))
                 throw error.argInvalid("type", bundle.structured.errors.property.typeNotSubtypeOfBaseType);
 
-              this._typeMeta = typeMeta;
+              this._type = type;
             }
           }
         }
@@ -352,7 +352,7 @@ define([
       // or PhantomJS 1.9.8 will throw a syntax error...
       set value(_) {
         if(_ === undefined) {
-          if(this !== _propertyMeta) {
+          if(this !== _propType) {
             // Clear local value. Inherit base value.
             delete this._value;
           }
@@ -882,7 +882,7 @@ define([
     } // end meta:
   });
 
-  _propertyMeta = Property.prototype;
+  _propType = Property.prototype;
 
   return Property;
 

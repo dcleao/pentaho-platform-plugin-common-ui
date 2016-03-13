@@ -128,9 +128,9 @@ define([
       it("should not throw if set to the same value", function() {
         var SubList = List.extend();
 
-        var elemMeta = SubList.meta.of;
-        SubList.meta.of = elemMeta;
-        expect(SubList.meta.of).toBe(elemMeta);
+        var elemType = SubList.meta.of;
+        SubList.meta.of = elemType;
+        expect(SubList.meta.of).toBe(elemType);
       });
     });
 

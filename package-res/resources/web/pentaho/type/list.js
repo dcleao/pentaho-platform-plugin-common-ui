@@ -370,7 +370,7 @@ define([
        * @protected
        */
       _cast: function(valueSpec) {
-        return this.meta._elemMeta.to(valueSpec);
+        return this.meta._elemType.to(valueSpec);
       },
 
       //region Change tracking
@@ -557,7 +557,7 @@ define([
           this.base.apply(this, arguments);
 
           // Force base value inheritance. Cannot change after set locally...
-          if(!O.hasOwn(this, "_elemMeta")) this._elemMeta = this._elemMeta;
+          if(!O.hasOwn(this, "_elemType")) this._elemType = this._elemType;
         },
 
         id: module.id,
@@ -596,7 +596,7 @@ define([
         //endregion
 
         //region of
-        _elemMeta: Element.meta,
+        _elemType: Element.meta,
 
         /**
          * Gets the type of the elements that this list can contain.
@@ -605,7 +605,7 @@ define([
          * @readonly
          */
         get of() {
-          return this._elemMeta;
+          return this._elemType;
         },
 
         // supports configuration
@@ -618,25 +618,25 @@ define([
           //  structurally equal. Because there isn't an equals test,
           //  it cannot be validated that a set is ok as long as the set value does not change.
 
-          var ElemMeta = this.context.get(value),
-              elemMeta = ElemMeta.meta,
-              baseMeta = this._elemMeta;
+          var ElemInstance = this.context.get(value),
+              elemType = ElemInstance.meta,
+              baseElemType = this._elemType;
 
           // Can't use O.setConst cause the configurable: false is inherited
           // and we need to be able to set each local value at least once.
-          if(O.hasOwn(this, "_elemMeta")) {
-            if(elemMeta !== baseMeta) throw error.operInvalid("Property 'of' cannot change.");
+          if(O.hasOwn(this, "_elemType")) {
+            if(elemType !== baseElemType) throw error.operInvalid("Property 'of' cannot change.");
             return;
           }
 
           // Hierarchy consistency
           // Validate that it is a sub-type of the base property's type.
           // This ensures that `of` is an element type...
-          if(elemMeta !== baseMeta && !elemMeta.isSubtypeOf(baseMeta))
+          if(elemType !== baseElemType && !elemType.isSubtypeOf(baseElemType))
             throw error.argInvalid("of", bundle.structured.errors.list.elemTypeNotSubtypeOfBaseElemType);
 
           // Mark set locally even if it is the same...
-          this._elemMeta = elemMeta;
+          this._elemType = elemType;
         },
         //endregion
 
