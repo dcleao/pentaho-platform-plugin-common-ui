@@ -674,11 +674,39 @@ define([
         //endregion
 
         //region serialization
-        // Can a list type be serialized as a reference?
-        //  [ ofTypeRef ] ?
-        // Is it _the list type_?
-        // If not, what is _elemType? Always local, but possibly equal to base...
+        // * "list" has an id and toReference immediately returns that ("list" is like ["element"], but the base class)
+        // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
+        //   toReference calls the toSpecInner, cause it has no id and because a temporary id is also
+        //   never generated to it, in scope
+        //   toSpecInner only can return this form if there are no other local list class attributes
 
+        toSpecInner: function(scope, keyArgs) {
+          // The type's id or the temporary id in this scope.
+          var baseType = this.ancestor;
+          var spec = {
+                id:   this.shortId,
+                base: baseType.toReference(scope, keyArgs)
+              };
+
+          var baseElemType = List.type.isSubTypeOf(baseType) ? baseType._elemType : null;
+          if(!baseElemType || this._elemType !== baseElemType) {
+            spec.of = this._elemType.toReference(scope, keyArgs);
+          }
+
+          // No other attributes, no id and base is "list"?
+          if(!this._addSpecAttributes(spec, scope, keyArgs) &&
+             !spec.id &&
+             spec.base === "list") {
+            // Can use the shorthand [ofType] syntax.
+            // Default ofType in [] syntax is "string" -> [] <=> ["string"]
+            return spec.of === "string" ? [] : [spec.of];
+          }
+
+          // Need id
+          if(!spec.id) spec.id = scope.add(this);
+
+          return spec;
+        }
         //endregion
       }
     }).implement({
