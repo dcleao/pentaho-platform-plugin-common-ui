@@ -144,7 +144,7 @@ define([
       var requireType = !keyArgs.omitRootType;
       var spec = this.toSpecInner(scope, requireType, keyArgs);
 
-      scope.dispose();
+      //scope.dispose();
 
       return spec;
     },

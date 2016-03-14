@@ -616,7 +616,7 @@ define([
           return this.list ? [spec] : spec;
         },
         _toSpec: function(keyArgs) {
-          return {id: this.id};
+          return this.id;
         }
         //endregion
       }

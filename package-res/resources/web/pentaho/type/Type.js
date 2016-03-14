@@ -796,7 +796,7 @@ define([
       var scope = new SpecificationScope();
       var spec = this.toSpecInner(scope, keyArgs);
 
-      scope.dispose();
+      //scope.dispose();
 
       return spec;
     },

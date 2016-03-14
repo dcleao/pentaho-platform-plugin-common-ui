@@ -564,13 +564,11 @@ define([
       //endregion
 
       //region serialization
-      _toSpec: function(keyArgs) {
-        var spec = {
+      toSpecInner: function(scope, requireType, keyArgs) {
+        return {
           name: this.name,
           type: this.type.toSpec(keyArgs)
         };
-
-        return spec;
       }
       //endregion
     } // end instance type:

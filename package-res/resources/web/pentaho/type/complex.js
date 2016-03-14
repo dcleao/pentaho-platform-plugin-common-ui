@@ -608,6 +608,12 @@ define([
       //endregion
       //endregion
 
+      //region serialization
+      toSpec: function(keyArgs) {
+        return this.type._toSpec(keyArgs, this._values);
+      },
+      //endregion
+
       type: /** @lends pentaho.type.Complex.Type# */{
         id: module.id,
 
@@ -790,12 +796,28 @@ define([
         //endregion
 
         //region serialization
-        _toSpec: function(keyArgs) {
-          var spec = this.base(keyArgs);
+        _toSpec: function(keyArgs, values) {
+          var spec = {};
           spec.props = [];
 
           this.each(function(prop) {
             spec.props.push(prop.toSpec(keyArgs));
+            var name = prop.name;
+            if(values && values[name]._values){
+              spec[name] = {};
+              if(keyArgs) {
+                if (keyArgs.inlineTypeSpec) {
+                  spec[name]._ = values[name].type.toSpec();
+                }
+              }
+              for (var val in values[name]._values){
+                spec[name][val] = values[name]._values[val].toSpec(keyArgs);
+              }
+            } else{
+              if(values) {
+                spec[name] = values[name].toSpec(keyArgs);
+              }
+            }
           });
 
           return spec;

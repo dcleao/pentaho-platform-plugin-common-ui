@@ -247,24 +247,36 @@ define([
       //endregion
 
       toSpec: function(keyArgs) {
-        var spec = {
-          v: this.value,
-          f: this.formatted
-        };
-
         if(keyArgs){
           if(!keyArgs.returnFormattedValues && !keyArgs.inlineTypeSpec) {
             return this.value;
-          }
-          if(keyArgs.inlineTypeSpec) {
-            spec['_'] = this.meta.toSpec();
-          }
-          if(!keyArgs.returnFormattedValues) {
-            delete spec['f'];
+          } else if(keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
+            return {
+              _: this.type.toSpec(),
+              v: this.value,
+              f: this.formatted
+            };
+          } else if(!keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
+            return {
+              v: this.value,
+              f: this.formatted
+            };
+          } else if(keyArgs.inlineTypeSpec && !keyArgs.returnFormattedValues) {
+            return {
+              _: this.type.toSpec(),
+              v: this.value
+            };
           }
         }
 
-        return spec;
+        if(!this.formatted){
+          return this.value;
+        } else {
+          return {
+            v: this.value,
+            f: this.formatted
+          };
+        }
       },
 
       type: /** pentaho.type.Simple.Type# */{
