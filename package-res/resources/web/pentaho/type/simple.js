@@ -247,6 +247,39 @@ define([
       },
       //endregion
 
+      toSpec: function(keyArgs) {
+        if(keyArgs){
+          if(!keyArgs.returnFormattedValues && !keyArgs.inlineTypeSpec) {
+            return this.value;
+          } else if(keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
+            return {
+              _: this.type.toSpec(),
+              v: this.value,
+              f: this.formatted
+            };
+          } else if(!keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
+            return {
+              v: this.value,
+              f: this.formatted
+            };
+          } else if(keyArgs.inlineTypeSpec && !keyArgs.returnFormattedValues) {
+            return {
+              _: this.type.toSpec(),
+              v: this.value
+            };
+          }
+        }
+
+        if(!this.formatted){
+          return this.value;
+        } else {
+          return {
+            v: this.value,
+            f: this.formatted
+          };
+        }
+      },
+
       type: /** pentaho.type.Simple.Type# */{
         id: module.id,
         isAbstract: true,

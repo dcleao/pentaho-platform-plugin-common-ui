@@ -94,7 +94,7 @@ define([
       describe("values", function() {
         describe("default", function() {
           it("should return primitive value and formatted value when formatted", function() {
-            var spec = value.toSpec();
+            var spec = value.toSpec({returnFormattedValues: true});
 
             expect(spec.quantity.v).toBe(originalSpec.quantity.v);
             expect(spec.quantity.f).toBe(originalSpec.quantity.f);
@@ -104,7 +104,7 @@ define([
           });
 
           it("should return primitive value when not formatted", function() {
-            var spec = value.toSpec();
+            var spec = value.toSpec({returnFormattedValues: false});
 
             expect(spec.noFormat).toBe(originalSpec.noFormat);
 
@@ -144,14 +144,14 @@ define([
           });
 
           it("should return primitive value and null formatted value when not formatted", function() {
-            var spec = value.toSpec();
+            var spec = value.toSpec({returnFormattedValues: true, inlineTypeSpec: true});
 
             expect(spec.noFormat.v).toBe(originalSpec.noFormat);
             expect(spec.noFormat.f).toBeNull();
           });
 
           it("should propagate and return primitive value and null formatted value when not formatted", function() {
-            var spec = value.toSpec();
+            var spec = value.toSpec({returnFormattedValues: true, inlineTypeSpec: true});
 
             expect(spec.sub.when.v).toBe(originalSpec.sub.when);
             expect(spec.sub.when.f).toBeNull();
@@ -160,13 +160,13 @@ define([
 
         describe("returnFormattedValues: false", function() {
           it("should return primitive value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true});
+            var spec = value.toSpec({returnFormattedValues: false});
 
             expect(spec.quantity).toBe(originalSpec.quantity.v);
           });
 
           it("should propagate and return primitive value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true});
+            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: false});
 
             expect(spec.sub.truth).toBe(originalSpec.sub.truth.v);
           });
@@ -186,28 +186,28 @@ define([
 
         describe("returnFormattedValues: false but inlineTypeSpec: true", function() {
           it("should return primitive value and undefined formatted value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true});
+            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
 
             expect(spec.quantity.v).toBe(originalSpec.quantity.v);
             expect(spec.quantity.f).toBeUndefined();
           });
 
           it("should propagate and return primitive value and undefined formatted value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true});
+            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
 
             expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
             expect(spec.sub.truth.f).toBeUndefined();
           });
 
           it("should return primitive value and undefined formatted value when not formatted", function() {
-            var spec = value.toSpec();
+            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
 
             expect(spec.noFormat.v).toBe(originalSpec.noFormat);
             expect(spec.noFormat.f).toBeUndefined();
           });
 
           it("should propagate and return primitive value and undefined formatted value when not formatted", function() {
-            var spec = value.toSpec();
+            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
 
             expect(spec.sub.when.v).toBe(originalSpec.sub.when);
             expect(spec.sub.when.f).toBeUndefined();

@@ -26,9 +26,9 @@ define([
     describe("pentaho/type/simple -", function() {
       // Using pentaho/type/boolean because pentaho/type/simple is abstract
       var PentahoBoolean = context.get("pentaho/type/boolean");
+      var originalSpec = {v: false, f: "I'm a simple value"};
 
       describe("values", function() {
-        var originalSpec = {v: false, f: "I'm a simple value"};
 
         describe("value with formatted info", function() {
           var value;
@@ -82,7 +82,7 @@ define([
 
           describe("default", function() {
             it("should return primitive value", function() {
-              var spec = value.toSpec({returnFormattedValues: "auto"});
+              var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: false});
 
               expect(spec).toBe(originalSpec.v);
             });
@@ -134,7 +134,7 @@ define([
 
         describe("default", function() {
           it("should not inline type spec", function() {
-            var spec = value.toSpec({inlineTypeSpec: false});
+            var spec = value.toSpec();
 
             expect(spec._).toBeUndefined();
           });
@@ -176,15 +176,15 @@ define([
 
         var value;
         beforeEach(function() {
-          value = new SimpleClass(simple.value);
-        });
+          value = new SimpleClass(simple);
+    });
 
         describe("values", function() {
           describe("primitive format (returnFormattedValues: false)", function() {
             it("should return the primitive value", function() {
-              var spec = value.toSpec({returnFormattedValues: false});
+              var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: false});
 
-              expect(typeof spec.v).toBe(simple.name);
+              expect(typeof spec).toBe(simple.name);
               expect(spec).toBe(simple.value);
             });
           });

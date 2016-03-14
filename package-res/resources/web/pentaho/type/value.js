@@ -611,7 +611,6 @@ define([
         },
         //endregion
 
-        //region serialization
         /**
          * Creates a specification that describes this value type under a given scope.
          *
