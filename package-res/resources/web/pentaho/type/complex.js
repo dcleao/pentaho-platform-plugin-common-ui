@@ -796,6 +796,7 @@ define([
 
           if(this.count) {
             any = true;
+
             this.each(function(propType) {
               this.push(propType.toSpecInner(scope, keyArgs));
             }, (spec.props = []));

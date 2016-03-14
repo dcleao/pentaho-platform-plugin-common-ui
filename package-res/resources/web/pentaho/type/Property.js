@@ -585,6 +585,7 @@ define([
       },
 
       _addSpecAttributes: function(spec, scope, keyArgs) {
+        var isJson = keyArgs.isJson;
 
         var any = this.base(spec, scope, keyArgs);
 
@@ -596,7 +597,7 @@ define([
             any = true;
 
             var value = this[namePriv];
-            spec[name] = F.is(value) ? value.toString() : value;
+            spec[name] = isJson && F.is(value) ? value.toString() : value;
           }
         }, this);
 

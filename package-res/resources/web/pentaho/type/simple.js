@@ -18,8 +18,9 @@ define([
   "./element",
   "../util/object",
   "../util/error",
+  "../util/fun",
   "../i18n!types"
-], function(module, elemFactory, O, error, bundle) {
+], function(module, elemFactory, O, error, F, bundle) {
 
   "use strict";
 
@@ -280,10 +281,29 @@ define([
         // NOTE: the argument cannot have the same name as the property setter
         // or PhantomJS 1.9.8 will throw a syntax error...
         set cast(_) {
+          if(_ && !(_ = F.as(_))) {
+            throw error.argInvalidType("cast", ["string", "function"]);
+          }
+
           this._cast = _ || castCore;
         },
 
-        _cast: castCore
+        _cast: castCore,
+        //endregion
+
+        //region serialization
+        _addSpecAttributes: function(spec, scope, keyArgs) {
+
+          var any = this.base(spec, scope, keyArgs);
+
+          if(O.hasOwn(this, "_cast")) {
+            any = true;
+            var value = this._cast;
+            spec.cast = (keyArgs.isJson && F.is(value)) ? value.toString() : value;
+          }
+
+          return any;
+        }
         //endregion
       }
     }).implement({
