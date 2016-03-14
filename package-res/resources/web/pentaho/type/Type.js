@@ -847,10 +847,11 @@ define([
 
       // Normal attributes
       _normalAttrNames.forEach(function(name) {
-        var _name = "_" + name;
-        if(O.hasOwn(this, _name)) {
+        var _name = "_" + name, v;
+        // !== undefined ensures refinement fields are well handled as well
+        if(O.hasOwn(this, _name) && (v = this[_name]) !== undefined) {
           any = true;
-          spec[name] = this[_name];
+          spec[name] = v;
         }
       }, this);
 

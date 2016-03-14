@@ -644,18 +644,11 @@ define([
           this._addSpecAttributes(spec, scope, keyArgs);
 
           return spec;
-        },
-
-        _addSpecAttributes: function(spec, scope, keyArgs) {
-          var any = false;
-
-          if(this.isAbstract) {
-            any = true;
-            spec.isAbstract = true;
-          }
-
-          return this.base(spec, scope, keyArgs) || any;
         }
+
+        // Cannot add this.isAbstract in local _addSpecAttributes, cause it
+        // wouldn't work for refinement type
+
         //endregion
       }
     }, /** @lends pentaho.type.Value */{

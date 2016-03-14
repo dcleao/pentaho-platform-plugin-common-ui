@@ -86,6 +86,10 @@ define([
       }
 
       return id;
+    },
+
+    dispose: function() {
+
     }
   });
 

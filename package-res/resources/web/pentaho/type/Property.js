@@ -605,7 +605,14 @@ define([
         var defaultValue = O.getOwn(this, "_value");
         if(defaultValue !== undefined) {
           any = true;
-          spec.value = defaultValue && defaultValue.toSpecInner(scope, keyArgs);
+          if(defaultValue) {
+            var valueType = this.type;
+            var requireType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
+
+            spec.value = defaultValue.toSpecInner(scope, requireType, keyArgs);
+          } else {
+            spec.value = null;
+          }
         }
 
         return any;

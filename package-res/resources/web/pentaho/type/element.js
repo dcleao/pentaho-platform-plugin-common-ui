@@ -130,7 +130,20 @@ define([
           this._compare = _ || compareCore;
         },
 
-        _compare: compareCore
+        _compare: compareCore,
+        //endregion
+
+        //region serialization
+        _addSpecAttributes: function(spec, scope, keyArgs) {
+          var any = false;
+
+          if(this.isAbstract) {
+            any = true;
+            spec.isAbstract = true;
+          }
+
+          return this.base(spec, scope, keyArgs) || any;
+        }
         //endregion
       }
     }).implement({

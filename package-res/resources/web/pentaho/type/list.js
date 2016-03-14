@@ -706,6 +706,17 @@ define([
           if(!spec.id) spec.id = scope.add(this);
 
           return spec;
+        },
+
+        _addSpecAttributes: function(spec, scope, keyArgs) {
+          var any = false;
+
+          if(this.isAbstract) {
+            any = true;
+            spec.isAbstract = true;
+          }
+
+          return this.base(spec, scope, keyArgs) || any;
         }
         //endregion
       }

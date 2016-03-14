@@ -326,6 +326,8 @@ define([
             addRefinement.call(this, values);
 
           function addRefinement(Facet) {
+            /*jshint validthis:true*/
+
             if(typeof Facet === "string") {
               Facet = resolveFacet(Facet);
             }
@@ -395,6 +397,7 @@ define([
 
         set isAbstract(value) {
           // nully is reset, which is false, so !! works well.
+          // jshint -W018
           if((!!value) !== this.isAbstract)
             throw error.operInvalid("Attribute cannot be changed.");
         },
@@ -666,6 +669,31 @@ define([
           return this.facets.reduce(function(errors, Facet) {
             return valueHelper.combineErrors(errors, Facet.validate.call(this, value));
           }.bind(this), null);
+        },
+        //endregion
+
+        //region serialization
+        _addSpecAttributes: function(spec, scope, keyArgs) {
+          var any = false;
+
+          var ofType = O.getOwn(this, "_of");
+          if(ofType) {
+            any = true;
+            spec.of = ofType.toReference(scope, keyArgs);
+          }
+
+          var facets = O.getOwn(this, "_facets");
+          if(facets && this !== _refinementType) {
+            var L = this.ancestor._facets.length;
+            any = true;
+
+          }
+
+          any = this.base(spec, scope, keyArgs) || any;
+
+          // Facets toSpec ...
+
+          return any;
         }
         //endregion
       }
