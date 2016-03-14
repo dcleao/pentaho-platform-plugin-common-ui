@@ -435,6 +435,7 @@ define([
               return Promise.all(factories.map(me.getAsync, me));
             })
             .then(function(InstCtors) {
+              /*jshint laxbreak:true*/
               return predicate
                   ? InstCtors.filter(function(InstCtor) { return predicate(InstCtor.type); })
                   : InstCtors;
@@ -471,7 +472,7 @@ define([
     _get: function(typeRef, sync) {
       // Default property type is "string".
       if(!typeRef) typeRef = _defaultTypeMid;
-
+      /*jshint laxbreak:true*/
       switch(typeof typeRef) {
         case "string":   return this._getById (typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
@@ -518,6 +519,7 @@ define([
       var InstCtor = O.getOwn(this._byTypeId, id);
       if(InstCtor) return this._return(InstCtor, sync);
 
+      /*jshint laxbreak:true*/
       return sync
           // `require` fails if a module with the id in the `typeSpec` var
           // is not already _loaded_.
@@ -685,7 +687,7 @@ define([
       return this._getByInstCtor(InstCtor, sync, factoryUid);
     },
 
-    // Inline type spec: {[base: "complex", ] ... }
+    // Inline type spec: {[base: "complex"], [id: ]}
     _getByObjectSpec: function(typeSpec, sync) {
       if(typeSpec instanceof Type)
         return this._getByInstCtor(typeSpec.instance.constructor, sync);
@@ -693,10 +695,52 @@ define([
       if(typeSpec instanceof Instance)
         return this._error(error.argInvalid("typeRef", "Value instance is not supported."), sync);
 
-      var baseTypeSpec = typeSpec.base || _defaultBaseTypeMid,
-          resolveSync = (function() {
-              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true),
-                  InstCtor = BaseInstCtor.extend({type: typeSpec});
+      // Because a base type is required (when null, it is defaulted)
+      // this means that the generic object spec cannot represent the root of type hierarchies:
+      // Instance, Value or Property...
+      var id = typeSpec.id;
+      if(id) id = toAbsTypeId(id);
+
+      /*
+       *  id      | base       | Result
+       *  --------+------------+--------------------
+       *  "value" | falsy      : base <- null
+       *  "value" | "anything" : throw error
+       *  falsy   | null       : id   <- "value"
+       *  "foo"   | falsy      : base <- "complex"
+       *  "foo"   | "anything" : ok
+       */
+      var baseTypeSpec = typeSpec.base;
+      if(baseTypeSpec === null) {
+        // must have no id or be "value"
+        if(id && id !== (_baseMid + "value"))
+          return this._error(
+              error.argInvalid("typeRef", "A type with a `null` base must be the root type `Value`."), sync);
+
+        id = "value";
+        // Already loaded, in constructor.
+      } else if(!baseTypeSpec) {
+        baseTypeSpec = _defaultBaseTypeMid;
+      }
+
+      var InstCtor;
+      // Already loaded?
+      if(id && (InstCtor = O.getOwn(this._byTypeId, id))) {
+        // TODO: Is this the best approach?
+        // Even for standard types?
+        InstCtor.implement(typeSpec);
+
+        return this._return(InstCtor, sync);
+      }
+
+      // assert baseTypeSpec
+
+      // if id and not loaded, the id is used later to register the new type under that id.
+
+      var resolveSync = (function() {
+              var BaseInstCtor = this._get(baseTypeSpec, /*sync:*/true);
+              var InstCtor = BaseInstCtor.extend({type: typeSpec});
+
               return this._getByInstCtor(InstCtor, /*sync:*/true);
             }).bind(this);
 
@@ -706,6 +750,7 @@ define([
 
       // Collect the module ids of all custom types used within typeSpec.
       var customTypeIds = collectTypeIds(typeSpec);
+      /*jshint laxbreak:true*/
       return customTypeIds.length
           // Require them all and only then invoke the synchronous BaseType.extend method.
           ? promiseUtil.require(customTypeIds).then(resolveSync)

@@ -435,6 +435,7 @@ define([
         if(index == null) {
           index = elems.length;
         } else {
+          /*jshint laxbreak:true*/
           index = index < 0
               ? Math.max(0, elems.length + index)
               : Math.min(index, elems.length);
@@ -599,7 +600,7 @@ define([
         _elemType: Element.type,
 
         /**
-         * Gets the type of the elements that this list can contain.
+         * Gets the type of the elements that this type of list can contain.
          *
          * @type {pentaho.type.Element.Type}
          * @readonly
@@ -669,11 +670,19 @@ define([
           return value._elems.reduce(function(errors, elem) {
             return valueHelper.combineErrors(errors, elemType.validateInstance(elem));
           }.bind(this), null);
-        }
+        },
+        //endregion
+
+        //region serialization
+        // Can a list type be serialized as a reference?
+        //  [ ofTypeRef ] ?
+        // Is it _the list type_?
+        // If not, what is _elemType? Always local, but possibly equal to base...
+
         //endregion
       }
     }).implement({
-      type: bundle.structured["list"]
+      type: bundle.structured.list
     });
 
     return List;

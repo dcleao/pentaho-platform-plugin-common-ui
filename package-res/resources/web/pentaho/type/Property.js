@@ -27,7 +27,9 @@ define([
 
   "use strict";
 
-  var _propType;
+  var _propType,
+      _dynamicAttrNames = ["isRequired", "countMin", "countMax", "isApplicable", "isReadOnly"];
+
   /**
    * @name pentaho.type.Property
    *
@@ -118,8 +120,8 @@ define([
           if(!this._name) this.name = null; // throws...
 
           // Force assuming default values
-          if(!this._type) this.type = null;
-          if(!this._label)    this._resetLabel();
+          if(!this._type)  this.type = null;
+          if(!this._label) this._resetLabel();
         }
       },
 
@@ -395,7 +397,7 @@ define([
        */
       _freshDefaultValue: function() {
         var value = this.value;
-        return value     ? value.clone()      :
+        return value       ? value.clone()      :
                this.isList ? this.type.create() :
                value;
       },
@@ -491,7 +493,7 @@ define([
         Object.keys(attrSpecs).forEach(function(name) {
           this._dynamicAttribute(name, attrSpecs[name]);
         }, this);
-      },
+      }, // jshint -W078
 
       /**
        * Dynamically defines an attribute and corresponding setter and getter methods.
@@ -564,13 +566,48 @@ define([
       //endregion
 
       //region serialization
-      _toSpec: function(keyArgs) {
+      toSpecInner: function(scope, keyArgs) {
+        // no id and no base
+        var valueTypeRef = this.type.toReference(scope, keyArgs);
         var spec = {
-          name: this.name,
-          type: this.type.toSpec(keyArgs)
+          name: this._name,
+          type: valueTypeRef
         };
 
+        // If there are no attributes and it's of type "string",
+        // return only the name of the property type.
+        if(!this._addSpecAttributes(spec, scope, keyArgs) &&
+           valueTypeRef === "string") {
+          return this._name;
+        }
+
         return spec;
+      },
+
+      _addSpecAttributes: function(spec, scope, keyArgs) {
+
+        var any = this.base(spec, scope, keyArgs);
+
+        // Dynamic attributes
+        _dynamicAttrNames.forEach(function(name) {
+          var namePriv = "_" + name;
+
+          if(O.hasOwn(this, namePriv)) {
+            any = true;
+
+            var value = this[namePriv];
+            spec[name] = F.is(value) ? value.toString() : value;
+          }
+        }, this);
+
+        // Custom attributes
+        var defaultValue = O.getOwn(this, "_value");
+        if(defaultValue !== undefined) {
+          any = true;
+          spec.value = defaultValue && defaultValue.toSpecInner(scope, keyArgs);
+        }
+
+        return any;
       }
       //endregion
     } // end instance type:

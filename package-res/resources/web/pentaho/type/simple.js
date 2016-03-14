@@ -118,7 +118,7 @@ define([
        */
       set v(value) {
         this.value = value;
-      },
+      }, // jshint -W078
       //endregion
 
       //region formatted attribute
@@ -145,7 +145,7 @@ define([
        */
       set f(value) {
         this.formatted = value;
-      },
+      }, // jshint -W078
       //endregion
 
       /**
@@ -297,6 +297,8 @@ define([
      * Wrapper cast function {@link pentaho.type.Simple.Type#cast}
      */
     function castTop(value) {
+      /*jshint validthis:true*/
+
       if(value == null)
         throw error.argRequired("value");
 

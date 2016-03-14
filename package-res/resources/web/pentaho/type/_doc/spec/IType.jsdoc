@@ -38,6 +38,18 @@
  */
 
 /**
+ * A reference to the type's base type, if any.
+ *
+ * When `null`, it has no base type.
+ *
+ * When absent or `undefined`, it defaults to `"complex`.
+ *
+ * @name base
+ * @memberOf pentaho.type.spec.IType#
+ * @type {?pentaho.type.spec.UTypeReference}
+ */
+
+/**
  * The label of the type.
  *
  * When non-{@link Nully} and not a string,

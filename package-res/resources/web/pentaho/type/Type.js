@@ -29,6 +29,9 @@ define([
   var _nextUid = 1,
       _extractShortId = /^pentaho\/type\/(\w+)$/i,
       _type = null,
+      _normalAttrNames = [
+        "label", "description", "category", "helpUrl", "isBrowsable", "isAdvanced", "styleClass", "ordinal"
+      ],
       O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
@@ -686,6 +689,7 @@ define([
      * @see pentaho.type.Type#view
      */
     get viewClass() {
+      /*jshint laxbreak:true*/
       var view = this._view;
       return view
           ? (view.promise || (view.promise = promiseUtil.require(view.value)))
@@ -810,26 +814,55 @@ define([
      *
      * Please see the documentation of subclasses for information on additional, supported keyword arguments.
      *
-     * @return {!any} A specification of this instance.
+     * @return {!pentaho.type.spec.IType} A specification of this instance.
      *
      * @abstract
      *
      * @see pentaho.type.Instance#toSpec
      */
     toSpecInner: function(scope, keyArgs) {
-      // The type's id or the temporary id in this scope.
-      var spec = {id: this.shortId || scope.add(this)};
-
-      var base = this.ancestor;
-      if(base) scope.base = base;
-
-      // label, description, category, ...
-
-      return spec;
+      throw error.notImplemented();
     },
 
-    // "list" | "[element]" | ["element"],
-    // ["string"] | [] |  "[string]"
+    /**
+     * Adds the attributes of a type to a given specification and under a given scope.
+     *
+     * This method does _not_ add the special `id` and `base` attributes to the specification.
+     *
+     * @param {Object} spec - The specification to be filled.
+     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+     * @param {!Object} keyArgs - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+     *
+     * @return {boolean} Returns `true` if any attribute was added, `false`, otherwise.
+     *
+     * @protected
+     *
+     * @see pentaho.type.Instance#toSpecInner
+     */
+    _addSpecAttributes: function(spec, scope, keyArgs) {
+      var any = false;
+
+      // Normal attributes
+      _normalAttrNames.forEach(function(name) {
+        var _name = "_" + name;
+        if(O.hasOwn(this, _name)) {
+          any = true;
+          spec[name] = this[_name];
+        }
+      }, this);
+
+      // Custom attributes
+      var viewInfo = O.getOwn(this, "_view");
+      if(viewInfo) {
+        any = true;
+        spec.view = String(viewInfo.value);
+      }
+
+      return any;
+    },
 
     /**
      * Returns a _reference_ to this type.
@@ -861,7 +894,7 @@ define([
      * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
      */
     toReference: function(scope, keyArgs) {
-      return this._id || scope.getIdOf(this) || this.toSpecInner(scope, keyArgs);
+      return this.shortId || scope.getIdOf(this) || this.toSpecInner(scope, keyArgs);
     }
     //endregion
  }, /** @lends pentaho.type.Type */{

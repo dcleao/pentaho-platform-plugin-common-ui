@@ -621,7 +621,7 @@ define([
         // Used for configuration only.
         set props(propSpecs) {
           this._getProps().configure(propSpecs);
-        },
+        }, // jshint -W078
 
         _getProps: function() {
           // Always get/create from/on the class' prototype.
@@ -790,15 +790,18 @@ define([
         //endregion
 
         //region serialization
-        _toSpec: function(keyArgs) {
-          var spec = this.base(keyArgs);
-          spec.props = [];
+        _addSpecAttributes: function(spec, scope, keyArgs) {
 
-          this.each(function(prop) {
-            spec.props.push(prop.toSpec(keyArgs));
-          });
+          var any = this.base(spec, scope, keyArgs);
 
-          return spec;
+          if(this.count) {
+            any = true;
+            this.each(function(propType) {
+              this.push(propType.toSpecInner(scope, keyArgs));
+            }, (spec.props = []));
+          }
+
+          return any;
         }
         //endregion
       }

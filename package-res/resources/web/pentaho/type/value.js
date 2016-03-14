@@ -18,8 +18,9 @@ define([
   "./Instance",
   "./valueHelper",
   "../i18n!types",
+  "../util/object",
   "../util/error"
-], function(module, Instance, valueHelper, bundle, error) {
+], function(module, Instance, valueHelper, bundle, O, error) {
 
   "use strict";
 
@@ -468,8 +469,8 @@ define([
          * @ignore
          */
         _throwAbstractType: function() {
-          throw error.operInvalid(
-              bundle.format(bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
+          throw error.operInvalid(bundle.format(
+              bundle.structured.errors.value.cannotCreateInstanceOfAbstractType, [this._getErrorLabel()]));
         },
 
         /**
@@ -607,6 +608,53 @@ define([
          * @see pentaho.type.Value.Type#validateInstance
          */
         _validate: function(value) {
+        },
+        //endregion
+
+        //region serialization
+        /**
+         * Creates a specification that describes this value type under a given scope.
+         *
+         * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+         * @param {!Object} keyArgs - The keyword arguments object.
+         * Passed to every type and instance serialized within this scope.
+         *
+         * Please see the documentation of subclasses for information on additional, supported keyword arguments.
+         *
+         * @return {!pentaho.type.spec.IType} A specification of this value type.
+         *
+         * @see pentaho.type.Instance#toSpec
+         */
+        toSpecInner: function(scope, keyArgs) {
+          // The type's id or the temporary id in this scope.
+          var spec = {id: this.shortId || scope.add(this)};
+
+          // The base type in the current type hierarchy.
+          // The default base type is "pentaho/type/complex".
+          var baseType = this.ancestor;
+          if(baseType) {
+            var baseRef = baseType.toReference(scope, keyArgs);
+            if(baseRef && baseRef !== "complex")
+              spec.base = baseRef;
+          } else {
+            // Value type itself
+            spec.base = null;
+          }
+
+          this._addSpecAttributes(spec, scope, keyArgs);
+
+          return spec;
+        },
+
+        _addSpecAttributes: function(spec, scope, keyArgs) {
+          var any = false;
+
+          if(this.isAbstract) {
+            any = true;
+            spec.isAbstract = true;
+          }
+
+          return this.base(spec, scope, keyArgs) || any;
         }
         //endregion
       }
