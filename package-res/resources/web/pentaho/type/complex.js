@@ -608,6 +608,29 @@ define([
       //endregion
       //endregion
 
+      //region serialization
+      /**
+       * @inheritdoc
+       */
+      toSpecInScope: function(scope, requireType, keyArgs) {
+        var spec = {};
+
+        if(requireType) {
+          // returns the id of the type when it has one, or the actual spec if not...
+          spec._ = this.type.toReference(scope, keyArgs);
+        }
+
+        this.type.each(function(propType) {
+          var valueSpec = propType.toSpecInstanceInner(this, scope, keyArgs);
+          if(valueSpec != null) {
+            spec[propType.name] = valueSpec;
+          }
+        }, this);
+
+        return spec;
+      },
+      //endregion
+
       type: /** @lends pentaho.type.Complex.Type# */{
         id: module.id,
 

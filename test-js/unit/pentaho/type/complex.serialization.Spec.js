@@ -230,11 +230,12 @@ define([
 
             expect(spec.anything._).toBeDefined();
             // TODO: What to compare?
-            expect(spec.anything._).toBe(TestLevel2.type);
+            expect(spec.anything._.label).toBe(TestLevel2.type.label);
+            expect(spec.anything._.props.length).toBe(2);
           });
 
           it("should not inline type spec every other case", function() {
-            var spec = value.toSpec();
+            var spec = value.toSpec({omitRootType: true});
 
             expect(spec._).toBeUndefined();
           });
@@ -246,7 +247,8 @@ define([
 
             expect(spec._).toBeDefined();
             // TODO: What to compare?
-            expect(spec._).toBe(Derived.type);
+            expect(spec._.label).toBe(Derived.type.label);
+            expect(spec._.props.length).toBe(5);
           });
 
           it("should propagate and inline type spec", function() {
@@ -254,7 +256,7 @@ define([
 
             expect(spec.sub._).toBeDefined();
             // TODO: What to compare?
-            expect(spec.sub._.id).toBe(Complex.type.id);
+            expect(spec.sub._.id).toBe(Complex.type.toSpec().id);
           });
         });
       });

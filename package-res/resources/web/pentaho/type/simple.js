@@ -247,35 +247,34 @@ define([
       },
       //endregion
 
-      toSpec: function(keyArgs) {
-        if(keyArgs){
-          if(!keyArgs.returnFormattedValues && !keyArgs.inlineTypeSpec) {
+      /**
+       * @inheritdoc
+       */
+      toSpecInScope: function(scope, requireType, keyArgs) {
+        if(!keyArgs.returnFormattedValues && !keyArgs.inlineTypeSpec) {
+          if(!this.formatted || (keyArgs.returnFormattedValues === false)){
             return this.value;
-          } else if(keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
-            return {
-              _: this.type.toSpec(),
-              v: this.value,
-              f: this.formatted
-            };
-          } else if(!keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
+          } else {
             return {
               v: this.value,
               f: this.formatted
-            };
-          } else if(keyArgs.inlineTypeSpec && !keyArgs.returnFormattedValues) {
-            return {
-              _: this.type.toSpec(),
-              v: this.value
             };
           }
-        }
-
-        if(!this.formatted){
-          return this.value;
-        } else {
+        } else if(keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
+          return {
+            _: this.type.toSpec(),
+            v: this.value,
+            f: this.formatted
+          };
+        } else if(!keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
           return {
             v: this.value,
             f: this.formatted
+          };
+        } else if(keyArgs.inlineTypeSpec && !keyArgs.returnFormattedValues) {
+          return {
+            _: this.type.toSpec(),
+            v: this.value
           };
         }
       },

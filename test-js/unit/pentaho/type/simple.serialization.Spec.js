@@ -208,7 +208,7 @@ define([
 
             expect(typeof spec).toBe("object");
             expect(spec._).toBeDefined();
-            expect(spec._).toBe(SimpleClass.type.id);
+            expect(spec._.id).toBe(SimpleClass.type.toSpec().id);
           });
         });
       });
@@ -253,7 +253,7 @@ define([
 
           expect(typeof spec).toBe("object");
           expect(spec._).toBeDefined();
-          expect(spec._).toBe(SimpleClass.type.id);
+          expect(spec._.id).toBe(SimpleClass.type.toSpec().id);
         });
       });
     }); // pentaho.type.Date

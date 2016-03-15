@@ -921,6 +921,28 @@ define([
         if(countMax < countMin) countMax = countMin;
 
         return {min: countMin, max: countMax};
+      },
+
+      /**
+       * Creates a specification that describes this instance under a given scope.
+       *
+       * @param {boolean} inst - The instance to serialize.
+       * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+       * @param {!Object} keyArgs - The keyword arguments object.
+       *
+       * @return {!any} A specification of this instance.
+       */
+      toSpecInstanceInner: function(inst, scope, keyArgs) {
+        var value = inst._values[this.name];
+        if (value) {
+          // Determine if value spec must contain the type inline
+          // (stealing a magic line I used for Property.Type#value serialization...)
+          var valueType = this.type;
+          var requireType =
+              value.type.id !== (valueType.isRefinement ? valueType.of : valueType);
+
+          return value.toSpecInScope(scope, requireType, keyArgs);
+        }
       }
     } // end type:
   });
