@@ -673,7 +673,7 @@ define([
         //endregion
 
         //region serialization
-        _addSpecAttributes: function(spec, scope, keyArgs) {
+        _fillSpecInScope: function(spec, scope, keyArgs) {
           var any = false;
 
           var ofType = O.getOwn(this, "_of");
@@ -682,16 +682,26 @@ define([
             spec.of = ofType.toReference(scope, keyArgs);
           }
 
-          var facets = O.getOwn(this, "_facets");
-          if(facets && this !== _refinementType) {
-            var L = this.ancestor._facets.length;
-            any = true;
+          // "facets" attribute
+          var facets = this.facets;
+          var L = facets.length;
+          var i;
 
+          // Include only "facets" added locally, not inherited ones.
+          // Local facets are placed after inherited facets.
+          if(this !== _refinementType && (i = this.ancestor._facets.length) < L) {
+            any = true;
+            var localFacetIds = spec.facets = [];
+            do { localFacetIds.push(facets[i].shortId); } while(++i < L);
           }
 
+          // Base attributes
           any = this.base(spec, scope, keyArgs) || any;
 
-          // Facets toSpec ...
+          // Each facet's attributes
+          i = -1;
+          while(++i < L)
+            any = facets[i].fillSpecInScope.call(this, scope, keyArgs) || any;
 
           return any;
         }

@@ -566,7 +566,7 @@ define([
       //endregion
 
       //region serialization
-      toSpecInner: function(scope, keyArgs) {
+      toSpecInScope: function(scope, keyArgs) {
         // no id and no base
         var valueTypeRef = this.type.toReference(scope, keyArgs);
         var spec = {
@@ -576,7 +576,7 @@ define([
 
         // If there are no attributes and it's of type "string",
         // return only the name of the property type.
-        if(!this._addSpecAttributes(spec, scope, keyArgs) &&
+        if(!this._fillSpecInScope(spec, scope, keyArgs) &&
            valueTypeRef === "string") {
           return this._name;
         }
@@ -584,7 +584,7 @@ define([
         return spec;
       },
 
-      _addSpecAttributes: function(spec, scope, keyArgs) {
+      _fillSpecInScope: function(spec, scope, keyArgs) {
         var isJson = keyArgs.isJson;
 
         var any = this.base(spec, scope, keyArgs);
@@ -609,7 +609,7 @@ define([
             var valueType = this.type;
             var requireType = defaultValue.type !== (valueType.isRefinement ? valueType.of : valueType);
 
-            spec.value = defaultValue.toSpecInner(scope, requireType, keyArgs);
+            spec.value = defaultValue.toSpecInScope(scope, requireType, keyArgs);
           } else {
             spec.value = null;
           }

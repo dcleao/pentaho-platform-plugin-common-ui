@@ -125,7 +125,7 @@ define([
      *
      * This method creates a new {@link pentaho.type.SpecificationScope} for describing
      * this instance, and any other instances and types it references,
-     * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInner}.
+     * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInScope}.
      *
      * @param {Object} [keyArgs] - The keyword arguments object.
      * Passed to every instance and type serialized within this scope.
@@ -142,7 +142,7 @@ define([
 
       var scope = new SpecificationScope();
       var requireType = !keyArgs.omitRootType;
-      var spec = this.toSpecInner(scope, requireType, keyArgs);
+      var spec = this.toSpecInScope(scope, requireType, keyArgs);
 
       scope.dispose();
 
@@ -165,7 +165,7 @@ define([
      *
      * @see pentaho.type.Instance#toSpec
      */
-    toSpecInner: function(scope, requireType, keyArgs) {
+    toSpecInScope: function(scope, requireType, keyArgs) {
       throw error.notImplemented();
     }
     //endregion

@@ -175,7 +175,7 @@ define([
        *
        * This method creates a new {@link pentaho.type.SpecificationScope} for describing
        * this value, and others it references,
-       * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInner}.
+       * and then delegates the actual work to {@link pentaho.type.Instance#toSpecInScope}.
        *
        * @name pentaho.type.Value#toSpec
        * @method
@@ -625,7 +625,7 @@ define([
          *
          * @see pentaho.type.Instance#toSpec
          */
-        toSpecInner: function(scope, keyArgs) {
+        toSpecInScope: function(scope, keyArgs) {
           // The type's id or the temporary id in this scope.
           var spec = {id: this.shortId || scope.add(this)};
 
@@ -641,12 +641,12 @@ define([
             spec.base = null;
           }
 
-          this._addSpecAttributes(spec, scope, keyArgs);
+          this._fillSpecInScope(spec, scope, keyArgs);
 
           return spec;
         }
 
-        // Cannot add this.isAbstract in local _addSpecAttributes, cause it
+        // Cannot add this.isAbstract in local _fillSpecInScope, cause it
         // wouldn't work for refinement type
 
         //endregion

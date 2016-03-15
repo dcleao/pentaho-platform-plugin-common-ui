@@ -790,7 +790,7 @@ define([
         //endregion
 
         //region serialization
-        _addSpecAttributes: function(spec, scope, keyArgs) {
+        _fillSpecInScope: function(spec, scope, keyArgs) {
 
           var any = this.base(spec, scope, keyArgs);
 
@@ -798,7 +798,7 @@ define([
             any = true;
 
             this.each(function(propType) {
-              this.push(propType.toSpecInner(scope, keyArgs));
+              this.push(propType.toSpecInScope(scope, keyArgs));
             }, (spec.props = []));
           }
 

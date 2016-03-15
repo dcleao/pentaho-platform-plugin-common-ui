@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "./Refinement",
   "../list",
   "../../i18n!../i18n/types",
   "../../util/error",
   "../../util/object",
   "../../util/fun"
-], function(RefinementFacet, listFactory, bundle, error, O, fun) {
+], function(module, RefinementFacet, listFactory, bundle, error, O, fun) {
 
   "use strict";
 
@@ -228,11 +229,27 @@ define([
       }
     }
   }, {
+    id: module.id,
+
     validate: function(value) {
       var domain = this._domain;
       if(domain && !domain.has(value.key))
         return new Error(bundle.structured.errors.value.notInDomain);
       return null;
+    },
+
+    fillSpecInScope: function(spec, scope, keyArgs) {
+      // TODO: because _domain is created locally through the getter
+      // this code cannot detect whether there are actual changes locally
+      // and this will be serializing unchanged domain values.
+      // Guess doing it right would require maintaining a flag to indicate local change.
+      var any = false;
+      var domain = O.getOwn(this, "_domain");
+      if(domain) {
+        any = true;
+        spec.domain = domain.toSpecInScope(scope, /*requireType:*/false, keyArgs);
+      }
+      return any;
     }
   });
 });

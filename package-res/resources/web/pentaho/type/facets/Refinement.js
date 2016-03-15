@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../../lang/Base",
   "../../util/error"
-], function(Base, error) {
+], function(module, Base, error) {
 
   "use strict";
+
+  var _extractShortId = /^pentaho\/type\/facets\/(\w+)$/i;
 
   /**
    * @name pentaho.type.facets.RefinementFacet
@@ -48,6 +51,35 @@ define([
   return Base.extend("pentaho.type.facets.RefinementFacet", {
     /* prototype mixin stuff */
   }, /** @lends pentaho.type.facets.RefinementFacet */{
+
+    /**
+     * Gets the id of the refinement facet AMD module.
+     *
+     * @type {!nonEmptyString}
+     * @readOnly
+     */
+    id: module.id,
+
+    /**
+     * Gets the short id of the refinement facet.
+     *
+     * When a refinement facet is one of the standard facets,
+     * and, thus, it is a direct sub-module of the `pentaho/type/facets` module,
+     * its short id is its _local module id_,
+     * like `"DiscreteDomain"` or `"OrdinalDomain"`.
+     *
+     * Otherwise, the short id is equal to the id.
+     *
+     * @type {!nonEmptyString}
+     * @readOnly
+     * @see pentaho.type.facets.RefinementFacet.id
+     */
+    get shortId() {
+      var id = this.id;
+      var m = _extractShortId.exec(id);
+      return m ? m[1] : id;
+    },
+
     /**
      * Performs validation of a given value of the representation type.
      *
@@ -62,6 +94,26 @@ define([
      */
     validate: function(value) {
       throw error.notImplemented();
+    },
+
+    /**
+     * Fills the given specification with the local values of
+     * the attributes that this refinement facet adds to a refinement type,
+     * under a given scope,
+     * and returns whether any attribute was actually added.
+     *
+     * This method is invoked **on** the refinement type,
+     * an instance of {@link pentaho.type.Refinement.Type}.
+     *
+     * @param {Object} spec - The specification to be filled.
+     * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
+     * @param {!Object} keyArgs - The keyword arguments object.
+     * Passed to every type and instance serialized within this scope.
+     *
+     * @return {boolean} Returns `true` if any attribute was added, `false`, otherwise.
+     */
+    fillSpecInScope: function(spec, scope, keyArgs) {
+      return false;
     }
   });
 });

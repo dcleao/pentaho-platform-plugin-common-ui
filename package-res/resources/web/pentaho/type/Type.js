@@ -785,7 +785,7 @@ define([
      *
      * This method creates a new {@link pentaho.type.SpecificationScope} for describing
      * this type, and any other instances and types it references,
-     * and then delegates the actual work to {@link pentaho.type.Type#toSpecInner}.
+     * and then delegates the actual work to {@link pentaho.type.Type#toSpecInScope}.
      *
      * @param {Object} [keyArgs] - The keyword arguments object.
      * Passed to every type and instance serialized within this scope.
@@ -798,7 +798,7 @@ define([
       if(!keyArgs) keyArgs = {};
 
       var scope = new SpecificationScope();
-      var spec = this.toSpecInner(scope, keyArgs);
+      var spec = this.toSpecInScope(scope, keyArgs);
 
       scope.dispose();
 
@@ -820,12 +820,14 @@ define([
      *
      * @see pentaho.type.Instance#toSpec
      */
-    toSpecInner: function(scope, keyArgs) {
+    toSpecInScope: function(scope, keyArgs) {
       throw error.notImplemented();
     },
 
     /**
-     * Adds the attributes of a type to a given specification and under a given scope.
+     * Fills the given specification with this type's attributes local values,
+     * under a given scope,
+     * and returns whether any attribute was actually added.
      *
      * This method does _not_ add the special `id` and `base` attributes to the specification.
      *
@@ -840,9 +842,9 @@ define([
      *
      * @protected
      *
-     * @see pentaho.type.Instance#toSpecInner
+     * @see pentaho.type.Instance#toSpecInScope
      */
-    _addSpecAttributes: function(spec, scope, keyArgs) {
+    _fillSpecInScope: function(spec, scope, keyArgs) {
       var any = false;
 
       // Normal attributes
@@ -878,7 +880,7 @@ define([
      * For anonymous types, a temporary, serialization-only id is generated.
      * In the first occurrence in the given scope,
      * that id is returned, within a full specification of the type,
-     * obtained by calling [toSpecInner]{@link pentaho.type.Type#toSpecInner}.
+     * obtained by calling [toSpecInScope]{@link pentaho.type.Type#toSpecInScope}.
      * In following occurrences, only the previously used temporary id is returned.
      *
      * Some standard types have a special reference syntax,
@@ -895,7 +897,7 @@ define([
      * @return {!pentaho.type.spec.UTypeReference} A reference to this type.
      */
     toReference: function(scope, keyArgs) {
-      return this.shortId || scope.getIdOf(this) || this.toSpecInner(scope, keyArgs);
+      return this.shortId || scope.getIdOf(this) || this.toSpecInScope(scope, keyArgs);
     }
     //endregion
  }, /** @lends pentaho.type.Type */{

@@ -134,7 +134,7 @@ define([
         //endregion
 
         //region serialization
-        _addSpecAttributes: function(spec, scope, keyArgs) {
+        _fillSpecInScope: function(spec, scope, keyArgs) {
           var any = false;
 
           if(this.isAbstract) {

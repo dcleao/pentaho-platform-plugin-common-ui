@@ -676,11 +676,11 @@ define([
         //region serialization
         // * "list" has an id and toReference immediately returns that ("list" is like ["element"], but the base class)
         // * ["string"] -> anonymous list type, equivalent to {base: "list", of: "string"}
-        //   toReference calls the toSpecInner, cause it has no id and because a temporary id is also
+        //   toReference calls the toSpecInScope, cause it has no id and because a temporary id is also
         //   never generated to it, in scope
-        //   toSpecInner only can return this form if there are no other local list class attributes
+        //   toSpecInScope only can return this form if there are no other local list class attributes
 
-        toSpecInner: function(scope, keyArgs) {
+        toSpecInScope: function(scope, keyArgs) {
           // The type's id or the temporary id in this scope.
           var baseType = this.ancestor;
           var spec = {
@@ -694,7 +694,7 @@ define([
           }
 
           // No other attributes, no id and base is "list"?
-          if(!this._addSpecAttributes(spec, scope, keyArgs) &&
+          if(!this._fillSpecInScope(spec, scope, keyArgs) &&
              !spec.id &&
              spec.base === "list") {
             // Can use the shorthand [ofType] syntax.
@@ -708,7 +708,7 @@ define([
           return spec;
         },
 
-        _addSpecAttributes: function(spec, scope, keyArgs) {
+        _fillSpecInScope: function(spec, scope, keyArgs) {
           var any = false;
 
           if(this.isAbstract) {

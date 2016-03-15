@@ -292,7 +292,7 @@ define([
         //endregion
 
         //region serialization
-        _addSpecAttributes: function(spec, scope, keyArgs) {
+        _fillSpecInScope: function(spec, scope, keyArgs) {
 
           var any = this.base(spec, scope, keyArgs);
 
