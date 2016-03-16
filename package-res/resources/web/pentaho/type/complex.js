@@ -616,14 +616,22 @@ define([
         var spec = {};
 
         if(requireType) {
-          // returns the id of the type when it has one, or the actual spec if not...
+          spec._ = this.type.id;
+        }
+
+        if(keyArgs.preferPropertyArray) {
           spec._ = this.type.toReference(scope, keyArgs);
+          spec.d = [];
         }
 
         this.type.each(function(propType) {
           var valueSpec = propType.toSpecInstanceInner(this, scope, keyArgs);
           if(valueSpec != null) {
-            spec[propType.name] = valueSpec;
+            if(keyArgs.preferPropertyArray) {
+              spec.d.push(valueSpec);
+            } else {
+              spec[propType.name] = valueSpec;
+            }
           }
         }, this);
 

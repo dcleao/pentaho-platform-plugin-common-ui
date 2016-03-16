@@ -73,14 +73,6 @@ define([
         sub: {
           truth: {v: true, f: "I'm a nested true"},
           when: new Date()
-        },
-        // TODO: Does this make sense?
-        other: {
-          _: {
-            props: ["name", {name: "price", type: "number"}]
-          },
-          name: "John",
-          price: 100
         }
       };
 
@@ -88,186 +80,185 @@ define([
 
       beforeEach(function() {
         value = new Derived(originalSpec);
-        console.log(value);
       });
 
       describe("values", function() {
         describe("default", function() {
-          it("should return primitive value and formatted value when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true});
+          it("should return primitive value, formatted value, and inline types", function() {
+            var spec = value.toSpec({preferPropertyArray: true});
 
             expect(spec.quantity.v).toBe(originalSpec.quantity.v);
             expect(spec.quantity.f).toBe(originalSpec.quantity.f);
+            expect(spec.quantity._).toBeDefined();
 
-            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
-            expect(spec.sub.truth.f).toBe(originalSpec.sub.truth.f);
-          });
-
-          it("should return primitive value when not formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: false});
-
-            expect(spec.noFormat).toBe(originalSpec.noFormat);
-
-            expect(spec.sub.when).toBe(originalSpec.sub.when);
-          });
-        });
-
-        describe("default but inlineTypeSpec: true", function() {
-          it("should return primitive value and undefined formatted value when not formatted", function() {
-            var spec = value.toSpec({inlineTypeSpec: true});
+            expect(spec.type.v).toBe(originalSpec.type.v);
+            expect(spec.type.f).toBe(originalSpec.type.f);
+            expect(spec.type._).toBeDefined();
 
             expect(spec.noFormat.v).toBe(originalSpec.noFormat);
-            expect(spec.noFormat.f).toBeUndefined();
-          });
-
-          it("should propagate and return primitive value and undefined formatted value when not formatted", function() {
-            var spec = value.toSpec({inlineTypeSpec: true});
-
-            expect(spec.sub.when.v).toBe(originalSpec.sub.when);
-            expect(spec.sub.when.f).toBeUndefined();
-          });
-        });
-
-        describe("returnFormattedValues: true", function() {
-          it("should return primitive value and formatted value when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true});
-
-            expect(spec.quantity.v).toBe(originalSpec.quantity.v);
-            expect(spec.quantity.f).toBe(originalSpec.quantity.f);
-          });
-
-          it("should propagate and return primitive value and formatted value when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true});
-
-            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
-            expect(spec.sub.truth.f).toBe(originalSpec.sub.truth.f);
-          });
-
-          it("should return primitive value and null formatted value when not formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true, inlineTypeSpec: true});
-
-            expect(spec.noFormat.v).toBe(originalSpec.noFormat);
+            expect(spec.noFormat.f).toBeDefined();
             expect(spec.noFormat.f).toBeNull();
-          });
+            expect(spec.noFormat._).toBeDefined();
 
-          it("should propagate and return primitive value and null formatted value when not formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: true, inlineTypeSpec: true});
+            //expect(spec.anything.name.v).toBe(originalSpec.anything.name.v);
+            expect(spec.anything.name.f).toBeDefined();
+            expect(spec.anything.name.f).toBeNull();
+            expect(spec.anything.name._).toBeDefined();
+
+            //expect(spec.anything.type.v).toBe(originalSpec.anything.type.v);
+            expect(spec.anything.type.f).toBeDefined();
+            expect(spec.anything.type.f).toBeNull();
+            expect(spec.anything.type._).toBeDefined();
+
+            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
+            expect(spec.sub.truth.f).toBe(originalSpec.sub.truth.f);
+            expect(spec.sub.truth._).toBeDefined();
 
             expect(spec.sub.when.v).toBe(originalSpec.sub.when);
+            expect(spec.sub.when.f).toBeDefined();
             expect(spec.sub.when.f).toBeNull();
+            expect(spec.sub.when._).toBeDefined();
           });
         });
 
-        describe("returnFormattedValues: false", function() {
-          it("should return primitive value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: false});
-
-            expect(spec.quantity).toBe(originalSpec.quantity.v);
-          });
-
-          it("should propagate and return primitive value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: false});
-
-            expect(spec.sub.truth).toBe(originalSpec.sub.truth.v);
-          });
-
-          it("should return primitive value when not formatted", function() {
+        describe("default", function() {
+          it("should return primitive value, formatted value, and inline types", function() {
             var spec = value.toSpec();
+
+            expect(spec.quantity.v).toBe(originalSpec.quantity.v);
+            expect(spec.quantity.f).toBe(originalSpec.quantity.f);
+            expect(spec.quantity._).toBeDefined();
+
+            expect(spec.type.v).toBe(originalSpec.type.v);
+            expect(spec.type.f).toBe(originalSpec.type.f);
+            expect(spec.type._).toBeDefined();
+
+            expect(spec.noFormat.v).toBe(originalSpec.noFormat);
+            expect(spec.noFormat.f).toBeDefined();
+            expect(spec.noFormat.f).toBeNull();
+            expect(spec.noFormat._).toBeDefined();
+
+            //expect(spec.anything.name.v).toBe(originalSpec.anything.name.v);
+            expect(spec.anything.name.f).toBeDefined();
+            expect(spec.anything.name.f).toBeNull();
+            expect(spec.anything.name._).toBeDefined();
+
+            //expect(spec.anything.type.v).toBe(originalSpec.anything.type.v);
+            expect(spec.anything.type.f).toBeDefined();
+            expect(spec.anything.type.f).toBeNull();
+            expect(spec.anything.type._).toBeDefined();
+
+            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
+            expect(spec.sub.truth.f).toBe(originalSpec.sub.truth.f);
+            expect(spec.sub.truth._).toBeDefined();
+
+            expect(spec.sub.when.v).toBe(originalSpec.sub.when);
+            expect(spec.sub.when.f).toBeDefined();
+            expect(spec.sub.when.f).toBeNull();
+            expect(spec.sub.when._).toBeDefined();
+          });
+        });
+
+        describe("omitFormatted: false and omitRootType: true", function() {
+          it("should return primitive value and undefined formatted value when not formatted", function() {
+            var spec = value.toSpec({omitRootType: true});
+
+            expect(spec.quantity.v).toBe(originalSpec.quantity.v);
+            expect(spec.quantity.f).toBe(originalSpec.quantity.f);
+            expect(spec.quantity._).toBeUndefined();
+
+            expect(spec.type.v).toBe(originalSpec.type.v);
+            expect(spec.type.f).toBe(originalSpec.type.f);
+            expect(spec.type._).toBeUndefined();
 
             expect(spec.noFormat).toBe(originalSpec.noFormat);
-          });
+            expect(spec.noFormat.f).toBeUndefined();
+            expect(spec.noFormat._).toBeUndefined();
 
-          it("should propagate and return primitive value when not formatted", function() {
-            var spec = value.toSpec();
+            expect(spec.anything.name).toBe(originalSpec.anything.name);
+            expect(spec.anything.name.f).toBeUndefined();
+            expect(spec.anything.name._).toBeUndefined();
+
+            expect(spec.anything.type).toBe(originalSpec.anything.type);
+            expect(spec.anything.type.f).toBeUndefined();
+            expect(spec.anything.type._).toBeUndefined();
+
+            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
+            expect(spec.sub.truth.f).toBe(originalSpec.sub.truth.f);
+            expect(spec.sub.truth._).toBeUndefined();
 
             expect(spec.sub.when).toBe(originalSpec.sub.when);
+            expect(spec.sub.when.f).toBeUndefined();
+            expect(spec.sub.when._).toBeUndefined();
           });
         });
 
-        describe("returnFormattedValues: false but inlineTypeSpec: true", function() {
-          it("should return primitive value and undefined formatted value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
+        describe("omitFormatted: true and omitRootType: false", function() {
+          it("should return primitive value even when formatted", function() {
+            var spec = value.toSpec({omitFormatted: true});
 
             expect(spec.quantity.v).toBe(originalSpec.quantity.v);
             expect(spec.quantity.f).toBeUndefined();
-          });
+            expect(spec.quantity._).toBeDefined();
 
-          it("should propagate and return primitive value and undefined formatted value even when formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
-
-            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
-            expect(spec.sub.truth.f).toBeUndefined();
-          });
-
-          it("should return primitive value and undefined formatted value when not formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
+            expect(spec.type.v).toBe(originalSpec.type.v);
+            expect(spec.type.f).toBeUndefined();
+            expect(spec.type._).toBeDefined();
 
             expect(spec.noFormat.v).toBe(originalSpec.noFormat);
             expect(spec.noFormat.f).toBeUndefined();
-          });
+            expect(spec.noFormat._).toBeDefined();
 
-          it("should propagate and return primitive value and undefined formatted value when not formatted", function() {
-            var spec = value.toSpec({returnFormattedValues: false, inlineTypeSpec: true});
+            expect(spec.anything.name.v).toBe(originalSpec.anything.name);
+            expect(spec.anything.name.f).toBeUndefined();
+            expect(spec.anything.name._).toBeDefined();
+
+            expect(spec.anything.type.v).toBe(originalSpec.anything.type);
+            expect(spec.anything.type.f).toBeUndefined();
+            expect(spec.anything.type._).toBeDefined();
+
+            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
+            expect(spec.sub.truth.f).toBeUndefined();
+            expect(spec.sub.truth._).toBeDefined();
 
             expect(spec.sub.when.v).toBe(originalSpec.sub.when);
             expect(spec.sub.when.f).toBeUndefined();
-          });
-        });
-      });
-
-      describe("with inline type specs", function() {
-        describe("default (inlineTypeSpec: false)", function() {
-          // TODO: What is an anonymous type?
-          it("should inline type spec if anonymous type", function() {
-            var spec = value.toSpec();
-
-            expect(spec._).toBeDefined();
-            // TODO: What to compare?
-          });
-
-          it("should inline type spec if different than property type", function() {
-            var spec = value.toSpec();
-
-            expect(spec.anything._).toBeDefined();
-            // TODO: What to compare?
-            expect(spec.anything._.label).toBe(TestLevel2.type.label);
-            expect(spec.anything._.props.length).toBe(2);
-          });
-
-          it("should not inline type spec every other case", function() {
-            var spec = value.toSpec({omitRootType: true});
-
-            expect(spec._).toBeUndefined();
+            expect(spec.sub.when._).toBeDefined();
           });
         });
 
-        describe("inlineTypeSpec: true", function() {
-          it("should inline type spec", function() {
-            var spec = value.toSpec({inlineTypeSpec: true});
+        describe("omitFormatted: true but omitRootType: true", function() {
+          it("should return primitive value and undefined formatted value even when formatted", function() {
+            var spec = value.toSpec({omitFormatted: true, omitRootType: true});
 
-            expect(spec._).toBeDefined();
-            // TODO: What to compare?
-            expect(spec._.label).toBe(Derived.type.label);
-            expect(spec._.props.length).toBe(5);
+            expect(spec.quantity).toBe(originalSpec.quantity.v);
+            expect(spec.quantity.f).toBeUndefined();
+            expect(spec.quantity._).toBeUndefined();
+
+            expect(spec.type).toBe(originalSpec.type.v);
+            expect(spec.type.f).toBeUndefined();
+            expect(spec.type._).toBeUndefined();
+
+            expect(spec.noFormat).toBe(originalSpec.noFormat);
+            expect(spec.noFormat.f).toBeUndefined();
+            expect(spec.noFormat._).toBeUndefined();
+
+            expect(spec.anything.name).toBe(originalSpec.anything.name);
+            expect(spec.anything.name.f).toBeUndefined();
+            expect(spec.anything.name._).toBeUndefined();
+
+            expect(spec.anything.type).toBe(originalSpec.anything.type);
+            expect(spec.anything.type.f).toBeUndefined();
+            expect(spec.anything.type._).toBeUndefined();
+
+            expect(spec.sub.truth).toBe(originalSpec.sub.truth.v);
+            expect(spec.sub.truth.f).toBeUndefined();
+            expect(spec.sub.truth._).toBeUndefined();
+
+            expect(spec.sub.when).toBe(originalSpec.sub.when);
+            expect(spec.sub.when.f).toBeUndefined();
+            expect(spec.sub.when._).toBeUndefined();
           });
-
-          it("should propagate and inline type spec", function() {
-            var spec = value.toSpec({inlineTypeSpec: true});
-
-            expect(spec.sub._).toBeDefined();
-            // TODO: What to compare?
-            expect(spec.sub._.id).toBe(Complex.type.toSpec().id);
-          });
-        });
-      });
-
-      describe("in array form", function() {
-        describe("default (arrayFormat: false)", function() {
-          // TODO: Anything to test?
-        });
-
-        describe("arrayFormat: true", function() {
-          // TODO: Where is this possible? Only with lists?
         });
       });
     }); // pentaho.type.Complex

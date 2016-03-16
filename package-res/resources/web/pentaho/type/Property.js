@@ -924,23 +924,25 @@ define([
       },
 
       /**
-       * Creates a specification that describes this instance under a given scope.
+       * Creates a specification that describes this property under a given scope.
        *
-       * @param {boolean} inst - The instance to serialize.
+       * @param {boolean} inst - The instance being serialized.
        * @param {!pentaho.type.SpecificationScope} scope - The specification scope.
        * @param {!Object} keyArgs - The keyword arguments object.
        *
-       * @return {!any} A specification of this instance.
+       * @return {!any} A specification of this property.
        */
       toSpecInstanceInner: function(inst, scope, keyArgs) {
         var value = inst._values[this.name];
         if (value) {
           // Determine if value spec must contain the type inline
-          // (stealing a magic line I used for Property.Type#value serialization...)
           var valueType = this.type;
           var requireType =
               value.type.id !== (valueType.isRefinement ? valueType.of : valueType);
-
+          //allow omitRootType flag to override this behavior
+          if(keyArgs.omitRootType){
+            requireType = false;
+          }
           return value.toSpecInScope(scope, requireType, keyArgs);
         }
       }

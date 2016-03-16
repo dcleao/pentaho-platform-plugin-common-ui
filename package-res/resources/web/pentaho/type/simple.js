@@ -251,8 +251,11 @@ define([
        * @inheritdoc
        */
       toSpecInScope: function(scope, requireType, keyArgs) {
-        if(!keyArgs.returnFormattedValues && !keyArgs.inlineTypeSpec) {
-          if(!this.formatted || (keyArgs.returnFormattedValues === false)){
+        if(keyArgs.includeDefaults){
+          return this;  //Not too sure about this Duarte, please advise...
+        }
+        if(!keyArgs.omitFormatted && !requireType) {
+          if(!this.formatted){
             return this.value;
           } else {
             return {
@@ -260,18 +263,15 @@ define([
               f: this.formatted
             };
           }
-        } else if(keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
+        } else if(requireType && !keyArgs.omitFormatted) {
           return {
             _: this.type.toSpec(),
             v: this.value,
             f: this.formatted
           };
-        } else if(!keyArgs.inlineTypeSpec && keyArgs.returnFormattedValues) {
-          return {
-            v: this.value,
-            f: this.formatted
-          };
-        } else if(keyArgs.inlineTypeSpec && !keyArgs.returnFormattedValues) {
+        } else if(!requireType && keyArgs.omitFormatted) {
+          return this.value;
+        } else if(requireType && keyArgs.omitFormatted) {
           return {
             _: this.type.toSpec(),
             v: this.value

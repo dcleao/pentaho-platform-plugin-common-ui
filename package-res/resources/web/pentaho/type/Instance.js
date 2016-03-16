@@ -141,7 +141,8 @@ define([
       if(!keyArgs) keyArgs = {};
 
       var scope = new SpecificationScope();
-      var requireType = !keyArgs.omitRootType;
+      //anonymous types should always return their `_` but the omitRootType flag may override this behavior
+      var requireType = (!keyArgs.omitRootType ? (!this.id ? true : false) : false);
       var spec = this.toSpecInScope(scope, requireType, keyArgs);
 
       scope.dispose();
