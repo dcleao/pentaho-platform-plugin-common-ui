@@ -551,6 +551,27 @@ define([
       },
       //endregion
 
+      //region serialization
+      /**
+       * @inheritdoc
+       */
+      toSpecInScope: function(scope, requireType, keyArgs) {
+        var elemType = this._elemType;
+        var elemSpecs = this._elems.map(function(elem) {
+          var elemRequireType = elem.type !== (elemType.isRefinement ? elemType.of : elemType);
+          return elem.toSpecInScope(scope, elemRequireType, keyArgs);
+        });
+
+        if(requireType)
+          return {
+            _: this.type.toReference(scope, keyArgs),
+            d: elemSpecs
+          };
+
+        return elemSpecs;
+      },
+      //endregion
+
       type: /** @lends pentaho.type.List.Type# */{
 
         _postInit: function() {
