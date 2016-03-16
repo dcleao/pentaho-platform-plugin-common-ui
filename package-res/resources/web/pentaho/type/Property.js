@@ -934,15 +934,11 @@ define([
        */
       toSpecInstanceInner: function(inst, scope, keyArgs) {
         var value = inst._values[this.name];
-        if (value) {
+        if (keyArgs.includeDefaults || !this.type.areEqual(this.value, value)) {
           // Determine if value spec must contain the type inline
           var valueType = this.type;
           var requireType =
               value.type.id !== (valueType.isRefinement ? valueType.of : valueType);
-          //allow omitRootType flag to override this behavior
-          if(keyArgs.omitRootType){
-            requireType = false;
-          }
           return value.toSpecInScope(scope, requireType, keyArgs);
         }
       }

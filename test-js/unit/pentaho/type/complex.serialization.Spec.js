@@ -134,18 +134,15 @@ define([
             expect(spec.type._).toBeDefined();
 
             expect(spec.noFormat.v).toBe(originalSpec.noFormat);
-            expect(spec.noFormat.f).toBeDefined();
-            expect(spec.noFormat.f).toBeNull();
+            expect(spec.noFormat.f).toBeUndefined();
             expect(spec.noFormat._).toBeDefined();
 
             //expect(spec.anything.name.v).toBe(originalSpec.anything.name.v);
-            expect(spec.anything.name.f).toBeDefined();
-            expect(spec.anything.name.f).toBeNull();
+            expect(spec.anything.name.f).toBeUndefined();
             expect(spec.anything.name._).toBeDefined();
 
             //expect(spec.anything.type.v).toBe(originalSpec.anything.type.v);
-            expect(spec.anything.type.f).toBeDefined();
-            expect(spec.anything.type.f).toBeNull();
+            expect(spec.anything.type.f).toBeUndefined();
             expect(spec.anything.type._).toBeDefined();
 
             expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
@@ -153,8 +150,7 @@ define([
             expect(spec.sub.truth._).toBeDefined();
 
             expect(spec.sub.when.v).toBe(originalSpec.sub.when);
-            expect(spec.sub.when.f).toBeDefined();
-            expect(spec.sub.when.f).toBeNull();
+            expect(spec.sub.when.f).toBeUndefined();
             expect(spec.sub.when._).toBeDefined();
           });
         });
@@ -165,31 +161,31 @@ define([
 
             expect(spec.quantity.v).toBe(originalSpec.quantity.v);
             expect(spec.quantity.f).toBe(originalSpec.quantity.f);
-            expect(spec.quantity._).toBeUndefined();
+            expect(spec.quantity._).toBeDefined();
 
             expect(spec.type.v).toBe(originalSpec.type.v);
             expect(spec.type.f).toBe(originalSpec.type.f);
-            expect(spec.type._).toBeUndefined();
+            expect(spec.type._).toBeDefined();
 
-            expect(spec.noFormat).toBe(originalSpec.noFormat);
+            expect(spec.noFormat.v).toBe(originalSpec.noFormat);
             expect(spec.noFormat.f).toBeUndefined();
-            expect(spec.noFormat._).toBeUndefined();
+            expect(spec.noFormat._).toBeDefined();
 
-            expect(spec.anything.name).toBe(originalSpec.anything.name);
+            expect(spec.anything.name.v).toBe(originalSpec.anything.name);
             expect(spec.anything.name.f).toBeUndefined();
-            expect(spec.anything.name._).toBeUndefined();
+            expect(spec.anything.name._).toBeDefined();
 
             expect(spec.anything.type).toBe(originalSpec.anything.type);
             expect(spec.anything.type.f).toBeUndefined();
-            expect(spec.anything.type._).toBeUndefined();
+            expect(spec.anything.type._).toBeDefined();
 
             expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
             expect(spec.sub.truth.f).toBe(originalSpec.sub.truth.f);
-            expect(spec.sub.truth._).toBeUndefined();
+            expect(spec.sub.truth._).toBeDefined();
 
             expect(spec.sub.when).toBe(originalSpec.sub.when);
             expect(spec.sub.when.f).toBeUndefined();
-            expect(spec.sub.when._).toBeUndefined();
+            expect(spec.sub.when._).toBeDefined();
           });
         });
 
@@ -231,33 +227,44 @@ define([
           it("should return primitive value and undefined formatted value even when formatted", function() {
             var spec = value.toSpec({omitFormatted: true, omitRootType: true});
 
-            expect(spec.quantity).toBe(originalSpec.quantity.v);
+            expect(spec.quantity.v).toBe(originalSpec.quantity.v);
             expect(spec.quantity.f).toBeUndefined();
-            expect(spec.quantity._).toBeUndefined();
+            expect(spec.quantity._).toBeDefined();
 
-            expect(spec.type).toBe(originalSpec.type.v);
+            expect(spec.type.v).toBe(originalSpec.type.v);
             expect(spec.type.f).toBeUndefined();
-            expect(spec.type._).toBeUndefined();
+            expect(spec.type._).toBeDefined();
 
-            expect(spec.noFormat).toBe(originalSpec.noFormat);
+            expect(spec.noFormat.v).toBe(originalSpec.noFormat);
             expect(spec.noFormat.f).toBeUndefined();
-            expect(spec.noFormat._).toBeUndefined();
+            expect(spec.noFormat._).toBeDefined();
 
-            expect(spec.anything.name).toBe(originalSpec.anything.name);
+            expect(spec.anything.name.v).toBe(originalSpec.anything.name);
             expect(spec.anything.name.f).toBeUndefined();
-            expect(spec.anything.name._).toBeUndefined();
+            expect(spec.anything.name._).toBeDefined();
 
             expect(spec.anything.type).toBe(originalSpec.anything.type);
             expect(spec.anything.type.f).toBeUndefined();
-            expect(spec.anything.type._).toBeUndefined();
+            expect(spec.anything.type._).toBeDefined();
 
-            expect(spec.sub.truth).toBe(originalSpec.sub.truth.v);
+            expect(spec.sub.truth.v).toBe(originalSpec.sub.truth.v);
             expect(spec.sub.truth.f).toBeUndefined();
-            expect(spec.sub.truth._).toBeUndefined();
+            expect(spec.sub.truth._).toBeDefined();
 
-            expect(spec.sub.when).toBe(originalSpec.sub.when);
+            expect(spec.sub.when.v).toBe(originalSpec.sub.when);
             expect(spec.sub.when.f).toBeUndefined();
-            expect(spec.sub.when._).toBeUndefined();
+            expect(spec.sub.when._).toBeDefined();
+          });
+        });
+
+        describe("omitFormatted: false, omitRootType: false, and includeDefaults: true", function() {
+          it("should return primitive value, formatted value, and undefined inline type", function() {
+            var spec = value.toSpec({includeDefaults: true});
+
+            expect(spec.value).toBe(originalSpec.v);
+            expect(spec.formatted).toBe(originalSpec.f);
+            expect(spec.type).toBeDefined();
+            expect(spec.type.toSpec().id).toBe(PentahoBoolean.type.toSpec().id);
           });
         });
       });

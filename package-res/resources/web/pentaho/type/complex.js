@@ -616,11 +616,10 @@ define([
         var spec = {};
 
         if(requireType) {
-          spec._ = this.type.id;
+          spec._ = this.type.toReference(scope, keyArgs);
         }
 
         if(keyArgs.preferPropertyArray) {
-          spec._ = this.type.toReference(scope, keyArgs);
           spec.d = [];
         }
 

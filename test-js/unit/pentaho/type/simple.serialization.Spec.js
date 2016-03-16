@@ -44,7 +44,7 @@ define([
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBe(originalSpec.f);
               expect(spec._).toBeDefined();
-              expect(spec._.id).toBe(PentahoBoolean.type.toSpec().id);
+              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
             });
           });
 
@@ -55,7 +55,7 @@ define([
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBeUndefined();
               expect(spec._).toBeDefined();
-              expect(spec._.id).toBe(PentahoBoolean.type.toSpec().id);
+              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
             });
           });
 
@@ -78,17 +78,6 @@ define([
               expect(spec._).toBeUndefined();
             });
           });
-
-          describe("omitFormatted: false, omitRootType: false, and includeDefaults: true", function() {
-            it("should return primitive value, formatted value, and undefined inline type", function() {
-              var spec = value.toSpec({includeDefaults: true});
-
-              expect(spec.value).toBe(originalSpec.v);
-              expect(spec.formatted).toBe(originalSpec.f);
-              expect(spec.type).toBeDefined();
-              expect(spec.type.toSpec().id).toBe(PentahoBoolean.type.toSpec().id);
-            });
-          });
         });
 
         describe("value without formatted info", function() {
@@ -103,10 +92,9 @@ define([
               var spec = value.toSpec();
 
               expect(spec.v).toBe(originalSpec.v);
-              expect(spec.f).toBeDefined();
-              expect(spec.f).toBeNull();
+              expect(spec.f).toBeUndefined();
               expect(spec._).toBeDefined();
-              expect(spec._.id).toBe(PentahoBoolean.type.toSpec().id);
+              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
             });
           });
 
@@ -117,7 +105,7 @@ define([
               expect(spec.v).toBe(originalSpec.v);
               expect(spec.f).toBeUndefined();
               expect(spec._).toBeDefined();
-              expect(spec._.id).toBe(PentahoBoolean.type.toSpec().id);
+              expect(spec._).toBe(PentahoBoolean.type.toSpec().id);
             });
           });
 
@@ -178,7 +166,7 @@ define([
               expect(typeof spec.v).toBe(simple.name);
               expect(spec.v).toBe(simple.value);
               expect(spec._).toBeDefined();
-              expect(spec._.id).toBe(SimpleClass.type.toSpec().id);
+              expect(spec._).toBe(SimpleClass.type.toSpec().id);
             });
           });
         });
@@ -200,10 +188,8 @@ define([
 
             expect(typeof spec).toBe("object");
             expect(spec._).toBeDefined();
-            expect(spec._.id).toBe(SimpleClass.type.toSpec().id);
-            expect(spec._.id).toBe(SimpleClass.type.toSpec().id);
-            expect(spec.f).toBeDefined();
-            expect(spec.f).toBeNull();
+            expect(spec._).toBe(SimpleClass.type.toSpec().id);
+            expect(spec.f).toBeUndefined();
           });
         });
       });
@@ -229,9 +215,8 @@ define([
             expect(spec.v instanceof Date).toBe(true);
             expect(spec.v).toBe(originalValue);
             expect(spec._).toBeDefined();
-            expect(spec._.id).toBe(SimpleClass.type.toSpec().id);
-            expect(spec.f).toBeDefined();
-            expect(spec.f).toBeNull();
+            expect(spec._).toBe(SimpleClass.type.toSpec().id);
+            expect(spec.f).toBeUndefined();
           });
         });
 
@@ -242,7 +227,7 @@ define([
             expect(spec.v instanceof Date).toBe(true);
             expect(spec.v).toBe(originalValue);
             expect(spec._).toBeDefined();
-            expect(spec._.id).toBe(SimpleClass.type.toSpec().id);
+            expect(spec._).toBe(SimpleClass.type.toSpec().id);
           });
         });
       });

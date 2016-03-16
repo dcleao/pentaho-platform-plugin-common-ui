@@ -251,32 +251,20 @@ define([
        * @inheritdoc
        */
       toSpecInScope: function(scope, requireType, keyArgs) {
-        if(keyArgs.includeDefaults){
-          return this;  //Not too sure about this Duarte, please advise...
-        }
-        if(!keyArgs.omitFormatted && !requireType) {
-          if(!this.formatted){
-            return this.value;
-          } else {
-            return {
-              v: this.value,
-              f: this.formatted
-            };
-          }
-        } else if(requireType && !keyArgs.omitFormatted) {
-          return {
-            _: this.type.toSpec(),
-            v: this.value,
-            f: this.formatted
-          };
-        } else if(!requireType && keyArgs.omitFormatted) {
-          return this.value;
-        } else if(requireType && keyArgs.omitFormatted) {
-          return {
-            _: this.type.toSpec(),
-            v: this.value
-          };
-        }
+        var addFormatted = !keyArgs.omitFormatted && !!this._formatted;
+
+        // Don't need a cell/object spec?
+        if(!(addFormatted || requireType))
+          return this._value;
+
+        // Need one. Ensure _ is the first property
+        var spec = requireType
+            ? {_: this.type.toReference(scope, keyArgs), v: this._value}
+            : {v: this._value};
+
+        if(addFormatted) spec.f = this._formatted;
+
+        return spec;
       },
 
       type: /** pentaho.type.Simple.Type# */{
