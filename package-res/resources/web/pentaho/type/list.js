@@ -556,9 +556,11 @@ define([
        * @inheritdoc
        */
       toSpecInScope: function(scope, requireType, keyArgs) {
-        var elemType = this._elemType;
+        var elemType = this.type.of;
+        if(elemType.isRefinement) elemType = elemType.of;
+
         var elemSpecs = this._elems.map(function(elem) {
-          var elemRequireType = elem.type !== (elemType.isRefinement ? elemType.of : elemType);
+          var elemRequireType = elem.type !== elemType;
           return elem.toSpecInScope(scope, elemRequireType, keyArgs);
         });
 
