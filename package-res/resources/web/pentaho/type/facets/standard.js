@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([], function() {
+define([
+  "./Refinement",
+  "./DiscreteDomain"
+], function(Refinement, DiscreteDomain) {
+
   "use strict";
-  return toSpec;
 
-  function toSpec(property, value) {
-    if(value == null || property == null)
-      return null;
-
-    var spec = {};
-    spec[property] = value;
-    return spec;
-  }
-
+  return {
+    //"Refinement": Refinement,
+    "DiscreteDomain": DiscreteDomain
+  };
 });

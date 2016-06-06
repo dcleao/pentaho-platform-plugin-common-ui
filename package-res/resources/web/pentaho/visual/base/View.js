@@ -16,11 +16,10 @@
 define([
   "pentaho/lang/Base",
   "pentaho/lang/Event",
-  "pentaho/data/filter",
   "pentaho/util/error",
   "pentaho/util/logger",
   "pentaho/shim/es6-promise"
-], function(Base, Event, filter, error, logger, Promise) {
+], function(Base, Event, error, logger, Promise) {
 
   "use strict";
 
@@ -256,9 +255,9 @@ define([
 
       var updateSelection = changeset.hasChange("selectionFilter");
       if(updateSelection) {
-        var newFilter = this.model.selectionFilter;
+        var newValue = this.model.selectionFilter;
         var oldValue = changeset.getOld("selectionFilter");
-        this._selectionChanged(newFilter, oldValue != null ? oldValue.value : null);
+        this._selectionChanged(newValue, oldValue);
       }
 
       var updateSize = changeset.hasChange("width") || changeset.hasChange("height");

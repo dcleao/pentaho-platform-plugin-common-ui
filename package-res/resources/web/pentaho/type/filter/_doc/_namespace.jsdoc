@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./_AbstractTable",
-  "./_Table",
-  "./_TableView"
-], function(AbstractTable, Table, TableView) {
 
-  "use strict";
+/**
+ * This namespace contains types for expressing
+ * [intensional]{@link https://en.wikipedia.org/wiki/Intensional_definition}.
+ * filters of complex values or lists of.
+ *
+ * @name pentaho.type.filter
+ * @namespace
+ */
 
-  AbstractTable.core = {
-    Abstract:  AbstractTable,
-    Table:     Table,
-    TableView: TableView
-  };
-
-  return AbstractTable;
-});
+/**
+ * @name pentaho.type.filter.spec
+ * @namespace
+ *
+ * @description The `filter.spec` namespace contains specification interfaces for filters.
+ */
