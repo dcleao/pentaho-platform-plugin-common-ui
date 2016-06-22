@@ -21,8 +21,8 @@
  *
  * @name OperationAPI
  * @class
- * @property {PromptPanel} _promptPanel The prompting panel object
- * @property {Object} _msgs Contains possible constants of messages
+ * @property {PromptPanel} _promptPanel - The prompting panel object
+ * @property {Object} _msgs - Contains possible constants of messages
  */
 define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
   return function(api, id) {
@@ -48,7 +48,7 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      *
      * @name OperationAPI#render
      * @method
-     * @param {Function}  getParameterDefinitionCallback The function called when the prompt panel needs to get the new parameter definition {@link ParameterDefinition}.
+     * @param {Function}  getParameterDefinitionCallback - The function called when the prompt panel needs to get the new parameter definition {@link ParameterDefinition}.
      *                                                   Receives a callback function which needs to be executed either synchronously or asynchronously.
      * @example
      *  // Asynchronous
@@ -132,8 +132,8 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      *
      * @name OperationAPI#setParameterValue
      * @method
-     * @param {String}    param The name of the parameter that's going to be set
-     * @param {Object}    value The new value for the parameter
+     * @param {String}    param - The name of the parameter that's going to be set
+     * @param {Object}    value - The new value for the parameter
      */
     this.setParameterValue = function(param, value) {
       this._getPromptPanel().setParameterValue(param, value);
@@ -146,7 +146,7 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
      * For example, this API function can be used for submitting the prompt panel.
      *
      * @name OperationAPI#refreshPrompt
-     * @param {Boolean} forceUpdate The flag indicates the ability to update all components regardless of the differences between the previous and new xml from the server.
+     * @param {Boolean} forceUpdate - The flag indicates the ability to update all components regardless of the differences between the previous and new xml from the server.
      * @method
      * @example
      *     api.operation.refreshPrompt();
@@ -157,26 +157,26 @@ define(['common-ui/prompting/PromptPanel'], function(PromptPanel) {
 
     /**
      * Reads and modifies a state of the prompting system.
-     * This state consists of a set of properties provided by the server which influence the prompting UI behavior.
-     * Additionally, this state includes prompting UI properties which are necessary for the prompting UI to interact with the user and the server.
+     * This state consists of a set of properties provided by the server, which influence the prompting UI behavior.
+     * Additionally, this state includes prompting UI properties, which are necessary for the prompting UI to interact with the user and the server.
      * The API function can be used to read the current state without inputting the 'state' parameter.
      * Also, the API function can be used to modify the current state with the 'state' parameter, and as a result, the API function returns the modified current state.
      *
      * @name OperationAPI#state
      * @method
-     * @param {Object} [state]                    The set of properties which will be applied to the current state. It's an optional parameter.
-     * @param {Boolean} [state.parametersChanged] True if the parameters have changed. Otherwise, false.
-     * @param {Boolean} [state.autoSubmit]        True is the prompt is in auto submit mode. Otherwise, false. It's limited by the 'allowAutoSubmit' flag.
-     * @param {Number} [state.page]               The number of the page. It's limited in range by the 'totalPages' and 'paginate' flags.
+     * @param {Object} [state]                    - The set of properties which will be applied to the current state. It's an optional parameter.
+     * @param {Boolean} [state.parametersChanged] - True if the parameters have changed; otherwise, false.
+     * @param {Boolean} [state.autoSubmit]        - True is the prompt is in auto submit mode; otherwise, false. It's limited by the 'allowAutoSubmit' flag.
+     * @param {Number} [state.page]               - The number of the page. It's limited in range by the 'totalPages' and 'paginate' flags.
      * @returns {Object}                          The current state which consists of the following properties:
      *                                            <ul>
-     *                                              <li>'promptNeeded' &lt;Boolean&gt; - True if prompts are needed. Otherwise, false. (read only property)</li>
-     *                                              <li>'paginate' &lt;Boolean&gt; - True if pagination is active. Otherwise, false. (read only property)</li>
+     *                                              <li>'promptNeeded' &lt;Boolean&gt; - True if prompts are needed; otherwise, false. (read only property)</li>
+     *                                              <li>'paginate' &lt;Boolean&gt; - True if pagination is active; otherwise, false. (read only property)</li>
      *                                              <li>'totalPages' &lt;Number&gt; - The number of total pages in the report. (read only property)</li>
      *                                              <li>'showParameterUI' &lt;Boolean&gt; - The boolean value of the parameter, 'showParameters'. (read only property)</li>
      *                                              <li>'allowAutoSubmit' &lt;Boolean&gt; - The value of autoSubmit, or if it is undefined, the value of autoSubmitUI. (read only property)</li>
-     *                                              <li>'parametersChanged' &lt;Boolean&gt; - True if the parameters have changed. Otherwise, false.</li>
-     *                                              <li>'autoSubmit' &lt;Boolean&gt; - True if the prompt is in auto submit mode. Otherwise, false.</li>
+     *                                              <li>'parametersChanged' &lt;Boolean&gt; - True if the parameters have changed; otherwise, false.</li>
+     *                                              <li>'autoSubmit' &lt;Boolean&gt; - True if the prompt is in auto submit mode; otherwise, false.</li>
      *                                              <li>'page' &lt;Number&gt; - The number of the page.</li>
      *                                            </ul>
      * @example

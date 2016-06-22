@@ -57,7 +57,7 @@ define(["common-ui/util/util", 'dojo/number', 'cdf/components/TextInputComponent
        * Builds the widget and returns a TextInputComponent
        * @method
        * @name TextInputBuilder#build
-       * @param {Object} args The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:37-TextInputComponent:text_input_component.xcdf/generatedContent}.
+       * @param {Object} args - The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:37-TextInputComponent:text_input_component.xcdf/generatedContent}.
        * @param {PromptPanel} args.promptPanel - The instance of PromptPanel
        * @param {ParameterDefinition} args.promptPanel.paramDefn - The parameter definition
        * @param {Parameter} args.param - The Parameter instance

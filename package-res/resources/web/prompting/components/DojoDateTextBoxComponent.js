@@ -77,7 +77,7 @@ define(['cdf/components/BaseComponent', "dojo/date/locale", 'dijit/form/DateText
         /**
          * Parses the date using the correct formatter
          *
-         * @param {String} value The String with the date to parse
+         * @param {String} value - The String with the date to parse
          * @returns {Date} The parsed string as a Date Object, if it is valid
          * @private
          */

@@ -29,7 +29,7 @@ define([], function() {
      *
      * @name EventAPI#beforeRender
      * @method
-     * @param {Function} callback   The function to be executed when the event is triggered
+     * @param {Function} callback   - The function to be executed when the event is triggered
      *                              Pass null if you wish to unbind this event
      */
     this.beforeRender = function(callback) {
@@ -41,7 +41,7 @@ define([], function() {
      *
      * @name EventAPI#afterRender
      * @method
-     * @param {Function} callback   The function to be executed when the event is triggered
+     * @param {Function} callback   - The function to be executed when the event is triggered
      *                              Pass null if you wish to unbind this event
      */
     this.afterRender = function(callback) {
@@ -53,7 +53,7 @@ define([], function() {
      *
      * @name EventAPI#beforeUpdate
      * @method
-     * @param {Function} callback   The function to be executed when the event is triggered
+     * @param {Function} callback   - The function to be executed when the event is triggered
      *                              Pass null if you wish to unbind this event
      */
     this.beforeUpdate = function(callback) {
@@ -65,7 +65,7 @@ define([], function() {
      *
      * @name EventAPI#afterUpdate
      * @method
-     * @param {Function} callback   The function to be executed when the event is triggered
+     * @param {Function} callback   - The function to be executed when the event is triggered
      *                              Pass null if you wish to unbind this event
      */
     this.afterUpdate = function(callback) {
@@ -77,9 +77,9 @@ define([], function() {
      *
      * @name EventAPI#parameterChanged
      * @method
-     * @param {Function} callback   The function to be executed when the event is triggered.
+     * @param {Function} callback   - The function to be executed when the event is triggered.
      *                              Pass null if you wish to unbind this event.
-     * @param {String} paramName    The name of the parameter to which the callback will be called.
+     * @param {String} paramName    - The name of the parameter to which the callback will be called.
      *                              This argument is optional. If no parameter name is passed on
      *                              the callback, it will be assigned to all the parameters. If paramName is
      *                              not a valid string, the callback will be registered to all parameters.
@@ -111,7 +111,7 @@ define([], function() {
      *
      * @name EventAPI#postInit
      * @method
-     * @param {Function} callback The function to be executed when the event is triggered
+     * @param {Function} callback - The function to be executed when the event is triggered
      *
      * @example
      * api.event.postInit(function() {
@@ -129,7 +129,7 @@ define([], function() {
      *
      * @name EventAPI#ready
      * @method
-     * @param {Function} callback   The function to be executed when the event is triggered.
+     * @param {Function} callback   - The function to be executed when the event is triggered.
      *                               Pass null if you wish to unbind this event.
      * @example
      *  api.event.ready(function(promptPanel) {
@@ -149,7 +149,7 @@ define([], function() {
      *
      * @name EventAPI#stateChanged
      * @method
-     * @param {Function} callback   The function to be executed when the event is triggered. Pass a value of null
+     * @param {Function} callback   - The function to be executed when the event is triggered. Pass a value of null
      *                              if you wish to unbind this event.
      * @example
      *  api.event.stateChanged(function(name, oldValue, newValue) {
@@ -180,7 +180,7 @@ define([], function() {
      *
      * @name EventAPI#submit
      * @method
-     * @param {Function} callback The function to be executed when the event is triggered.
+     * @param {Function} callback - The function to be executed when the event is triggered.
      *                            Passing anything other than a function will unbind this event.
      * @example
      *  api.event.submit(function(options) {

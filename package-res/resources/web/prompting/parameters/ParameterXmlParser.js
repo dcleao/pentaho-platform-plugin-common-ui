@@ -29,7 +29,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        *
        * @name ParameterXmlParser#_parseXml
        * @method
-       * @param {Object} data The data to be parsed
+       * @param {Object} data - The data to be parsed
        * @returns {Object} The xml parsed from a DOMParser
        * @private
        */
@@ -50,8 +50,8 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        *
        * @name ParameterXmlParser#_parseErrors
        * @method
-       * @param {ParameterDefinition} paramDefn The parameter definition to store the errors parsed
-       * @param {Object} xmlRoot The xml to parse errors
+       * @param {ParameterDefinition} paramDefn - The parameter definition to store the errors parsed
+       * @param {Object} xmlRoot - The xml to parse errors
        * @private
        */
       var _parseErrors = function (paramDefn, xmlRoot) {
@@ -83,8 +83,8 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        *
        * @name ParameterXmlParser#_parseParameters
        * @method
-       * @param {ParameterDefinition} paramDefn The parameters objects storing the parameter info
-       * @param {Object} parametersNode The node of parameter to iterate
+       * @param {ParameterDefinition} paramDefn - The parameters objects storing the parameter info
+       * @param {Object} parametersNode - The node of parameter to iterate
        * @private
        */
       var _parseParameters = function (paramDefn, parametersNode) {
@@ -111,7 +111,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        *
        * @name ParameterXmlParser#_parseParameter
        * @method
-       * @param {Object} node The xml node containing the parameter information
+       * @param {Object} node - The xml node containing the parameter information
        * @returns {Parameter} The Parameter instance
        * @private
        */
@@ -142,8 +142,8 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        *
        * @name ParameterXmlParser#_parseParameterValues
        * @method
-       * @param {Object} node The xml node containing the parameter information
-       * @param {Parameter} parameter Parameter with the current parameter metadata
+       * @param {Object} node - The xml node containing the parameter information
+       * @param {Parameter} parameter - Parameter with the current parameter metadata
        * @returns {Array} Array with the
        * @private
        */
@@ -183,9 +183,9 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        *
        * @name ParameterXmlParser#_getAttributeFromXmlNode
        * @method
-       * @param {Object} node The xml node containing the parameter information
-       * @param {String} name The name to extract from the xml node
-       * @param {Boolean} error Flag that indicates empty values should throw an error
+       * @param {Object} node - The xml node containing the parameter information
+       * @param {String} name - The name to extract from the xml node
+       * @param {Boolean} error - Flag that indicates empty values should throw an error
        * @returns {String} The value retrieved from the xml node
        * @throws {Error} Exception if the error flag is true
        * @private
@@ -207,8 +207,8 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
        *
        * @name ParameterXmlParser#_getBooleanFromXmlNode
        * @method
-       * @param {Object} node The xml node containing the parameter information
-       * @param {String} name The name to extract from the xml node
+       * @param {Object} node - The xml node containing the parameter information
+       * @param {String} name - The name to extract from the xml node
        * @returns {Boolean} The boolean value retrieved from the xml node
        * @private
        */
@@ -228,7 +228,7 @@ define(['cdf/lib/Base', 'common-ui/util/base64', 'common-ui/util/formatting',  '
          *
          * @name ParameterXmlParser#parseParameterXml
          * @method
-         * @param {String} xmlString String with the xml
+         * @param {String} xmlString - String with the xml
          * @returns {ParameterDefinition} Parameter Definition instance
          * @throws {Error} Exception if the xml string is not a valid xml with the error
          */

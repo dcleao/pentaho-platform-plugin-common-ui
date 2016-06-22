@@ -20,15 +20,15 @@
  *
  * @name Parameter
  * @class
- * @property {String} name The name of the parameter
- * @property {String} type The java class name describing the type of the parameter
- * @property {Boolean} list {true} if the parameter is a list, {false} otherwise
- * @property {Boolean} mandatory {true} if the parameter is mandatory, {false} otherwise
- * @property {Boolean} multiSelect {true} if the parameter is a multi select, {false} otherwise
- * @property {Boolean} strict {true} if the parameter is strict, {false} otherwise
- * @property {String} timezoneHint The timezone of the parameter
- * @property {Object|String} attributes Hash of string for the remaining parameter attributes
- * @property {Array|ParameterValue} values The array of possible values of the parameter
+ * @property {String} name - The name of the parameter
+ * @property {String} type - The java class name describing the type of the parameter
+ * @property {Boolean} list - {true} if the parameter is a list; {false} otherwise
+ * @property {Boolean} mandatory - {true} if the parameter is mandatory; {false} otherwise
+ * @property {Boolean} multiSelect - {true} if the parameter is a multi select; {false} otherwise
+ * @property {Boolean} strict - {true} if the parameter is strict; {false} otherwise
+ * @property {String} timezoneHint - The timezone of the parameter
+ * @property {Object|String} attributes - Hash of string for the remaining parameter attributes
+ * @property {Array|ParameterValue} values - The array of possible values of the parameter
  */
 define(['common-ui/jquery-clean'], function ($) {
   return function () {
@@ -48,7 +48,7 @@ define(['common-ui/jquery-clean'], function ($) {
        *
        * @name Parameter#isSelectedValue
        * @method
-       * @param {Object} value Value to search for
+       * @param {Object} value - Value to search for
        * @return {Boolean} true if this parameter contains a selection whose value = {value}
        */
       isSelectedValue: function (value) {
@@ -69,7 +69,7 @@ define(['common-ui/jquery-clean'], function ($) {
        *
        * @name Parameter#hasSelection
        * @method
-       * @return {Boolean} {true} if any value is selected, {false} otherwise
+       * @return {Boolean} - {true} if any value is selected; {false} otherwise
        */
       hasSelection: function () {
         var s = false;

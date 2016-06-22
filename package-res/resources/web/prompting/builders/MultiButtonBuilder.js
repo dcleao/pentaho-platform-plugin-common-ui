@@ -58,7 +58,7 @@ define(['cdf/components/MultiButtonComponent', './ValueBasedParameterWidgetBuild
          * Builds the widget and returns a MultiButtonComponent
          * @method
          * @name MultiButtonBuilder#build
-         * @param {Object} args The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:56-MultiButtonComponent:multibutton_component.xcdf/generatedContent}.
+         * @param {Object} args - The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:56-MultiButtonComponent:multibutton_component.xcdf/generatedContent}.
          * @returns {MultiButtonComponent} The MultiButtonComponent built
          */
         build: function (args) {

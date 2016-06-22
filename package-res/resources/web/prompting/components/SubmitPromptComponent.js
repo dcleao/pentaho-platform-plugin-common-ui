@@ -59,7 +59,7 @@ define(['./ScopedPentahoButtonComponent', 'common-ui/jquery-clean'], function(Sc
   return ScopedPentahoButtonComponent.extend({
 
     /**
-     * Creates a label and a checkbox elements for auto-submit option. Moreover uses parent's functional to render a submit button element.
+     * Creates a label and a checkbox elements for auto-submit option; moreover, uses parent's functional to render a submit button element.
      *
      * @method
      * @name SubmitPromptComponent#update

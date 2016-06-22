@@ -90,8 +90,8 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
          *
          * @name WidgetBuilder#_findBuilderFor
          * @method
-         * @param {Object} args The arguments to call the builder
-         * @param {String} type The type of the builder to get
+         * @param {Object} args - The arguments to call the builder
+         * @param {String} type - The type of the builder to get
          * @returns {ParameterWidgetBuilderBase}
          * @private
          */
@@ -112,8 +112,8 @@ define(['./builders/PromptPanelBuilder', './builders/ParameterGroupPanelBuilder'
          *
          * @name WidgetBuilder#build
          * @method
-         * @param {Object} args The arguments to call the builder
-         * @param {String} type The type of the builder to get
+         * @param {Object} args - The arguments to call the builder
+         * @param {String} type - The type of the builder to get
          * @returns {BaseComponent} The CDF component built
          */
         build: function (args, type) {

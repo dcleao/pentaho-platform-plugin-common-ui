@@ -62,17 +62,17 @@ define([], function() {
       /**
        * Returns result differences object for oldParamDefn and newParamDefn object. The result contains group and arrays of
        * parameters that were added to newParamDefn object, were removed from newParamDefn object and were changed in
-       * newParamDefn object. The result array "toAdd" contains new parameters and means that is needed to create new 
-       * components based this new parameters. The result array "toRemove" contains old parameters and means that is
-       * needed to remove components based this old parameters. The result array "toChangeData" contains parameters
-       * with changed data and means that is needed to update data of existing components based this changed parameters.
+       * newParamDefn object. The result array "toAdd" contains new parameters and means that are needed to create new 
+       * components based the new parameters. The result array "toRemove" contains old parameters and means that are
+       * needed to remove components based the old parameters. The result array "toChangeData" contains parameters
+       * with changed data and means that are needed to update data of existing components based the changed parameters.
        * 
        * @name ParameterDefinitionDiffer#diff
        * @method
        * @param {ParameterDefinition}
-       *          oldParamDefn The old object instance of {@link ParameterDefinition}
+       *          oldParamDefn - The old object instance of {@link ParameterDefinition}
        * @param {ParameterDefinition}
-       *          newParamDefn The new object instance of {@link ParameterDefinition}
+       *          newParamDefn - The new object instance of {@link ParameterDefinition}
        * @returns {Object} The result object contains data about added, changed and removed parameters between
        *          oldParamDefn and newParamDefn object. The result object consists of properties "toAdd",
        *          "toChangeData", "toRemove". Each property is an array with values of {@link Parameter} type

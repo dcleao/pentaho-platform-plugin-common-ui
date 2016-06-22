@@ -52,7 +52,7 @@ define(['cdf/lib/Base', '../components/FlowPromptLayoutComponent'],
          * @method
          * @name SubmitPanelBuilder#build
          * @param {Object}
-         *          args The arguments to build the widget in accordance with {@link FlowPromptLayoutComponent}
+         *          args - The arguments to build the widget in accordance with {@link FlowPromptLayoutComponent}
          * @returns {FlowPromptLayoutComponent} The new instance of FlowPromptLayoutComponent
          */
         build: function (args) {

@@ -58,7 +58,7 @@ define([ 'cdf/components/CheckComponent', './ToggleButtonBaseBuilder' ], functio
      * @method
      * @name CheckBuilder#build
      * @param {Object}
-     *          args The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:55-CheckComponent:check_component.xcdf/generatedContent}
+     *          args - The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:55-CheckComponent:check_component.xcdf/generatedContent}
      * @param {Parameter}
      *          args.param - The parameter with the properties needed to build the component
      * @returns {CheckComponent} The new instance of CheckComponent

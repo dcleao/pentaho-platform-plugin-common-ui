@@ -58,7 +58,7 @@ define([ 'cdf/components/RadioComponent', './ToggleButtonBaseBuilder' ], functio
      * @method
      * @name RadioBuilder#build
      * @param {Object}
-     *          args The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:52-RadioComponent:radio_component.xcdf/generatedContent}
+     *          args - The arguments to build the widget in accordance with [the CDF documentation]{@link http://localhost:8080/pentaho/api/repos/:public:plugin-samples:pentaho-cdf:pentaho-cdf-require:30-documentation:30-component_reference:10-core:52-RadioComponent:radio_component.xcdf/generatedContent}
      * @param {Parameter}
      *          args.param - The parameter with the properties needed to build the component
      * @returns {RadioComponent} The new instance of RadioComponent

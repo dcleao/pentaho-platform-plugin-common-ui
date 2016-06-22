@@ -69,7 +69,7 @@ define(['cdf/lib/Base', '../components/SubmitPromptComponent', 'pentaho/common/M
          * @method
          * @name SubmitComponentBuilder#build
          * @param {Object}
-         *          args The arguments to build the widget in accordance with {@link SubmitPromptComponent}
+         *          args - The arguments to build the widget in accordance with {@link SubmitPromptComponent}
          * @returns {SubmitPromptComponent} The new instance of SubmitPromptComponent
          */
         build: function (args) {

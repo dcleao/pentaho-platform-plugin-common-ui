@@ -21,9 +21,9 @@
  * @name CompositeComponent
  * @class
  *
- * @property {Array|BaseComponent} components The array of components
- * @property {Boolean} executeAtStart True if this component should be executed on the first update of the Dashboard
- * object were it is, False otherwise
+ * @property {Array|BaseComponent} components - The array of components
+ * @property {Boolean} executeAtStart - True if this component should be executed on the first update of the Dashboard
+ * object were it is; False, otherwise
  */
 define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboard/Utils' ], 
   function($, BaseComponent, Utils) {
@@ -74,7 +74,7 @@ define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboar
      *
      * @name CompositeComponent#getClassFor
      * @method
-     * @param {BaseComponent} component The component to get the css class
+     * @param {BaseComponent} component - The component to get the css class
      * @returns {string|*|string|string} The css class
      */
     getClassFor : function(component) {
@@ -86,7 +86,7 @@ define([ 'common-ui/jquery-clean', 'cdf/components/BaseComponent', 'cdf/dashboar
      *
      * @name CompositeComponent#getMarkupFor
      * @method
-     * @param {BaseComponent} component The Component to get the Markup
+     * @param {BaseComponent} component - The Component to get the Markup
      * @returns {String} String with the markup
      */
     getMarkupFor : function(component) {

@@ -20,13 +20,13 @@
  * This is a simple and concise mechanism for easily plugging prompting.
  *
  * @name PromptingAPI
- * @param {String}    id HTML object id where to render the prompt panel
+ * @param {String}    id - HTML object identifier where to render the prompt panel
  * @class
- * @property {OperationAPI} operation The prompting operation API
- * @property {EventAPI} event The prompting event API
- * @property {UiAPI} ui The prompting ui API
- * @property {UtilAPI} util The prompting utility API
- * @property {Object} log The console logger of prompting API
+ * @property {OperationAPI} operation - The prompting operation API
+ * @property {EventAPI} event - The prompting event API
+ * @property {UiAPI} ui - The prompting ui API
+ * @property {UtilAPI} util - The prompting utility API
+ * @property {Object} log - The console logger of prompting API
  */
 define(["./OperationAPI", "./EventAPI", "./UiAPI", "./UtilAPI"], function(OperationAPI, EventAPI, UiAPI, UtilAPI) {
   var API = function(id) {

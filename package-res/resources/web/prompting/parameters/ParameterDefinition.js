@@ -18,15 +18,15 @@
 /**
  * @name ParameterDefinition
  * @class
- * @property {Boolean} autoSubmit True is the prompt is in auto submit mode, False otherwise
- * @property {Boolean} autoSubmitUI True if the prompt is in auto submit mode defined in the ui, False otherwise
- * @property {String} layout String defining if the layout of the prompt is Vertical or Horizontal
- * @property {Number} page The number of the page
- * @property {Boolean} paginate True if pagination is active, False otherwise
- * @property {Array|ParameterGroup} parameterGroups The array of ParameterGroup
- * @property {Boolean} promotNeeded True if prompts are needed, False otherwise
- * @property {Number} totalPages The number of total pages of the report
- * @property {Object|Array} errors The array of errors per parameter
+ * @property {Boolean} autoSubmit - True is the prompt is in auto submit mode; False, otherwise
+ * @property {Boolean} autoSubmitUI - True if the prompt is in auto submit mode defined in the ui; False, otherwise
+ * @property {String} layout - String defining if the layout of the prompt is Vertical or Horizontal
+ * @property {Number} page - The number of the page
+ * @property {Boolean} paginate - True if pagination is active; False, otherwise
+ * @property {Array|ParameterGroup} parameterGroups - The array of ParameterGroup
+ * @property {Boolean} promotNeeded - True if prompts are needed;, False, otherwise
+ * @property {Number} totalPages - The number of total pages of the report
+ * @property {Object|Array} errors - The array of errors per parameter
  */
 define(['common-ui/jquery-clean'], function ($) {
   return function () {
@@ -48,7 +48,7 @@ define(['common-ui/jquery-clean'], function ($) {
        *
        * @name ParameterDefinition#getParameterGroup
        * @method
-       * @param {String} name The name of the group to get
+       * @param {String} name - The name of the group to get
        * @returns {ParameterGroup} The parameter group matching the name
        */
       getParameterGroup: function (name) {
@@ -99,7 +99,7 @@ define(['common-ui/jquery-clean'], function ($) {
        *
        * @name ParameterDefinition#getParameter
        * @method
-       * @param {String} name The name of the parameter
+       * @param {String} name - The name of the parameter
        * @returns {Parameter} The parameter
        */
       getParameter: function (name) {
@@ -119,8 +119,8 @@ define(['common-ui/jquery-clean'], function ($) {
        * @name ParameterDefinition#mapParameters
        * @method
        * @param {callback~cb} callback
-       * @param {Object} x The context to run the callback
-       * @returns {Boolean} {true} if all parameters were mapped, {false} otherwise
+       * @param {Object} x - The context to run the callback
+       * @returns {Boolean} {true} if all parameters were mapped; {false} otherwise
        */
       mapParameters: function (callback, x) {
         var d = this;

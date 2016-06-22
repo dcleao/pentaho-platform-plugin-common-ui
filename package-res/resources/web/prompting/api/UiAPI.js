@@ -27,7 +27,7 @@ define([], function() {
      * Makes visible the progress indicator.
      * By default it adds elements to the DOM to give the appearance and behavior of blocking user interaction.
      * For example, this API function can be used during long-running calls or to show a special popup with messages.
-     * To cancel this action can be used {@link UiAPI#hideProgressIndicator}.
+     * To cancel, this action can be used {@link UiAPI#hideProgressIndicator}.
      *
      * @name UiAPI#showProgressIndicator
      * @method
