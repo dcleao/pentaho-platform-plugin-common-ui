@@ -19,7 +19,7 @@ define( [], function () {
 
   /**
    * Register a local module object
-   * @param {String} name Name of the local module
+   * @param {String} name - Name of the local module
    */
   registerLocal = function (name, module) {
     defined[name] = [module];
@@ -29,7 +29,7 @@ define( [], function () {
 
   /**
    * Determine if a local module has been defined
-   * @param {String} name Name of the local module to check
+   * @param {String} name - Name of the local module to check
    */
   isDefined = function (name) {
     return defined[name] !== undefined;
@@ -37,8 +37,8 @@ define( [], function () {
 
   /**
    * Add a callback to be called when the local module is loaded
-   * @param {String} name Name of the local module the callback depends on
-   * @param {Function} callback The function to execute when the local module is loaded
+   * @param {String} name - Name of the local module the callback depends on
+   * @param {Function} callback - The function to execute when the local module is loaded
    */
   addCallback = function (name, callback) {
     var req = required[name] || [];
@@ -48,8 +48,8 @@ define( [], function () {
 
   /**
    * Invokes callbacks registered for the local module and removes them from our cache
-   * @param {String} name Name of the local module
-   * @param {Object} local Local module to pass along to the callback
+   * @param {String} name - Name of the local module
+   * @param {Object} local - Local module to pass along to the callback
    */
   invokeCallbacks = function (name, local) {
     var i, req = required[name];
@@ -85,8 +85,8 @@ define( [], function () {
      *
      * TODO Implement dependencies during define (would be best to hook into RequireJS for this)
      *
-     * @param {String} name Name of the local module to define
-     * @param {Function} f The function that should return the defined module. This is optional.
+     * @param {String} name - Name of the local module to define
+     * @param {Function} f - The function that should return the defined module. This is optional.
      */
     define: function (name, f) {
       var module;

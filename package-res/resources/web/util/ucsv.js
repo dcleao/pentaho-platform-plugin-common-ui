@@ -83,7 +83,7 @@ define("common-ui/util/ucsv", [],	function(){
 		* Each item in the array should be an array that represents one line in the CSV.
 		* Nulls are interpreted as empty fields.
 		*
-		* @param {String} a The array to convert
+		* @param {String} a - The array to convert
 		*
 		* @returns A CSV representation of the provided array.
 		* @type string
@@ -149,7 +149,7 @@ define("common-ui/util/ucsv", [],	function(){
 		 * @return The CSV parsed as an array
 		 * @type Array
 		 * 
-		 * @param {String} s The string to convert
+		 * @param {String} s - The string to convert
 		 * @param {Boolean} [trm=false] If set to True leading and trailing whitespace is stripped off of each non-quoted field as it is imported
 		 * @public
 		 * @static

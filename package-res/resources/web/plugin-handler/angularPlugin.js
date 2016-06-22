@@ -61,7 +61,7 @@ define(deps, function(PentahoPlugin, AngularPluginHandler, ring) {
 		},
 
 		/**
-		 * A funtion which goes directly to the home "/" hash in the url
+		 * A function that goes directly to the home "/" hash in the url
 		 */
 		goHome : function() {
 			this.config.pluginHandler.goHome(this.moduleName);

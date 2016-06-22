@@ -163,11 +163,11 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
      * Inject localization strings into DOM elements using a naming convention.
      * <p>
      * Iterates over all keys in the bundle (assumed to have been previously loaded) and matches them to
-     * DOM elements ID based on a naming convention.
+     * DOM elements identifier based on a naming convention.
      * <code>
      *   errorMessage_label=Here is an error Message.
      * </code>
-     * errorMessage will be the DOM id it tries to match on and label is the type of element to set the value on.
+     * errorMessage will be the DOM identifier it tries to match on and label is the type of element to set the value on.
      * Supported types:
      * <ul>
      *   <li>label: sets a label</li>
@@ -177,7 +177,7 @@ define("common-ui/util/util", ["dijit/registry", "dojo/dom"], function(registry,
      * </ul>
      * </p>
      * @param bundleName - name of the mesages bundle to use as the source for translations
-     * @param prefix - id prefix to match on when getting id's from the dom
+     * @param prefix - identifier prefix to match on when getting identifiers from the dom
      */
     localizeDom: function(/*String*/ bundleName, /*Optional|String*/ prefix) {
       var key;

@@ -1,6 +1,6 @@
 /*
  * This is an API layer providing standard animations for sliding left/right and fade out when exiting views. These transitions
- * are accessible by calling the goNext, goPrevious, and close functions provided. These functions can be called in 2 ways.
+ * are accessible by calling the goNext, goPrevious, and close functions provided. These functions can be called in 2 ways:
  * 1) You can call these methods directly from the included AnimatedAngularPluginHandler, when it is required. You will need to
  * 		provide the module name for which you are changing the location, as the urls are namespaced
  * 2) You can call them from within partials. The module name is not required to call these functions, since they are bound to

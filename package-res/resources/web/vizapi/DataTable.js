@@ -458,7 +458,7 @@ pentaho.DataView = function( dataTable ) {
     Sets the row numbers of the rows to have in the view.
     The row numbers do not have to match the order of the
     underlying table.
-    If this function is not called this DataView will include
+    If this function is not called, this DataView will include
     all the rows of the underlying DataTable.
     All of the row numbers must be within the range of valid
     row numbers for the DataTable.
@@ -474,7 +474,7 @@ pentaho.DataView.prototype.setRows = function(rows) {
     Sets the column numbers to have in the view.
     The column numbers do not have to match the order of the
     columns in the underlying table.
-    If this function is not called this DataView will include
+    If this function is not called, this DataView will include
     all the columns of the underlying DataTable.
     All of the columns numbers must be within the range of valid
     columns numbers for the DataTable.

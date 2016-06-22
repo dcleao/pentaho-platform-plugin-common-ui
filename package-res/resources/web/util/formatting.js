@@ -22,8 +22,8 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
   return {
     /**
      * Create a text formatter that formats to/from text. This is designed to convert between data formatted as a string
-     * and the Reporting Engine's expected format for that object type.
-     * e.g. "01/01/2003" <-> "2003-01-01T00:00:00.000-0500"
+     * and the Reporting Engine's expected format for that object type, 
+     * for example, "01/01/2003" <-> "2003-01-01T00:00:00.000-0500"
      */
     createDataTransportFormatter: function(parameter) {
       var formatterType = TextFormatter.getFormatType(parameter.type);
@@ -210,11 +210,11 @@ define("common-ui/util/formatting", ['common-ui/util/timeutil', 'common-ui/util/
     },
 
     /**
-     * Converts a time from a arbitary timezone into the local timezone. The timestamp value remains unchanged,
+     * Converts a time from an arbitary timezone into the local timezone. The timestamp value remains unchanged,
      * but the string representation changes to reflect the give timezone.
      *
-     * @param value the timestamp as string in UTC format
-     * @param timezone the target timezone
+     * @param value - The timestamp as string in UTC format
+     * @param timezone - The target timezone
      * @return the converted timestamp string.
      */
     convertTimeStampToTimeZone: function(value, timezone) {

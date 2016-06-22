@@ -56,7 +56,7 @@ define("common-ui/util/ContextProvider", ["common-ui/jquery-pentaho-i18n"], func
 	}
 
 	/**
-	 * Loads a single file and provides a post function for after the context has been loaded. 
+	 * Loads a single file and provides a post function for use after the context has been loaded. 
 	 */
 	function loadFile(path, postFileLoad, addToContext) {	
 		var locale = getUrlVars()["locale"];

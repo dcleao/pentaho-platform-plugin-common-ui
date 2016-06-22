@@ -47,7 +47,7 @@ define('common-ui/util/TextFormatter', ['dojo/number', 'dojo/date/locale'], func
    * Returns a type of formatter depends on input parametr.
    *
    * @name TextFormatter#getFormatType
-   * @param  {String} type The source type is needed to find according resulting formatter type
+   * @param  {String} type - The source type is needed to find according resulting formatter type
    * @returns {String}     Returns 'number' or 'date' depends on the input source type
    */
   var getFormatType = function(type) {
@@ -121,13 +121,13 @@ define('common-ui/util/TextFormatter', ['dojo/number', 'dojo/date/locale'], func
   };
 
   /**
-   * Creates a number formatter or a date formatter depends on type and pattern.
+   * Creates a number formatter or a date formatter depending on the type and pattern.
    * The formatter should have two methods: format and parse.
    *
    * @method
    * @name TextFormatter#createFormatter
-   * @param   {String} type       The type of formatter, see typeMap property for details
-   * @param   {String} pattern    The pattern for concreate formatter
+   * @param   {String} type       - The type of formatter, see typeMap property for details
+   * @param   {String} pattern    - The pattern for concreate formatter
    * @returns {*|{format, parse}} An object capable of formatting the 'type' to and from text
    * @example
    *

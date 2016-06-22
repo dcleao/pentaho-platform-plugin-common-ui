@@ -27,11 +27,11 @@ var pathArray = window.location.pathname.split( '/' );
 var webAppPath = "/" + pathArray[1];
 
 /**
- * @param solution String name of the solution containing the action sequence definition being called
- * @param path String path to the action sequence definition being called
- * @param action String name of the action sequence definition being called
- * @param params Array containing the parameters for the query string
- * @param func String, object, or function. It is optional. Refers to the function to call
+ * @param solution - String name of the solution containing the action sequence definition being called
+ * @param path - String path to the action sequence definition being called
+ * @param action - String name of the action sequence definition being called
+ * @param params - Array containing the parameters for the query string
+ * @param func - String, object, or function. It is optional. Refers to the function to call
  * asynchronously when the client receives the server's response. If the parameter is:
  *   null or undefined:
  *     the request to the server is synchronous, and the response is returned
@@ -67,9 +67,9 @@ function pentahoAction( solution, path, action, params, func ) {
 	return pentahoPost( url, query, func );
 }
 /**
- * @param component String
- * @param params Array containing the parameters for the query string
- * @param func String, object, or function. It is optional. Refers to the function to call when the client
+ * @param component - String
+ * @param params - Array containing the parameters for the query string
+ * @param func - String, object, or function. It is optional. Refers to the function to call when the client
  * receives the server's response. If the parameter is:
  *   null or undefined:
  *     the request to the server is synchronous, and the response is returned
@@ -110,9 +110,9 @@ function pentahoService( component, params, func, mimeType ) {
 }
 
 /**
- * @param url String url of the web service/servlet
- * @param query String containing the message to send to the server
- * @param func String, object, or function. It is optional. Refers to the function to call when the client
+ * @param url - String url of the web service/servlet
+ * @param query - String containing the message to send to the server
+ * @param func - String, object, or function. It is optional. Refers to the function to call when the client
  * receives the server's response. If the parameter is:
  *   null or undefined:
  *     the request to the server is synchronous, and the response is returned
@@ -124,8 +124,8 @@ function pentahoService( component, params, func, mimeType ) {
  *   of type object, where the object has the properties obj and method:
  *     func.obj is the object to call the method func.method on,
  *     e.g. obj.method()
- * @param mimeType String optional, specifies the mime type of the response
- * @param allowCaching If not true a unique request string will be generated
+ * @param mimeType - String, optional, specifies the mime type of the response
+ * @param allowCaching - If not true, a unique request string will be generated
  *
  * @return String containing the server's response if func is not null or undefined,
  * null if the call is asynchronous.
@@ -200,9 +200,9 @@ function getNotFoundMsg()
 }
 
 /**
- * @param url String url of the web service/servlet
- * @param query String containing the message to send to the server
- * @param func String, object, or function. It is optional. Refers to the function to call when the client
+ * @param url - String url of the web service/servlet
+ * @param query - String containing the message to send to the server
+ * @param func - String, object, or function. It is optional. Refers to the function to call when the client
  * receives the server's response. If the parameter is:
  *   null or undefined:
  *     the request to the server is synchronous, and the response is returned
@@ -214,7 +214,7 @@ function getNotFoundMsg()
  *   of type object, where the object has the properties obj and method:
  *     func.obj is the object to call the method func.method on,
  *     e.g. obj.method()
- * @param mimeType String optional, specifies the mime type of the response
+ * @param mimeType - String optional, specifies the mime type of the response
  *
  * @return String containing the server's response if func is not null or undefined,
  * null if the call is asynchronous.
