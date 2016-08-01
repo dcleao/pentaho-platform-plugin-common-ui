@@ -16,17 +16,20 @@
 define([
   "pentaho/lang/Base",
   "pentaho/lang/EventSource",
-  "./events/DidCreate",
   "./events/WillUpdate",
   "./events/DidUpdate",
   "./events/RejectedUpdate",
-  "pentaho/lang/ActionResult",
+  "pentaho/lang/UserError",
   "pentaho/data/filter",
+  "pentaho/util/object",
+  "pentaho/util/arg",
+  "pentaho/util/fun",
+  "pentaho/util/BitSet",
   "pentaho/util/error",
   "pentaho/util/logger",
-  "pentaho/shim/es6-promise"
-], function(Base, EventSource, DidCreate, WillUpdate, DidUpdate, RejectedUpdate, ActionResult,
-            filter, error, logger, Promise) {
+  "pentaho/util/promise"
+], function(Base, EventSource, WillUpdate, DidUpdate, RejectedUpdate, UserError,
+            filter, O, arg, F, BitSet, error, logger, promise) {
 
   "use strict";
 
@@ -52,13 +55,20 @@ define([
    * @constructor
    * @param {pentaho.visual.base.Model} model - The base visualization `Model`.
    */
+  /*global Promise:false */
+
+  // Allow ~0
+  // jshint -W016
+
+  var _reUpdateMethodName = /^_update(.+)$/;
 
   var View = Base.extend(/** @lends pentaho.visual.base.View# */{
 
-    constructor: function(model) {
+    constructor: function(domContainer, model) {
+      if(!domContainer) throw error.argRequired("domContainer");
+      if(!model) throw error.argRequired("model");
 
-      if(!model)
-        throw error.argRequired("model");
+      this.__domContainer = domContainer;
 
       /**
        * The DOM node where the visualization should render.
@@ -66,32 +76,39 @@ define([
        * @protected
        * @readonly
        */
-      this._domNode = null;
+      this.__model = model;
 
       /**
        * The model of the visualization.
        * @type {pentaho.visual.base.Model}
        * @readonly
        */
-      this.model = model;
+      this.__updatingPromise = null;
 
       /**
        * Indicates when an update is in progress.
        * @type {boolean}
        * @readonly
-       */
-      this._isUpdating = false;
+      this.__isAutoUpdate = true;
 
-      this._init();
+       */
+      this.__dirtyPropGroups = new BitSet(View.PropertyGroups.All); // mark view as initially dirty
+
+      this.__changeDidHandle = model.on("did:change", this.__onChangeDidOuter.bind(this));
     },
 
+    //region Properties
     /**
      * Gets the view's DOM node.
      *
      * @type {?(Node|Text|HTMLElement)}
      */
-    get domNode() {
-      return this._domNode;
+    get domContainer() {
+      return this.__domContainer;
+    },
+
+    get model() {
+      return this.__model;
     },
 
     /**
@@ -111,11 +128,58 @@ define([
      * @type {!boolean}
      */
     get isUpdating() {
-      return this._isUpdating;
+      return !!this.__updatingPromise;
     },
 
     /**
      * Orchestrates the rendering of the visualization and is meant to be invoked by the container.
+    get isAutoUpdate() {
+      return this.__isAutoUpdate;
+    },
+
+    set isAutoUpdate(value) {
+      this.__isAutoUpdate = !!value;
+    },
+
+    get isDirty() {
+      // Because dirty prop groups are cleared optimistically before update methods run,
+      // it is needed to use isUpdating to not let that transient non-dirty state show through.
+      return this.isUpdating || !this.__dirtyPropGroups.isEmpty;
+    },
+    //endregion
+
+    //region Changes
+    __onChangeDidOuter: function(event) {
+
+      var bitSetNew = new BitSet();
+
+      this._onChangeDid(bitSetNew, event.changeset);
+
+      if(!bitSetNew.isEmpty) {
+
+        this.__dirtyPropGroups.set(bitSetNew.get());
+
+        if(this.isAutoUpdate) {
+          this.update()["catch"](function(error) {
+            logger.warn("Auto-update was canceled: " + error);
+          });
+        }
+      }
+    },
+
+    _onChangeDid: function(dirtyPropGroups, changeset) {
+
+      changeset.propertyNames.forEach(function(name) {
+
+        var dirtyGroupName = this[name] || "General";
+
+        dirtyPropGroups.set(View.PropertyGroups[dirtyGroupName]);
+
+      }, this.constructor.__PropertyGroupOfProperty);
+    },
+    //endregion
+
+    //region Update
      *
      * Executes [_update]{@link pentaho.visual.base.View#_update} asynchronously in
      * the will/did/rejected event loop associated with an update of a visualization,
@@ -134,43 +198,79 @@ define([
      * @fires "did:create"
      */
     update: function() {
-      if(this.isUpdating) return Promise.reject(new Error("Previous update still in progress!"));
 
-      this._isUpdating = true;
+      var p = this.__updatingPromise;
+      if(!p) {
+        // Nothing to do?
+        if(this.__dirtyPropGroups.isEmpty) {
+          p = Promise.resolve();
+        } else {
+          var _resolve = null, _reject = null;
 
-      var willUpdate;
+          this.__updatingPromise = p = new Promise(function(resolve, reject) {
+            // ignore the fulfillment value of returned promises
+            _resolve = function() { resolve(); };
+            _reject  = reject;
+          });
+
+          // Protect against overrides failing.
+          var cancelReason;
+          try {
+            cancelReason = this._onUpdateWill();
+          } catch(ex) { cancelReason = ex; }
+
+          (cancelReason ? Promise.reject(cancelReason) : this.__updateLoop())
+            .then(this.__onUpdateDidOuter.bind(this), this.__onUpdateRejectedOuter.bind(this))
+            .then(_resolve, _reject);
+        }
+      }
+
+      return p;
+    },
+
+    _onUpdateWill: function() {
+
       if(this._hasListeners(WillUpdate.type)) {
-        willUpdate = new WillUpdate(this);
-        this._emitSafe(willUpdate);
+
+        var willUpdate = new WillUpdate(this);
+
+        if(!this._emitSafe(willUpdate))
+          return willUpdate.cancelReason;
       }
 
-      if(willUpdate && willUpdate.isCanceled) {
-        this._isUpdating = false;
+      return null;
+    },
 
-        if(this._hasListeners(RejectedUpdate.type))
-          this._emitSafe(new RejectedUpdate(this, willUpdate.cancelReason));
+    __updateLoop: function() {
 
-        return Promise.reject(willUpdate.cancelReason);
-      }
+      // assert !this.__dirtyPropGroups.isEmpty;
 
-      var me = this, hadDomNode = this.domNode;
-      return Promise.resolve(me._doUpdate()).then(function() {
-          if(!hadDomNode && me.domNode && me._hasListeners(DidCreate.type))
-            me._emitSafe(new DidCreate(me));
+      var validationErrors = this.__validate();
+      if(validationErrors)
+        return Promise.reject(new UserError("View model is invalid:\n - " + validationErrors.join("\n - ")));
 
-          me._isUpdating = false;
+      // ---
 
-          if(me._hasListeners(DidUpdate.type))
-            me._emitSafe(new DidUpdate(me));
+      var dirtyPropGroups = this.__dirtyPropGroups;
+      var updateMethodInfo = this.__selectUpdateMethod(dirtyPropGroups);
 
-        }, function(reason) {
-          me._isUpdating = false;
+      // Assume update succeeds.
+      dirtyPropGroups.clear(updateMethodInfo.mask);
 
-          if(me._hasListeners(RejectedUpdate.type))
-            me._emitSafe(new RejectedUpdate(me, reason.error));
+      var me = this;
 
-          return Promise.reject(reason.error);
-        });
+      return promise.wrapCall(this[updateMethodInfo.name], this)
+          .then(function() {
+
+            return dirtyPropGroups.isEmpty ? Promise.resolve() : me.__updateLoop();
+
+          }, function(reason) {
+
+            // Restore
+            dirtyPropGroups.set(updateMethodInfo.mask);
+
+            return Promise.reject(reason);
+          });
     },
 
     /**
@@ -185,28 +285,47 @@ define([
      * 
      * @protected
      */
-    _doUpdate: function() {
-      var validationErrors = this._validate();
-      if(validationErrors) {
-        var error = "View update was rejected:\n - " +
-          (Array.isArray(validationErrors) ? validationErrors.join("\n - ") : validationErrors);
+    __validate: function() {
+      return this.model.validate();
+    },
 
-        return Promise.reject(ActionResult.reject(error));
+    __selectUpdateMethod: function(dirtyPropGroups) {
+
+      var ViewClass = this.constructor;
+
+      // 1. Is there an exact match?
+      var methodInfo = ViewClass.__UpdateMethods[dirtyPropGroups.get()];
+      if(!methodInfo) {
+
+        // TODO: A sequence of methods that handles the dirty bits...
+
+        // 2. Find the first method that cleans all (or more) of the dirty bits.
+        ViewClass.__UpdateMethodsList.some(function(info) {
+          if(dirtyPropGroups.isSubsetOf(info.mask)) {
+            methodInfo = info;
+            return true;
+          }
+        });
+
+        // At least the _updateAll method is registered. It is able to handle any dirty bits.
+        // assert methodInfo
       }
 
-      try {
-        return Promise.resolve(this._update());
-      } catch(e) {
-        return Promise.reject(ActionResult.reject(e.message));
-      }
-
+      return methodInfo;
     },
 
     /**
      * Called before the visualization is discarded.
      */
-    dispose: function() {
-      this._domNode = null;
+    __onUpdateDidOuter: function() {
+
+      // J.I.C.
+      this.__dirtyPropGroups.clear();
+      this.__updatingPromise =  null;
+
+      // ---
+
+      this.__callOverridableSafe("_onUpdateDid");
     },
 
     /**
@@ -215,13 +334,15 @@ define([
      * @param {?(Node|Text|HTMLElement)} domNode - Visualization's DOM node.
      * @protected
      */
-    _setDomNode: function(domNode) {
-      if(!domNode)  throw error.argRequired("domNode");
-      
-      if(this._domNode && domNode !== this._domNode)
-        throw new Error("Can't change the visualization dom node once it is set.");
+    __onUpdateRejectedOuter: function(reason) {
 
-      this._domNode = domNode;
+      this.__updatingPromise = null;
+
+      // ---
+
+      this.__callOverridableSafe("_onUpdateRejected", reason);
+
+      return Promise.reject(reason);
     },
 
     /**
@@ -233,10 +354,10 @@ define([
      *
      * @protected
      */
-    _init: function() {
-      this.model.on("did:change", function(event) {
-        this._onChange(event.changeset);
-      }.bind(this));
+    _onUpdateDid: function() {
+
+      if(this._hasListeners(DidUpdate.type))
+        this._emitSafe(new DidUpdate(this));
     },
 
     /**
@@ -248,10 +369,13 @@ define([
      * @return {?Array.<!pentaho.type.ValidationError>} A non-empty array of errors or `null`.
      * @protected
      */
-    _validate: function() {
-      var validationErrors = this.model.validate();
-      return validationErrors;
+    _onUpdateRejected: function(reason) {
+
+      if(this._hasListeners(RejectedUpdate.type))
+        this._emitSafe(new RejectedUpdate(this, reason));
     },
+
+    //endregion
 
     /**
      * Determines if the visualization is in a valid state.
@@ -262,21 +386,114 @@ define([
      * @protected
      * @see pentaho.visual.base.View#_validate
      */
-    _isValid: function() {
-      return !this._validate();
+    dispose: function() {
+
+      this.__domContainer = null;
+
+      var h = this.__changeDidHandle;
+      if(h) {
+        h.dispose();
+        this.__changeDidHandle = null;
+      }
     },
 
+    // see Base.js
+    extend: function(source, keyArgs) {
+
+      this.base(source, keyArgs);
+
+      if(source) {
+        var Subclass = this.constructor;
+
+        O.eachOwn(source, function(v, methodName) {
+          var m;
+          if(F.is(v) && (m = _reUpdateMethodName.exec(methodName))) {
+
+            var methodCleansBits = parsePropertyGroupsText(Subclass, m[1]);
+            if(methodCleansBits && !Subclass.__UpdateMethods[methodCleansBits]) {
+              var updateMethodInfo = {
+                name: methodName,
+                mask: methodCleansBits
+              };
+
+              Subclass.__UpdateMethods[methodCleansBits] = updateMethodInfo;
+              Subclass.__UpdateMethodsList.push(updateMethodInfo);
+
+              Subclass.__UpdateMethodsList.sort(function(a, b) {
+                // Never happens: if(a.mask === b.mask) return 0;
+                return new BitSet(a.mask).isSubsetOf(b.mask) ? -1 : 1;
+              });
+            }
+          }
+        });
+      }
+
+      return this;
+    },
+
+    __callOverridableSafe: function(methodName) {
+      var args = arg.slice(arguments, 1);
+      try {
+        return this[methodName].apply(this, args);
+      } catch(ex) {
+        logger.error("Exception thrown by 'View#" + methodName + "' override:" + ex + "\n" + ex.stack);
+      }
+    }
+  }, /** @lends pentaho.visual.base.View */{
+    // see Base.js
+    _subclassed: function(Subclass, instSpec, classSpec, keyArgs) {
+
+      // "Inherit" PropertyGroups, __PropertyGroupOfProperty, __UpdateMethods and __UpdateMethodsList properties
+      Subclass.PropertyGroups            = Object.create(this.PropertyGroups);
+      Subclass.__PropertyGroupOfProperty = Object.create(this.__PropertyGroupOfProperty);
+      Subclass.__UpdateMethods           = Object.create(this.__UpdateMethods);
+      Subclass.__UpdateMethodsList       = this.__UpdateMethodsList.slice();
+
+      this.base(Subclass, instSpec, classSpec, keyArgs);
+    },
+
+    PropertyGroups: O.assignOwn(Object.create(null),
     /**
      * Renders the visualization.
      *
      * Subclasses of `pentaho.visual.base.View` must override this method
      * and implement a complete rendering of the visualization.
+     {
+      All: ~0,
+
+      Ignored: 0,
+
+      General: 1,
+
+      Data: 2,
+
+      Size: 4,
+
+      Selection:  8
+    }),
+
+    __PropertyGroupOfProperty: O.assignOwn(Object.create(null), {
+      "selectionMode":   "Ignored",
+      "data":            "Data",
+      "width":           "Size",
+      "height":          "Size",
+      "selectionFilter": "Selection"
+    }),
+
+    // bits -> {name: , mask: }
+    __UpdateMethods: Object.create(null),
+
+    // [{name: , mask: }, ...]
+    __UpdateMethodsList: []
+  })
+  .implement(EventSource)
+  .implement(/** @lends pentaho.visual.base.View# */{
+    //region _updateXyz Methods
      *
      * @protected
      * @abstract
      */
-    _update: /* istanbul ignore next: placeholder method */ function() {
-      throw error.notImplemented("_update");
+    _updateAll: function() {
     },
 
     /**
@@ -289,9 +506,6 @@ define([
      *
      * @protected
      */
-    _resize: /* istanbul ignore next: placeholder method */ function() {
-      this._update();
-    },
 
     /**
      * Updates the visualization, taking into account that
@@ -304,10 +518,6 @@ define([
      *
      * @protected
      */
-    _selectionChanged:
-    /* istanbul ignore next: placeholder method */function(newSelectionFilter, previousSelectionFilter) {
-      this._update();
-    },
 
     /**
      * Decides how the visualization should react
@@ -333,39 +543,24 @@ define([
      *
      * @protected
      */
-    _onChange: function(changeset) {
-      if(!changeset.hasChanges) return;
+    //endregion
+  });
 
-      var exclusionList = {
-        width: true,
-        height: true,
-        selectionMode: true, // never has a direct visual impact
-        selectionFilter: true
-      };
+  function parsePropertyGroupsText(ViewClass, groupNamesText) {
 
-      var fullUpdate = changeset.propertyNames.some(function(p) { return !exclusionList[p]; });
-      if(fullUpdate) {
-        this.update().then(function() {
-          logger.info("Auto-update succeeded!");
-        }, function(errors) {
-          logger.warn("Auto-update canceled:\n - " +
-              (Array.isArray(errors) ? errors.join("\n - ") : errors));
-        });
-        return;
+    var groupsBits = 0;
+
+    groupNamesText.split("And").forEach(function(groupName) {
+      var groupBits = ViewClass.PropertyGroups[groupName];
+      if(groupBits == null || isNaN(+groupBits)) {
+        logger.warn("There is no registered property group with name '" + groupName + "'.");
+      } else {
+        groupsBits |= groupBits;
       }
+    });
 
-      var updateSelection = changeset.hasChange("selectionFilter");
-      if(updateSelection) {
-        var newFilter = this.model.selectionFilter;
-        var oldValue = changeset.getOld("selectionFilter");
-        this._selectionChanged(newFilter, oldValue != null ? oldValue.value : null);
-      }
-
-      var updateSize = changeset.hasChange("width") || changeset.hasChange("height");
-      if(updateSize) this._resize();
-    }
-  }).implement(EventSource);
+    return groupsBits;
+  }
 
   return View;
-
 });

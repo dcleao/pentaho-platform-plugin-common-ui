@@ -19,7 +19,9 @@ define(["./has"], function(has) {
   var O_hasOwn = Object.prototype.hasOwnProperty,
       A_empty  = [],
       setProtoOf = has("Object.setPrototypeOf") ? Object.setPrototypeOf : (has("Object.prototype.__proto__") ? setProtoProp : setProtoCopy),
-      constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false};
+      constPropDesc = {value: undefined, writable: false, configurable: false, enumerable: false},
+      O_root = Object.prototype,
+      O_isProtoOf = Object.prototype.isPrototypeOf;
 
   /**
    * The `object` namespace contains functions for
@@ -224,6 +226,19 @@ define(["./has"], function(has) {
     getPropertyDescriptor: getPropertyDescriptor,
 
     /**
+    lca: function(o1, o2) {
+      if(!o1 || !o2) return null;
+
+      var lca = o2;
+      while(o1 !== lca && (lca !== O_root) && !O_isProtoOf.call(lca, o1) && (lca = Object.getPrototypeOf(lca)));
+
+      // o1 may not descend from O_root, when any of its ancestors has no prototype.
+      if(lca === O_root && !O_isProtoOf.call(lca, o1)) lca = null;
+
+      return lca;
+    },
+
+    /**
      * Constructs an instance of a class,
      * from an array of arguments.
      *
@@ -314,9 +329,10 @@ define(["./has"], function(has) {
     return to;
   }
 
-  function getPropertyDescriptor(o, p) {
+  function getPropertyDescriptor(o, p, lcaExclude) {
     var pd;
-    while(!(pd = Object.getOwnPropertyDescriptor(o, p)) && (o = Object.getPrototypeOf(o)));
+    while(!(pd = Object.getOwnPropertyDescriptor(o, p)) && (o = Object.getPrototypeOf(o)) &&
+          (!lcaExclude || o !== lcaExclude));
     return pd || null;
   }
 
