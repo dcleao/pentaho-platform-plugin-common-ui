@@ -218,14 +218,24 @@ define(["./has"], function(has) {
      *
      * @param {!Object} object - The object that contains the property.
      * @param {string} property - The name of property.
-     * @return {?Object} The
-     * [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
+     * @param {Object} lcaExclude - A lowest-common-ancestor object whose properties inherited from should
+     * not be returned.
+     * @return {?Object} The [property descriptor]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty}.
      * @method
      */
     //only used by pentaho.lang.Base
     getPropertyDescriptor: getPropertyDescriptor,
 
     /**
+     * Obtains the **l**owest **c**ommon **a**ncestor of both of the given objects, if any.
+     *
+     * If one of the objects has a `null` prototype, there is no common ancenstor and `null` is returned.
+     *
+     * @param {Object} o1 - The first object.
+     * @param {Object} o2 - The second object.
+     *
+     * @return {Object} The lowest common ancestor object, if any, or `null`, if none.
+     */
     lca: function(o1, o2) {
       if(!o1 || !o2) return null;
 
