@@ -2611,15 +2611,8 @@ function(def, pvc, pv){
 
         _configureDoubleClick: function(){
             var me = this;
-            this.options.doubleClickAction = function(scene){
-                me._onDoubleClick(scene.datum);
-            };
-
-            this.options.axisDoubleClickAction = function(scene) {
-                var group = scene.group;
-                if(group){
-                    return me._onDoubleClick(group);
-                }
+            this.options.axisDoubleClickAction = this.options.doubleClickAction = function(scene){
+                me._onDoubleClick(scene);
             };
         },
 
@@ -2727,13 +2720,15 @@ function(def, pvc, pv){
 
         _getTooltipText: function(complex, context){
             var tooltipLines = [];
+            var msg;
 
             this._axesIds.forEach(function(axisId){
                 this.axes[axisId].buildHtmlTooltip(tooltipLines, complex, context);
             }, this);
 
             if(!complex.isVirtual){
-                msg = this._vizHelper.getDoubleClickTooltip();
+                var doubleClickSelection = this._getDoubleClickSelection(context.scene);
+                msg = this._vizHelper.getDoubleClickTooltip(doubleClickSelection);
                 if (msg)
                     tooltipLines.push(msg);
             }
@@ -3064,8 +3059,16 @@ function(def, pvc, pv){
 
         /* INTERACTIVE - DOUBLE-CLICK */
 
+        _getDoubleClickSelection: function(scene) {
+          var complex = scene.group || scene.datum;
+          if(complex) {
+            return this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
+          }
+        },
+
         _onDoubleClick: function(complex){
-            var selection = this._complexToCellSelection(complex, this._selectionExcludesMultiGems());
+            var selection = this._getDoubleClickSelection(complex);
+            if(selection) {
             pentaho.events.trigger(this, "doubleclick", {
                 source:        this,
                 selections:    [selection]
@@ -3074,6 +3077,7 @@ function(def, pvc, pv){
                 // For chart data point use case, please pass all gems across gembars into the selection
                 // gembar: rows
             });
+            }
             return true;
         },
 
