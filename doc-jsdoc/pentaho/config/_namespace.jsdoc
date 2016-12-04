@@ -19,7 +19,7 @@
  * related to the configuration of value types.
  *
  * Specifically, it contains classes that implement the
- * {@link pentaho.type.IConfigurationService} interface.
+ * {@link pentaho.config.IService} interface.
  *
  * @name pentaho.type.config
  * @namespace

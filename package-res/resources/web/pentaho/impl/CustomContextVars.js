@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 define([
-  "./contextVars"
+  "../contextVars"
 ], function(defaultContextVars) {
 
   "use strict";
 
   /**
    * @alias CustomContextVars
-   * @memberOf pentaho
+   * @memberOf pentaho.impl
    *
    * @class
    * @implements pentaho.spec.IContextVars
@@ -44,8 +44,14 @@ define([
     this.basePath = readVar(customContextVars, "basePath");
     this.application = readVar(customContextVars, "application");
     this.user = readVar(customContextVars, "user");
+    this.userHome = readVar(customContextVars, "userHome");
     this.theme = readVar(customContextVars, "theme");
     this.locale = readVar(customContextVars, "locale");
+    this.reservedChars = readVar(customContextVars, "reservedChars");
+    this.reservedCharsDisplay = readVar(customContextVars, "reservedCharsDisplay");
+    this.reservedCharsPattern = readVar(customContextVars, "reservedCharsPattern");
+    this.serverUrl = readVar(customContextVars, "serverUrl");
+    this.serverProtocol = readVar(customContextVars, "serverProtocol");
   }
 
   return pentaho_CustomContextVars;

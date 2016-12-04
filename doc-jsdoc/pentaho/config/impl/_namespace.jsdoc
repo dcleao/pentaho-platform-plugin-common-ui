@@ -15,9 +15,8 @@
  */
 
 /**
- * The `debug` namespace contains types for helping programs deal with
- * various debugging information such as debugging level.
+ * The `impl` namespace contains implementation classes.
  *
- * @name pentaho.util.debug
+ * @name pentaho.config.impl
  * @namespace
  */

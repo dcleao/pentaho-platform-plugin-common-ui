@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([], function() {
+define(function() {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false */
 
-  describe("pentaho.type.config.AmdLoadedConfigurationService -", function() {
+  describe("pentaho.config.impl.AmdLoadedService -", function() {
 
     // Should we refactor the tests so they don't depend on the "private" property _ruleStore?
 
@@ -34,19 +34,25 @@ define([], function() {
         config3 = {
           rules: [
             {
-              select: {},
+              select: {
+                type: "A"
+              },
               apply: {
                 testId: 4
               }
             },
             {
-              select: {},
+              select: {
+                type: "A"
+              },
               apply: {
                 testId: 5
               }
             },
             {
-              select: {},
+              select: {
+                type: "A"
+              },
               apply: {
                 testId: 6
               }
@@ -58,7 +64,9 @@ define([], function() {
         config1 = {
           rules: [
             {
-              select: {},
+              select: {
+                type: "A"
+              },
               apply: {
                 testId: 1
               }
@@ -70,13 +78,17 @@ define([], function() {
         config2 = {
           rules: [
             {
-              select: {},
+              select: {
+                type: "A"
+              },
               apply: {
                 testId: 2
               }
             },
             {
-              select: {},
+              select: {
+                type: "A"
+              },
               apply: {
                 testId: 3
               }
@@ -89,9 +101,9 @@ define([], function() {
         localRequire.config({
           config: {
             "pentaho/service": {
-              "test/config/3": "pentaho.type.spec.ITypeConfiguration",
-              "test/config/2": "pentaho.type.spec.ITypeConfiguration",
-              "test/config/1": "pentaho.type.spec.ITypeConfiguration"
+              "test/config/3": "pentaho.config.spec.IRuleSet",
+              "test/config/2": "pentaho.config.spec.IRuleSet",
+              "test/config/1": "pentaho.config.spec.IRuleSet"
             }
           }
         });
@@ -102,18 +114,18 @@ define([], function() {
       });
 
       it("should add loaded rules", function(done) {
-        localRequire(["pentaho/type/config/AmdLoadedConfigurationService"], function(LocalConfigService) {
-          var cf = new LocalConfigService();
-          expect(cf._ruleStore["pentaho/type/value"].length).toBe(6);
+        localRequire(["pentaho/config/impl/AmdLoadedService"], function(ConfigService) {
+          var cf = new ConfigService();
+          expect(cf._ruleStore["A"].length).toBe(6);
           done();
         });
       });
 
       it("natural rule order follows moduleId alphabetic order and each config rules order", function(done) {
-        localRequire(["pentaho/type/config/AmdLoadedConfigurationService"], function(LocalConfigService) {
-          var cf = new LocalConfigService();
+        localRequire(["pentaho/config/impl/AmdLoadedService"], function(ConfigService) {
+          var cf = new ConfigService();
 
-          var Ids = cf._ruleStore["pentaho/type/value"].map(function(rule) {
+          var Ids = cf._ruleStore["A"].map(function(rule) {
             return rule.apply.testId;
           });
 
@@ -122,7 +134,5 @@ define([], function() {
         });
       });
     });
-
   });
-
 });

@@ -15,26 +15,24 @@
  */
 
 /**
- * The `spec.ITypeConfigurationRule` interface describes
- * a type configuration rule,
- * used to configure one or more [value types]{@link pentaho.type.Value.Type} of
- * the Pentaho Client Metadata Model.
+ * The `config.spec.IRule` interface describes a configuration rule,
+ * used to configure one or more types.
  *
- * A configuration rule is part of a [type(s) configuration]{@link pentaho.type.spec.ITypeConfiguration}.
+ * A configuration rule is part of a [configuration rule set]{@link pentaho.config.spec.IRuleSet}.
  *
- * @name pentaho.type.spec.ITypeConfigurationRule
+ * @name pentaho.config.spec.IRule
  * @interface
  *
- * @see pentaho.type.spec.ITypeConfiguration
+ * @see pentaho.config.spec.IRuleSet
  */
 
 /**
- * The priority of the type configuration rule.
+ * The priority of the configuration rule.
  *
  * A rule's priority is the attribute that most influences its precedence order.
  *
  * @name priority
- * @memberOf pentaho.type.spec.ITypeConfigurationRule#
+ * @memberOf pentaho.config.spec.IRule#
  * @type {number}
  * @default 0
  */
@@ -47,8 +45,8 @@
  * it is like every selection variable had been specified with a `null` value.
  *
  * @name select
- * @memberOf pentaho.type.spec.ITypeConfigurationRule#
- * @type {pentaho.type.spec.ITypeConfigurationRuleSelection}
+ * @memberOf pentaho.config.spec.IRule#
+ * @type {pentaho.config.spec.IRuleSelector}
  */
 
 /**
@@ -56,6 +54,6 @@
  * is _applied_ to the selected value type(s).
  *
  * @name apply
- * @memberOf pentaho.type.spec.ITypeConfigurationRule#
- * @type {pentaho.type.spec.IValueTypeProto}
+ * @memberOf pentaho.config.spec.IRule#
+ * @type {!Object}
  */

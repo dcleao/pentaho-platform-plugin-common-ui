@@ -15,32 +15,32 @@
  */
 
 /**
- * The `IConfigurationService` interface describes a service
- * that manages configurations of [value types]{@link pentaho.type.Value.Type}
- * of the Pentaho Client Metadata Model.
+ * The `config.IService` interface describes a service
+ * that manages configurations, usually of types.
  *
- * The [add]{@link pentaho.type.IConfigurationService#add} method
- * is used to register a [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}
+ * The platform's main configuration service instance can be obtained by requiring
+ * the module `pentaho/service!pentaho.config.IService?single`.
+ *
+ * The platform registers an instance module that
+ * loads all registered configuration rule set modules
+ * (i.e., modules of type {@link pentaho.config.spec.IRuleSet}).
+ *
+ * The [add]{@link pentaho.config.IService#add} method
+ * is used to register a [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}
  * to the service.
  *
- * The [select]{@link pentaho.type.IConfigurationService#select} method
- * selects the rules of added type configurations that apply to
+ * The [select]{@link pentaho.config.IService#select} method
+ * selects the rules of added configurations that apply to
  * a given type and context variables,
  * sorts these by specificity,
- * then merges the rules' [type specifications]{@link pentaho.type.spec.ITypeConfigurationRule#apply}
+ * then merges the rules' [specifications]{@link pentaho.config.spec.IRule#apply}
  * and returns the result.
  * For more information on the specificity of rules,
- * see [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}.
+ * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
  *
- * The merged type configuration specification can then be used to configure a value type,
- * by calling its [pentaho.type.Type.implement]{@link pentaho.lang.Base.implement} method.
+ * The merged configuration specification can then be used to configure a type or an instance.
  *
  * Normally, you won't call these operations directly.
- *
- * The singleton configuration service, {@link pentaho.type.configurationService},
- * already handles loading of all type configurations registered
- * with the [pentaho/service]{@link pentaho.service} module,
- * under the service identifier `pentaho.type.spec.ITypeConfiguration`.
  *
  * Then, the [Context]{@link pentaho.type.Context} class
  * already handles obtaining configurations from its configuration service,
@@ -51,25 +51,25 @@
  * ```js
  * var myTypeConfig = {
  *   rules: [
- *     // Disable a still experimental Viz.
+ *     // Disable a still experimental component.
  *     {
  *       select: {
- *         type: "my/radial/bar"
+ *         type: "my.foo.component"
  *       },
  *       apply: {
- *         isBrowsable: false
+ *         enabled: false
  *       }
  *     },
  *
- *     // Enable it, only for the dev user, "john", when in Analyzer
+ *     // Enable it, only for the dev user, "john", and the "super-app" application.
  *     {
  *       select: {
- *         type:        "my/radial/bar",
+ *         type:        "my.foo.component",
  *         user:        "john",
- *         application: "pentaho.analyzer"
+ *         application: "super-app"
  *       },
  *       apply: {
- *         isBrowsable: true
+ *         enabled: true
  *       }
  *     }
  *   ]
@@ -79,22 +79,21 @@
  *
  * configService.add(myTypeConfig);
  *
- * var mergedTypeConfigSpec = configService.select("pentaho/visual/ccc/bar", {
+ * var mergedConfigSpec = configService.select("my.foo.component", {
  *      user:        "john",
- *      application: "pentaho.cdf"
+ *      application: "not-so-super-app"
  *    });
  *
- * // Results in a specification like:
+ * // Results in a configuration specification like:
  * // {
- * //   isBrowsable: false
+ * //   enabled: false
  * // }
  * ```
  *
- * @name pentaho.type.IConfigurationService
+ * @name pentaho.config.IService
  * @interface
  *
- * @see pentaho.type.Context
- * @see pentaho.type.spec.ITypeConfiguration
+ * @see pentaho.config.spec.IRuleSet
  */
 
 /**
@@ -102,11 +101,10 @@
  * the selection of configuration rules that apply to a given type and context variables.
  *
  * @name select
- * @memberOf pentaho.type.IConfigurationService#
+ * @memberOf pentaho.config.IService#
  * @method
  *
- * @param {string} typeId - The [id]{@link pentaho.type.Type#id} of the type whose
- * configuration specification is desired.
+ * @param {string} typeId - The id of the type whose configuration specification is desired.
  *
  * @param {pentaho.spec.IContextVars} [contextVars] The context variables that are used to select rules.
  *
@@ -119,24 +117,24 @@
  * Variable values are matched against each value specified by a rule in its selection variables,
  * using JavaScript's strict equality operator, `===`.
  *
- * @return {pentaho.type.spec.ITypeProto} The merged configuration specification,
+ * @return {!Object} The merged configuration specification,
  * if any rule was selected; or `null`, if no rule was selected.
  */
 
 /**
- * Adds a type configuration.
+ * Adds a configuration rule set.
  *
- * An added configuration overrides previously added configurations,
+ * Added configurations overrides previously added configurations,
  * if all other rule-ordering criteria are equal.
  * For more information on the specificity of rules,
- * see [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}.
+ * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
  *
  * Note that the specified configuration object **may** be modified to serve
  * the service's internal needs.
  *
  * @name add
- * @memberOf pentaho.type.IConfigurationService#
+ * @memberOf pentaho.config.IService#
  * @method
  *
- * @param {!pentaho.type.spec.ITypeConfiguration} config - A type configuration to add.
+ * @param {!pentaho.config.spec.IRuleSet} config - A type configuration to add.
  */

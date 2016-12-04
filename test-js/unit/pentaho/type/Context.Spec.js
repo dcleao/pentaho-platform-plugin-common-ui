@@ -74,11 +74,11 @@ define([
 
       it("should respect a given contextVars instance", function() {
 
-        return require.using(["pentaho/type/Context", "pentaho/CustomContextVars"],
+        return require.using(["pentaho/type/Context", "pentaho/impl/CustomContextVars"],
         function(Context, CustomContextVars) {
-          var vars = new CustomContextVars();
-          var context = new Context(vars);
-          expect(context.vars).toBe(vars);
+          var customContextVars = new CustomContextVars();
+          var context = new Context(customContextVars);
+          expect(context.vars).toBe(customContextVars);
         });
       });
     });
@@ -1077,12 +1077,6 @@ define([
     describe("#getAllAsync(baseTypeId, ka)", function() {
 
       function configRequire(localRequire) {
-        // Reset current service configuration
-        localRequire.config({
-          config: {"pentaho/service": null}
-        });
-
-        // ---
 
         localRequire.define("exp/baseWithNoRegistrations", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {
@@ -1367,13 +1361,6 @@ define([
       });
 
       function configRequire(localRequire) {
-
-        // Reset current service configuration
-        localRequire.config({
-          config: {"pentaho/service": null}
-        });
-
-        // ---
 
         localRequire.define("exp/thing", ["pentaho/type/simple"], function(simpleFactory) {
           return function(context) {

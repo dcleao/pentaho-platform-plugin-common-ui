@@ -47,7 +47,7 @@ var KARMA_DEBUG = false;
  * for development purposes.
  *
  * The expression is evaluated on the part of the spec file name that is after
- * `test-js/unit/` and before the `.js` extension (e.g. `"pentaho/serviceSpec"`).
+ * `test-js/unit/` and before the `.js` extension (e.g. `"pentaho/service.Spec"`).
  *
  * @type RegExp
  *

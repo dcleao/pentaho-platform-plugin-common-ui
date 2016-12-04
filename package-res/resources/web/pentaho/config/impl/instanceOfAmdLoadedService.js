@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "./AmdLoadedService"
+], function(AmdLoadedService) {
 
-/**
- * The variables of the default context of the Pentaho Web-Client Platform.
- *
- * @name pentaho.contextVars
- * @type pentaho.spec.IContextVars
- * @amd {pentaho.spec.IContextVars} pentaho.contextVars
- *
- * @see pentaho.CustomContextVars
- */
+  "use strict";
+
+  /**
+   * An instance of {@link pentaho.config.impl.AmdLoadedService}.
+   *
+   * @name pentaho.config.impl.instanceOfAmdLoadedService
+   * @type {pentaho.config.impl.AmdLoadedService}
+   * @amd pentaho/config/impl/instanceOfAmdLoadedService
+   * @private
+   */
+  return new AmdLoadedService();
+});

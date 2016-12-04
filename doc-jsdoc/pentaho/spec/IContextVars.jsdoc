@@ -25,7 +25,11 @@
  */
 
 /**
- * The base path of the Pentaho platform server (e.g. `"/pentaho/"`).
+ * The base path of the Pentaho web application (e.g. `"/pentaho/"`).
+ *
+ * In embedded scenarios,
+ * this property may have the same value as {@link pentaho.spec.IContextVars#serverUrl}.
+ * Otherwise, it contains an absolute virtual path for the current web server.
  *
  * @name basePath
  * @memberOf pentaho.spec.IContextVars#
@@ -33,7 +37,9 @@
  */
 
 /**
- * The identifier of the application.
+ * The identifier of the client application.
+ *
+ * This is the value specified in a web context script URL, as in: `webcontext.js?context=application-id`.
  *
  * @name application
  * @memberOf pentaho.spec.IContextVars#
@@ -44,6 +50,14 @@
  * The identifier of the user.
  *
  * @name user
+ * @memberOf pentaho.spec.IContextVars#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The home folder of the user.
+ *
+ * @name userHome
  * @memberOf pentaho.spec.IContextVars#
  * @type {?nonEmptyString}
  */
@@ -60,6 +74,46 @@
  * The identifier of the locale.
  *
  * @name locale
+ * @memberOf pentaho.spec.IContextVars#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The reserved characters for file names, all concatenated in a single string.
+ *
+ * @name reservedChars
+ * @memberOf pentaho.spec.IContextVars#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The reserved characters for file names, in a human-readable form.
+ *
+ * @name reservedCharsDisplay
+ * @memberOf pentaho.spec.IContextVars#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The reserved characters for file names, in a JavaScript regular expression format.
+ *
+ * @name reservedCharsPattern
+ * @memberOf pentaho.spec.IContextVars#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The fully-qualified URL to the Pentaho web application (e.g. `"http://localhost:8080/pentaho/"`).
+ *
+ * @name serverUrl
+ * @memberOf pentaho.spec.IContextVars#
+ * @type {?nonEmptyString}
+ */
+
+/**
+ * The protocol of the server URL (e.g. `"http"`).
+ *
+ * @name serverProtocol
  * @memberOf pentaho.spec.IContextVars#
  * @type {?nonEmptyString}
  */

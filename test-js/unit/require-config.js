@@ -52,7 +52,4 @@
 
   requireCfg.paths["pentaho/i18n"] = "/base/test-js/unit/pentaho/i18nMock";
 
-  // Reset "pentaho/service" module configuration.
-  requireCfg.config["pentaho/service"] = {};
-
 }());

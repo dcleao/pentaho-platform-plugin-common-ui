@@ -22,7 +22,8 @@ define([
   "./SpecificationContext",
   "./SpecificationScope",
   "../contextVars",
-  "./configurationService",
+  "../impl/CustomContextVars",
+  "../service!pentaho.config.IService?single",
   "./changes/Transaction",
   "./changes/TransactionScope",
   "./changes/CommittedScope",
@@ -33,7 +34,7 @@ define([
   "../util/object",
   "../util/fun"
 ], function(localRequire, module, service, bundle, standard, SpecificationContext, SpecificationScope,
-    contextVarsDefault, configurationService,
+    contextVarsDefault, CustomContextVars, configurationService,
     Transaction, TransactionScope, CommittedScope,
     Base, promiseUtil, arg, error, O, F) {
 
@@ -93,8 +94,9 @@ define([
      * so that these are configured before being used.
      * This applies whether an instance constructor is used for creating an instance or to derive a subtype.
      *
-     * The following properties are specified at construction time and
-     * constitute the environmental information held by a context:
+     * A type context holds environmental information in the form of a Pentaho web client context,
+     * [spec.IContextVars]{@link pentaho.spec.IContextVars},
+     * which contains relevant information such as:
      * [application]{@link pentaho.spec.IContextVars#application},
      * [user]{@link pentaho.spec.IContextVars#user},
      * [theme]{@link pentaho.spec.IContextVars#theme} and
@@ -156,6 +158,7 @@ define([
      * @description Creates a `Context` with given variables.
      * @param {pentaho.spec.IContextVars} [contextVars] The context variables' specification.
      * When unspecified, it defaults to {@link pentaho.contextVars}.
+     * Unspecified platform context properties default to the value of those of the default context.
      */
     constructor: function(contextVars) {
       /**
@@ -164,7 +167,9 @@ define([
        * @type {!pentaho.spec.IContextVars}
        * @private
        */
-      this._vars = contextVars || contextVarsDefault;
+      this._vars = (!contextVars || contextVars === contextVarsDefault) ? contextVarsDefault :
+                   (contextVars instanceof CustomContextVars)           ? contextVars        :
+                   new CustomContextVars(contextVars);
 
       /**
        * The ambient/current transaction, if any, or `null`.
@@ -739,6 +744,7 @@ define([
      * string, function or array or object.
      *
      * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
+     * @param {pentaho.type.spec.UTypeReference} defaultBase - A reference to the default base type.
      * @param {boolean} [sync=false] Whether to perform a synchronous get.
      *
      * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
@@ -755,9 +761,9 @@ define([
 
       /* eslint default-case: 0 */
       switch(typeof typeRef) {
-        case "string":   return this._getById (typeRef, sync);
+        case "string": return this._getById (typeRef, sync);
         case "function": return this._getByFun(typeRef, sync);
-        case "object":   return Array.isArray(typeRef)
+        case "object": return Array.isArray(typeRef)
             ? this._getByListSpec(typeRef, sync)
             : this._getByObjectSpec(typeRef, defaultBase, sync);
       }
@@ -1052,7 +1058,7 @@ define([
           // So, it works to use the above ambient specification context to handle all contained temporary ids.
 
           // 1. Resolve the base type
-          var BaseInstCtor = this._get(baseTypeSpec, null, /*sync:*/true);
+          var BaseInstCtor = this._get(baseTypeSpec, null, /* sync: */true);
 
           // 2. Extend the base type
           var InstCtor = BaseInstCtor.extend({type: typeSpec});
@@ -1063,7 +1069,7 @@ define([
             specScope.specContext.add(InstCtor.type, id);
           }
 
-          return this._getByInstCtor(InstCtor, /*sync:*/true);
+          return this._getByInstCtor(InstCtor, /* sync: */true);
         }, this);
       };
 

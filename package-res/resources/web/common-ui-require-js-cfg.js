@@ -15,6 +15,9 @@
  */
 (function() {
   /* global requireCfg:false, CONTEXT_PATH:false, KARMA_RUN:false, SESSION_LOCALE:false, active_theme:false */
+
+  /* eslint dot-notation: 0 */
+
   var basePath =
         // environment configured
         (typeof ENVIRONMENT_CONFIG !== "undefined" && typeof ENVIRONMENT_CONFIG.paths !== "undefined" &&
@@ -26,47 +29,55 @@
         // build
         "common-ui",
 
-      useDebug  = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0,
+      useDebug = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0,
       minSuffix = useDebug ? "" : ".min",
-      requirePaths   = requireCfg.paths,
-      requireShim    = requireCfg.shim,
-      requireMap     = requireCfg.map,
+      requirePaths = requireCfg.paths,
+      requireShim = requireCfg.shim,
+      requireMap = requireCfg.map,
 
       // TODO: This fallback logic is temporary, and can be removed when the remaining
       //    parts of the system rename the "service" plugin id to "pentaho/service".
-      requireService = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
+      requireTypes = requireCfg.config["pentaho/service"] || (requireCfg.config["pentaho/service"] = {});
 
+  // region common-ui
   requirePaths["common-ui"  ] = basePath;
   requirePaths["common-repo"] = basePath + "/repo";
   requirePaths["common-data"] = basePath + "/dataapi";
 
   requirePaths["pentaho/common"] = basePath + "/dojo/pentaho/common";
+  // endregion
 
-  // Unfortunately, mantle already maps the "pentaho" id to "/js",
-  // so all the following sub-modules must be mapped individually.
-  requirePaths["pentaho/data"] = basePath + "/pentaho/data";
-  requirePaths["pentaho/lang"] = basePath + "/pentaho/lang";
-  requirePaths["pentaho/type"] = basePath + "/pentaho/type";
-  requirePaths["pentaho/util"] = basePath + "/pentaho/util";
-  requirePaths["pentaho/visual"] = basePath + "/pentaho/visual";
-  requirePaths["pentaho/service"] = basePath + "/pentaho/service";
-  requirePaths["pentaho/i18n"] = basePath + "/pentaho/i18n";
-  requirePaths["pentaho/shim"] = basePath + "/pentaho/shim";
+  // region Pentaho Web-Client Platform
 
-  requirePaths["pentaho/CustomContextVars"] = basePath + "/pentaho/CustomContextVars";
+  // Unfortunately, *mantle* already maps the "pentaho" id to "/js",
+  // so the paths of all of the following sub-modules must be configured individually.
+  // E.g. requirePaths["pentaho/util"] = basePath + "/pentaho/util";
+  [
+    "shim", "util", "impl", "lang",
+    "i18n", "service", "data", "type",
+    "visual", "config", "contextVars",
+    "debug", "DebugLevels"
+  ].forEach(function(name) {
+    requirePaths["pentaho/" + name] = basePath + "/pentaho/" + name;
+  });
 
-  // TODO: remove this mapping after all Pentaho consumers of GlobalContextVars (DET, Analyzer, CDF) have been changed.
-  requireMap["*"]["pentaho/GlobalContextVars"] = "pentaho/CustomContextVars";
+  // Named instances
+  requireTypes["pentaho/config/impl/instanceOfAmdLoadedService"] = "pentaho.config.IService";
 
-  // TODO: Only used if not defined explicitly by webcontext.js.
-  // When the latter is converted to do so, these 2 paths can be removed as well as the `_globalContextVars` module.
-  requirePaths["pentaho/_globalContextVars"] = basePath + "/pentaho/_globalContextVars";
-  requirePaths["pentaho/contextVars"] = requirePaths["pentaho/_globalContextVars"];
+  // Default debug manager implementation
+  requireTypes["pentaho/impl/DebugManager"] = "Class<pentaho.IDebugManager>";
 
-  // AMD PLUGINS
-  requirePaths["local"  ] = basePath + "/util/local";
-  requirePaths["json"   ] = basePath + "/util/require-json/json";
-  requirePaths["text"   ] = basePath + "/util/require-text/text";
+  // TODO: replace use of the following in DET, Analyzer, CDF:
+  // pentaho/GlobalContextVars
+  // pentaho.type.spec.ITypeConfiguration
+  // pentaho/contextVars
+
+  // endregion
+
+  // region Base AMD Plugins
+  requirePaths["local"] = basePath + "/util/local";
+  requirePaths["json"] = basePath + "/util/require-json/json";
+  requirePaths["text"] = basePath + "/util/require-text/text";
   // Using `map` is important for use in r.js and correct AMD config of the other files of the package.
   // Placing the minSuffix in the path ensures building works well,
   // so that the resolved module id is the same in both debug and non-debug cases.
@@ -74,11 +85,17 @@
     requirePaths["common-ui/util/require-css/css"] = basePath + "/util/require-css/css" + minSuffix;
   }
   requireMap["*"]["css"] = "common-ui/util/require-css/css";
+  // endregion
 
-  // Use the debugInfoByUrl implementation.
-  requirePaths["pentaho/util/debugInfo"] = basePath + "/pentaho/util/debugInfoByUrl";
+  // region ES Shims
+  // Intended for private use of "pentaho/shim/es6-promise" only!
+  if(minSuffix) {
+    requirePaths["pentaho/shim/_es6-promise/es6-promise"] =
+        basePath + "/pentaho/shim/_es6-promise/es6-promise" + minSuffix;
+  }
+  // endregion
 
-  // DOJO
+  // region DOJO
   requirePaths["dojo" ] = basePath + "/dojo/dojo";
   requirePaths["dojox"] = basePath + "/dojo/dojox";
   requirePaths["dijit"] = basePath + "/dojo/dijit";
@@ -102,16 +119,18 @@
   requirePaths["dojo/store/Memory"] = dojoOverrides + "dojo/store/Memory";
   requirePaths["dijit/_HasDropDown"] = dojoOverrides + "dijit/_HasDropDown";
   requirePaths["dijit/_CssStateMixin"] = dojoOverrides + "dijit/_CssStateMixin";
+  // endregion
 
-  // Plugin Handler
+  // region Plugin Handler
   requirePaths["common-ui/PluginHandler"] = basePath + "/plugin-handler/pluginHandler";
   requirePaths["common-ui/Plugin"] = basePath + "/plugin-handler/plugin";
   requirePaths["common-ui/AngularPluginHandler"] = basePath + "/plugin-handler/angularPluginHandler";
   requirePaths["common-ui/AngularPlugin"] = basePath + "/plugin-handler/angularPlugin";
   requirePaths["common-ui/AnimatedAngularPluginHandler"] = basePath + "/plugin-handler/animatedAngularPluginHandler";
   requirePaths["common-ui/AnimatedAngularPlugin"] = basePath + "/plugin-handler/animatedAngularPlugin";
+  // endregion
 
-  // OTHER LIBS
+  // region Bundled 3rd party libs
   requirePaths["common-ui/jquery"] = basePath + "/jquery/jquery-1.12.4" + minSuffix;
   requireShim ["common-ui/jquery"] = {exports: "$"};
 
@@ -139,11 +158,6 @@
   requirePaths["common-ui/underscore"] = basePath + "/underscore/underscore" + minSuffix;
   // underscore should be required using the module ID above, creating a map entry to guarantee backwards compatibility
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
-
-  // Intended for private use of "pentaho/shim/es6-promise" only!
-  if(minSuffix) {
-    requirePaths["pentaho/shim/_es6-promise/es6-promise"] = basePath + "/pentaho/shim/_es6-promise/es6-promise" + minSuffix;
-  }
 
   // ANGULAR
   requirePaths["common-ui/angular"] = basePath + "/angular/angular" + minSuffix;
@@ -208,10 +222,10 @@
 
   requirePaths["common-ui/angular-directives"] = basePath + "/angular-directives";
   requireShim ["common-ui/angular-directives"] = ["common-ui/angular-ui-bootstrap"];
+  // endregion
 
-  // Metadata Model and Visualizations Packages
-  requireService["pentaho/type/config"] = "pentaho.type.spec.ITypeConfiguration";
-  requireService["pentaho/type/config/AmdLoadedConfigurationService"] = "pentaho.type.IConfigurationService";
+  // region Metadata Model and Visualizations Packages
+  requireTypes["pentaho/type/config"] = "pentaho.config.spec.IRuleSet";
 
   function mapTheme(mid, themeRoot, themes) {
     var theme = (typeof active_theme !== "undefined") ? active_theme : null;
@@ -224,7 +238,7 @@
   function registerVizPackage(name) {
     requireCfg.packages.push({"name": name, "main": "model"});
 
-    requireService[name] = "pentaho/visual/base";
+    requireTypes[name] = "pentaho/visual/base";
   }
 
   // Metadata Model Base Theme
@@ -266,5 +280,6 @@
     "pentaho/visual/ccc/scatter",
     "pentaho/visual/ccc/bubble"
   ].forEach(registerVizPackage);
+  // endregion
 
 }());

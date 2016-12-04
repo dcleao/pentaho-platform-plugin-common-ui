@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 define([
+  "module",
   "../../lang/Base",
-  "../util",
+  "../../util/spec",
+  "../../lang/ArgumentRequiredError",
   "../../lang/SortedList"
-], function(Base, typeUtil, SortedList) {
+], function(module, Base, specUtil, ArgumentRequiredError, SortedList) {
   "use strict";
 
   /**
@@ -43,26 +45,24 @@ define([
    * Ensures sorting algorithm stability, because insertion order would be lost during a re-sort.
    *
    * @type {number}
-   * @see pentaho.type.config.ConfigurationService#addRule
+   * @see pentaho.config.Service#addRule
    */
   var _ruleCounter = 0;
 
   /**
-   * @classDesc The `ConfigurationService` class is the base implementation of
-   * the {@link pentaho.type.IConfigurationService} interface.
+   * @classDesc The `Service` class is the base implementation of the {@link pentaho.config.IService} interface.
    *
    * @class
-   * @alias ConfigurationService
-   * @memberOf pentaho.type.config
-   * @amd pentaho/type/config/ConfigurationService
+   * @alias Service
+   * @memberOf pentaho.config.impl
+   * @amd pentaho/config/impl/Service
    *
    * @extends pentaho.lang.Base
-   * @implements pentaho.type.IConfigurationService
+   * @implements pentaho.config.IService
    *
    * @description Creates a configuration service instance with no registrations.
    */
-  var ConfigurationService = Base.extend("pentaho.type.config.ConfigurationService",
-  /** @lends pentaho.type.config.ConfigurationService# */{
+  var ConfigurationService = Base.extend(module.id, /** @lends pentaho.config.impl.Service# */{
 
     constructor: function() {
       /**
@@ -70,7 +70,7 @@ define([
        * the applicable type configuration rules,
        * ordered from least to most specific.
        *
-       * @type {Object.<string, Array.<pentaho.type.spec.ITypeConfigurationRule>>}
+       * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
        * @private
        */
       this._ruleStore = {};
@@ -90,40 +90,42 @@ define([
      *
      * The insertion order is used as the fallback rule order.
      * For more information on the specificity of rules,
-     * see [spec.ITypeConfiguration]{@link pentaho.type.spec.ITypeConfiguration}.
+     * see [config.spec.IRuleSet]{@link pentaho.config.spec.IRuleSet}.
      *
      * Note that the specified rule object may be slightly modified to serve
      * the service's internal needs.
      *
-     * @param {!pentaho.type.spec.ITypeConfigurationRule} rule - The type configuration rule to add.
+     * @param {!pentaho.config.spec.IRule} rule - The type configuration rule to add.
      */
     addRule: function(rule) {
-      // Assuming the ConfigurationService takes ownership of
+      // Assuming the Service takes ownership of
       // the rules, so mutating it directly is ok
       rule._ordinal = _ruleCounter++;
 
       var select = rule.select || {};
-      var typeIds = select.type || ["pentaho/type/value"];
+      var typeIds = select.type;
+      if(!typeIds)
+        throw new ArgumentRequiredError("rule.select.type");
+
       if(!Array.isArray(typeIds)) {
         typeIds = [typeIds];
       }
 
       typeIds.forEach(function(typeId) {
-        var type = toAbsTypeId(typeId);
+        if(!typeId)
+          throw new ArgumentRequiredError("rule.select.type");
 
-        if(!this._ruleStore[type]) {
-          this._ruleStore[type] = new SortedList({"comparer": _ruleComparer});
+        if(!this._ruleStore[typeId]) {
+          this._ruleStore[typeId] = new SortedList({"comparer": _ruleComparer});
         }
 
-        this._ruleStore[type].push(rule);
+        this._ruleStore[typeId].push(rule);
       }, this);
     },
 
     /** @inheritdoc */
     select: function(typeId, contextVars) {
-      var type = toAbsTypeId(typeId);
-
-      var rules = this._ruleStore[type] || [];
+      var rules = this._ruleStore[typeId] || [];
       var filtered_rules = rules.filter(_ruleFilterer, contextVars || {});
       var configs = filtered_rules.map(function(rule) {
         return rule.apply;
@@ -133,7 +135,7 @@ define([
         return null;
       }
 
-      return configs.reduce(typeUtil.mergeSpecs.bind(typeUtil), {});
+      return configs.reduce(specUtil.merge.bind(specUtil), {});
     }
   });
 
@@ -143,8 +145,8 @@ define([
   /**
    * Compares two type-configuration rules according to specificity.
    *
-   * @param {pentaho.type.spec.ITypeConfigurationRule} r1 - The first type configuration rule.
-   * @param {pentaho.type.spec.ITypeConfigurationRule} r2 - The second type configuration rule.
+   * @param {pentaho.config.spec.IRule} r1 - The first type configuration rule.
+   * @param {pentaho.config.spec.IRule} r2 - The second type configuration rule.
    *
    * @return {number} `-1`, if `r1` is more specific than `r2`,
    * `1`, if `r2` is more specific than `r1`,
@@ -178,7 +180,7 @@ define([
   /**
    * Determines if a given rule is selected by the current context variables.
    *
-   * @param {pentaho.type.spec.ITypeConfigurationRule} rule - A type configuration rule to check.
+   * @param {pentaho.config.spec.IRule} rule - A type configuration rule to check.
    * @this pentaho.spec.IContextVars
    * @return {boolean} `true` if `rule` is selected, `false`, otherwise.
    */
@@ -205,14 +207,4 @@ define([
     return true;
   }
   // endregion
-
-  /**
-   * Ensures that standard type identifiers are made absolute.
-   *
-   * @param {string} id - A type identifier.
-   * @return {string} An absolute type identified.
-   */
-  function toAbsTypeId(id) {
-    return id.indexOf("/") < 0 ? ("pentaho/type/" + id) : id;
-  }
 });

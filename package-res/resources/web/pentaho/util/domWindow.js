@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation. All rights reserved.
+ * Copyright 2016 - 2017 Pentaho Corporation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([
-  "./debug/DebugInfo"
-], function(DebugInfo) {
+define(function() {
 
   "use strict";
 
-  /**
-   * The `debugInfo` singleton provides access to the current maximum information level
-   * and other debugging information.
-   *
-   * @name debugInfo
-   * @namespace
-   * @memberOf pentaho.util
-   * @amd {pentaho.util.debug.DebugInfo} pentaho/util/debugInfo
-   * @private
-   */
-  return new DebugInfo();
+  /* globals window */
+
+  return typeof window !== "undefined" ? window : null;
 });

@@ -15,10 +15,9 @@
  */
 
 /**
- * The `spec.ITypeConfiguration` interface describes
- * a list of [configuration rules]{@link pentaho.type.spec.ITypeConfiguration#rules}
- * used to configure one or more [value types]{@link pentaho.type.Value.Type} of
- * the Pentaho Client Metadata Model.
+ * The `config.spec.IRuleSet` interface describes
+ * a list of [configuration rules]{@link pentaho.config.spec.IRuleSet#rules}
+ * used to configure one or more types.
  *
  * The following example is a hypothetical configuration,
  * where a developer (John) states that only he should see the visualization
@@ -57,7 +56,7 @@
  *
  * A rule is selected by a given type and context variables,
  * if the type and variables match the rule's
- * [selection variables]{@link pentaho.type.spec.ITypeConfigurationRule#select}.
+ * [selection variables]{@link pentaho.config.spec.IRule#select}.
  *
  * ### Rule Specificity
  *
@@ -72,7 +71,7 @@
  *
  * A rule is more specific than another if it:
  *
- * 1. has a greater [priority]{@link pentaho.type.spec.ITypeConfigurationRule#priority};
+ * 1. has a greater [priority]{@link pentaho.config.spec.IRule#priority};
  *    this is the attribute that most affects specificity, and can be used to easily
  *    surpass every other affecting factors,
  * 2. selects a user (and the other doesn't),
@@ -85,7 +84,7 @@
  * ### Rule's Configuration Merging
  *
  * Type configuration rules specify a _configuration_
- * in its [apply]{@link pentaho.type.spec.ITypeConfigurationRule#apply} property.
+ * in its [apply]{@link pentaho.config.spec.IRule#apply} property.
  *
  * When merging two configurations, the default behavior works this way:
  * 1. If both configurations contain a plain JavaScript object,
@@ -121,10 +120,10 @@
  *
  * Note that replacing with a {@link Nully} value effectively clears existing configurations.
  *
- * @name pentaho.type.spec.ITypeConfiguration
+ * @name pentaho.config.spec.IRuleSet
  * @interface
  *
- * @see pentaho.type.IConfigurationService
+ * @see pentaho.config.IService
  */
 
 /**
@@ -135,6 +134,6 @@
  * the later configuration rules override the former configuration rules.
  *
  * @name rules
- * @memberOf pentaho.type.spec.ITypeConfiguration#
- * @type {pentaho.type.spec.ITypeConfigurationRule}
+ * @memberOf pentaho.config.spec.IRuleSet#
+ * @type {pentaho.config.spec.IRule}
  */

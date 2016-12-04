@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 define([
-  "pentaho/type/config/ConfigurationService",
+  "pentaho/config/impl/Service",
   "tests/pentaho/util/errorMatch"
 ], function(ConfigurationService, errorMatch) {
   "use strict";
 
   /* global describe:false, it:false, expect:false, beforeEach:false, beforeAll:false */
 
-  describe("pentaho.type.config.ConfigurationService -", function() {
+  describe("pentaho.config.Service -", function() {
 
     it("should be defined.", function() {
       expect(ConfigurationService).toBeDefined();
@@ -32,14 +32,19 @@ define([
     describe("adding", function() {
       describe("types", function() {
         var ruleNoId;
-        var ruleShortId;
+        var ruleOneId1;
+        var ruleOneId2;
         var ruleMultiIds;
+        var ruleMultiIdsOneNull;
 
         var configurationService;
 
         beforeAll(function() {
           ruleNoId = {select: {user: "1", theme: "1", locale: "1", application: "1"}};
-          ruleShortId = {select: {type: "A", user: "1", theme: "1", locale: "1", application: "1"}};
+          ruleMultiIdsOneNull = {type: ["A", null], select: {user: "1", theme: "1", locale: "1", application: "1"}};
+
+          ruleOneId1 = {select: {type: "A", user: "1", theme: "1", locale: "1", application: "1"}};
+          ruleOneId2 = {select: {type: "B", user: "1", theme: "1", locale: "1", application: "1"}};
           ruleMultiIds = {
             select: {
               type: ["test/type", "test/type2", "A2"],
@@ -51,27 +56,51 @@ define([
           };
 
           configurationService = new ConfigurationService();
-
-          configurationService.add({
-            rules: [
-              ruleNoId,
-              ruleShortId,
-              ruleMultiIds
-            ]
-          });
         });
 
-        it("should default to pentaho/type/value", function() {
-          expect(configurationService._ruleStore["pentaho/type/value"]).toBeDefined();
-          expect(configurationService._ruleStore["pentaho/type/value"][0]).toBe(ruleNoId);
+        it("should define rules with one type id", function() {
+
+          configurationService.add({rules: [ruleOneId1]});
+
+          expect(configurationService._ruleStore["A"]).toBeDefined();
         });
 
-        it("should convert from short IDs to full IDs", function() {
-          expect(configurationService._ruleStore["A"]).toBeUndefined();
-          expect(configurationService._ruleStore["pentaho/type/A"]).toBeDefined();
+        it("should define rules with multiple type ids", function() {
 
-          expect(configurationService._ruleStore["A2"]).toBeUndefined();
-          expect(configurationService._ruleStore["pentaho/type/A2"]).toBeDefined();
+          configurationService.add({rules: [ruleMultiIds]});
+
+          expect(configurationService._ruleStore["test/type"]).toBeDefined();
+          expect(configurationService._ruleStore["test/type2"]).toBeDefined();
+          expect(configurationService._ruleStore["A2"]).toBeDefined();
+        });
+
+        it("should define rules with multiple rules", function() {
+
+          configurationService.add({rules: [
+            ruleOneId1,
+            ruleOneId2
+          ]});
+
+          expect(configurationService._ruleStore["A"]).toBeDefined();
+          expect(configurationService._ruleStore["B"]).toBeDefined();
+        });
+
+        it("should throw if given a rule with no type", function() {
+
+          expect(function() {
+            configurationService.add({rules: [
+              ruleNoId
+            ]});
+          }).toThrow(errorMatch.argRequired("rule.select.type"));
+        });
+
+        it("should throw if given a rule with a type array having null elements", function() {
+
+          expect(function() {
+            configurationService.add({rules: [
+              ruleMultiIdsOneNull
+            ]});
+          }).toThrow(errorMatch.argRequired("rule.select.type"));
         });
       });
 
@@ -239,10 +268,6 @@ define([
 
         it("should return config if rule applies to type", function() {
           expect(configurationService.select("A").testId).toEqual("A");
-        });
-
-        it("should convert from short IDs to full IDs", function() {
-          expect(configurationService.select("A").testId).toEqual(configurationService.select("pentaho/type/A").testId);
         });
       });
 

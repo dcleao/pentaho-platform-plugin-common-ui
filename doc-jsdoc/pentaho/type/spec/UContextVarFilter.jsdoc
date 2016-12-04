@@ -17,7 +17,7 @@
 /**
  * A `spec.UContextVarFilter` represents the union of JS types that can be used to
  * filter the value of a [context variable]{@link pentaho.spec.IContextVars},
- * in the [select]{@link pentaho.type.spec.ITypeConfigurationRule#select} attribute
+ * in the [select]{@link pentaho.config.spec.IRule#select} attribute
  * of a type configuration rule.
  *
  * A {@link Nully} filter is equivalent to not filtering a variable.
