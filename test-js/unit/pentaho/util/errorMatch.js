@@ -1,5 +1,5 @@
 /*!
- * Copyright 2010 - 2016 Pentaho Corporation.  All rights reserved.
+ * Copyright 2010 - 2017 Pentaho Corporation.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,16 @@ define([
   });
 
   var ArgumentInvalidErrorMatcher = ArgumentErrorMatcher.extend("ArgumentInvalidError", {
-    original: {Type: ArgumentInvalidError}
+    constructor: function(name, msg) {
+      this.base(name);
+      this.message = msg;
+    },
+
+    original: {Type: ArgumentInvalidError},
+
+    asymmetricMatch: function(actual) {
+      return this.base(actual) && (this.message == null || (this.message === actual.message));
+    }
   });
 
   var ArgumentRangeErrorMatcher = ArgumentErrorMatcher.extend("ArgumentRangeError", {
