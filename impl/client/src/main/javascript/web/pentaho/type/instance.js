@@ -267,7 +267,7 @@ define([
       },
 
       /**
-       * See Base.js
+       * See `Base.js`.
        * @ignore
        */
       _subclassed: function(SubInstCtor, instSpec, classSpec, keyArgs) {
@@ -285,7 +285,10 @@ define([
         this.Type.extend(typeName, instSpec && instSpec.type, classSpec && classSpec.type, ka);
 
         // Don't process `instSpec.type` and `classSpec.type` twice, during construction.
-        SubInstCtor.mix(instSpec, classSpec, _keyArgsExcludeInstance);
+        ka = keyArgs ? Object.create(keyArgs) : {};
+        (ka.exclude || (ka.exclude = {})).type = 1;
+
+        this.base(SubInstCtor, instSpec, classSpec, ka);
       }
     });
 
