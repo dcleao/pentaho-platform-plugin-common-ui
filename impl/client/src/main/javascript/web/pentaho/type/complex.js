@@ -698,7 +698,11 @@ define([
         keyArgs = keyArgs ? Object.create(keyArgs) : {};
 
         var spec;
-        var includeType = !!keyArgs.includeType;
+        var declaredType;
+        var includeType = !!keyArgs.forceType ||
+              (!!(declaredType = keyArgs.declaredType) &&
+               this.type !== (declaredType.isRefinement ? declaredType.of : declaredType));
+
         var useArray = !includeType && keyArgs.preferPropertyArray;
         var omitProps;
         if(useArray) {
@@ -714,6 +718,9 @@ define([
 
         var includeDefaults = !!keyArgs.includeDefaults;
         var areEqual = this.type.areEqual;
+
+        // reset
+        keyArgs.forceType = false;
 
         this.type.each(propToSpec, this);
 
@@ -746,9 +753,7 @@ define([
           if(includeValue) {
             var valueSpec;
             if(value) {
-              // Determine if value spec must contain the type inline
-              var valueType = propType.type;
-              keyArgs.includeType = value.type !== (valueType.isRefinement ? valueType.of : valueType);
+              keyArgs.declaredType = propType.type;
 
               valueSpec = value.toSpecInContext(keyArgs);
 
