@@ -45,8 +45,9 @@ define([
   ];
   var O_isProtoOf = Object.prototype.isPrototypeOf;
 
-  return function(context) {
+  return function() {
 
+    var context = this;
     var __type = null;
     var __Number = null;
     var __Boolean = null;
@@ -989,7 +990,6 @@ define([
       * When a function,
       * it is the class or factory of the default view.
       *
-      * @see pentaho.type.Type#defaultViewClass
       * @see pentaho.type.Type#buildSourceRelativeId
       *
       * @type {string | function}
@@ -1031,24 +1031,6 @@ define([
 
           throw error.argInvalidType("defaultView", ["nully", "string", "function"], typeof value);
         }
-      },
-
-      /**
-       * Gets a promise for the default view class or factory, if any; or `null`.
-       *
-       * A default view exists if property {@link pentaho.type.Type#defaultView}
-       * has a non-null value.
-       *
-       * @type {Promise.<?function>}
-       * @readOnly
-       * @see pentaho.type.Type#defaultView
-       */
-      get defaultViewClass() {
-        /* jshint laxbreak:true*/
-        var defaultView = this.__defaultView;
-        return defaultView
-            ? (defaultView.promise || (defaultView.promise = promiseUtil.require(defaultView.fullValue, localRequire)))
-            : Promise.resolve(null);
       },
       // endregion
 

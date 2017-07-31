@@ -15,7 +15,6 @@
  */
 define([
   "module",
-  "./element",
   "./PropertyTypeCollection",
   "./util",
   "./mixins/Container",
@@ -25,7 +24,7 @@ define([
   "../i18n!types",
   "../util/object",
   "../util/error"
-], function(module, elemFactory, PropertyTypeCollection, typeUtil,
+], function(module, PropertyTypeCollection, typeUtil,
             ContainerMixin, ActionResult, UserError,
             ComplexChangeset, bundle, O, error) {
 
@@ -39,9 +38,7 @@ define([
   // Need to recognize requests for the currently being built _top-level_ complex in a special way -
   // the one that cannot be built and have a module id.
 
-  return function(context) {
-
-    var Element = context.get(elemFactory);
+  return ["element", "property", function(Element) {
 
     /**
      * @name pentaho.type.Complex.Type
@@ -65,11 +62,9 @@ define([
      *
      * Example complex type:
      * ```js
-     * define(["pentaho/type/complex"], function(complexFactory) {
+     * define(function() {
      *
-     *   return function(context) {
-     *
-     *     var Complex = context.get(complexFactory);
+     *   return ["pentaho/type/complex", function(Complex) {
      *
      *     return Complex.extend({
      *       $type: {
@@ -860,7 +855,7 @@ define([
      */
 
     return Complex;
-  };
+  }];
 
   // Constructor's helper functions
   function __readSpecByIndex(spec, propType) {
