@@ -625,6 +625,13 @@ define([
       };
     },
 
+    applyAsync: function(typeRefs, fun, ctx) {
+
+      return this.resolveAsync(typeRefs).then(function(Types) {
+        return fun.apply(ctx || this, Types);
+      });
+    },
+
     /**
      * Gets, asynchronously, the **configured instance constructor** of a type.
      *
@@ -1087,7 +1094,7 @@ define([
 
       if(sync) {
         return this.__error(
-            error.argInvalid("typeRef", "Named type has not been loaded yet."),
+            error.argInvalid("typeRef", "Type '" + id + "' has not been loaded yet."),
             true);
       }
 
@@ -1252,7 +1259,7 @@ define([
       if(sync) {
         if(id) {
           return this.__error(
-              error.argInvalid("typeRef", "Named type has not been loaded yet."),
+              error.argInvalid("typeRef", "Type '" + id + "' has not been loaded yet."),
               true);
         }
 

@@ -1211,7 +1211,7 @@ define([
 
         return customTypeIds.length
             // Require them all and only then invoke the synchronous BaseType.extend method.
-            ? promiseUtil.require(customTypeIds, localRequire).then(resolveSync.bind(this))
+            ? this.context.resolveAsync(customTypeIds).then(resolveSync.bind(this))
             // All types are standard and can be assumed to be already loaded.
             // However, we should behave asynchronously as requested.
             : promiseUtil.wrapCall(resolveSync, this);
