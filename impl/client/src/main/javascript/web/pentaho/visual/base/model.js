@@ -18,8 +18,9 @@ define([
   "pentaho/type/model",
   "./application",
   "../role/property",
+  "../color/paletteProperty",
   "pentaho/i18n!model"
-], function(module, modelFactory, visualApplicationFactory, rolePropertyFactory, bundle) {
+], function(module, modelFactory, visualApplicationFactory, rolePropertyFactory, palettePropertyFactory, bundle) {
 
   "use strict";
 
@@ -27,6 +28,7 @@ define([
 
     var Model = context.get(modelFactory);
     var _rolePropertyType = context.get(rolePropertyFactory).type;
+    var _palettePropertyType = context.get(palettePropertyFactory).type;
 
     /**
      * @name pentaho.visual.base.Model.Type
@@ -145,6 +147,17 @@ define([
          */
         isVisualRole: function(propType) {
           return propType.isSubtypeOf(_rolePropertyType);
+        },
+
+        /**
+         * Gets a value that indicates if a given property type is a subtype of
+         * {@link pentaho.visual.color.PaletteProperty.Type}.
+         *
+         * @param {!pentaho.type.Property.Type} propType - The property type to test.
+         * @return {boolean} `true` if `type` is a color palette property type; or `false`, otherwise.
+         */
+        isColorPalette: function(propType) {
+          return propType.isSubtypeOf(_palettePropertyType);
         }
       }
     })

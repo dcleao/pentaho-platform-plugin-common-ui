@@ -96,15 +96,6 @@
   requireTypeInfo["pentaho/data/filter/isLessOrEqual"] = {alias: "<=", base: "pentaho/data/filter/property"};
   requireTypeInfo["pentaho/data/filter/isLike"] = {alias: "like", base: "pentaho/data/filter/property"};
 
-
-  requireTypeInfo["pentaho/visual/base"] = {base: "model"};
-  requireTypeInfo["pentaho/visual/base/view"] = {
-    base: "complex",
-    props: {
-      model: {valueType: "pentaho/visual/base"}
-    }
-  };
-
   requirePaths["json"] = basePath + "/util/require-json/json";
 
   // jquery
@@ -216,7 +207,19 @@
     "pentaho/visual/models/bubble"
   ].forEach(registerViz);
 
-  // VizAPI actions
+  // Base Model and View
+  requireTypeInfo["pentaho/visual/base"] = {base: "model"};
+  requireTypeInfo["pentaho/visual/base/view"] = {
+    base: "complex",
+    props: {
+      model: {valueType: "pentaho/visual/base"}
+    }
+  };
+
+  // Color Palette
+  requireTypeInfo["pentaho/visual/color/palette"] = {base: "complex"};
+
+  // Actions
   requireTypeInfo["pentaho/visual/action/select"] = {alias: "select"};
   requireTypeInfo["pentaho/visual/action/execute"] = {alias: "execute"};
 

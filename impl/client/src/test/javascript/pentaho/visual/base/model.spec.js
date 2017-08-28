@@ -17,8 +17,9 @@ define([
   "pentaho/type/Context",
   "pentaho/visual/base",
   "pentaho/lang/UserError",
-  "pentaho/visual/role/property"
-], function(Context, modelFactory, UserError, rolePropFactory) {
+  "pentaho/visual/role/property",
+  "pentaho/visual/color/paletteProperty"
+], function(Context, modelFactory, UserError, rolePropFactory, palettePropertyFactory) {
   "use strict";
 
   /* globals jasmine, console, expect, it, describe, beforeEach */
@@ -172,6 +173,25 @@ define([
           var NotRoleProp = context.get("complex");
 
           expect(Model.type.isVisualRole(NotRoleProp.type)).toBe(false);
+        });
+      });
+
+      describe("#isColorPalette()", function() {
+
+        it("should return true if property type is a color.PaletteProperty", function() {
+
+          var ColorPaletteProperty = context.get(palettePropertyFactory);
+          var SubColorPaletteProperty = ColorPaletteProperty.extend();
+
+          expect(Model.type.isColorPalette(ColorPaletteProperty.type)).toBe(true);
+          expect(Model.type.isColorPalette(SubColorPaletteProperty.type)).toBe(true);
+        });
+
+        it("should return false if type is not a Color Palette", function() {
+
+          var NotPaletteProp = context.get("complex");
+
+          expect(Model.type.isColorPalette(NotPaletteProp.type)).toBe(false);
         });
       });
 
