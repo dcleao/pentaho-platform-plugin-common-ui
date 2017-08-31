@@ -106,7 +106,7 @@ It is of
 [number]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Number'}}), 
 is [required]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#isRequired'}}) and 
 has a 
-[default value]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#value'}}) 
+[default value]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type.Property.Type' | append: '#defaultValue'}}) 
 of `30`.
 That's as simple as it gets.
 
