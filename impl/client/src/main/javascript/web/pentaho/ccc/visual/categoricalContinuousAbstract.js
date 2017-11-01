@@ -32,23 +32,24 @@ define([
         },
 
         _genericMeasureCccVisualRole: "value",
+        _genericMeasureDiscrimCccVisualRole: "series",
 
         _isAxisTitleVisible: function(type) {
-          return !this._hasMultiChartColumns || type === "ortho";
+          return !this._isMultiChartMode || type === "ortho";
         },
 
         _getOrthoAxisTitle: function() {
-          var roleNames = def.getOwn(this._rolesByCccVisualRole, this._genericMeasureCccVisualRole);
+          var roleNames = this._getRolesMappedToCccRole(this._genericMeasureCccVisualRole);
           return roleNames ? this._getMeasureRoleTitle(roleNames[0]) : "";
         },
 
         _getBaseAxisTitle: function() {
-          var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
+          var roleNames = this._getRolesMappedToCccRole("category");
           return roleNames ? this._getDiscreteRolesTitle(roleNames) : "";
         },
 
         _isBaseAxisQualitative: function() {
-          var roleNames = def.getOwn(this._rolesByCccVisualRole, "category");
+          var roleNames = this._getRolesMappedToCccRole("category");
           return !!roleNames && this._isRoleQualitative(roleNames[0]);
         },
 

@@ -53,7 +53,8 @@ define([
           options.plot2NullInterpolationMode = value;
         },
 
-        _initAxes: function() {
+        _initData: function() {
+
           this.base.apply(this, arguments);
 
           // Data part codes
@@ -63,22 +64,20 @@ define([
           var calculation;
           if(this._isGenericMeasureMode) {
             /* jshint laxbreak:true*/
-            var barAttrInfos = this._getMappingAttrInfosByRole("measures");
-            var barAttrsByName = barAttrInfos
-                ? def.query(barAttrInfos).uniqueIndex(function(maInfo) {
-                  return maInfo.attr.name;
-                })
+            var barAttrInfos = this._getAttributeInfosOfRole("measures");
+            var barAttrInfosByName = barAttrInfos
+                ? def.query(barAttrInfos).uniqueIndex(function(attrInfo) { return attrInfo.attr.name; })
                 : {};
-            var measureDiscrimCccDimName = this.GENERIC_MEASURE_DISCRIM_DIM_NAME;
+            var measureDiscrimDimName = this._genericMeasureDiscrimCccDimName;
 
             calculation = function(datum, atoms) {
-              var meaAttrName = datum.atoms[measureDiscrimCccDimName].value;
-              atoms.dataPart = def.hasOwn(barAttrsByName, meaAttrName) ? "0" : "1";
+              var meaAttrName = datum.atoms[measureDiscrimDimName].value;
+              atoms.dataPart = def.hasOwn(barAttrInfosByName, meaAttrName) ? "0" : "1";
             };
           } else if(this._genericMeasuresCount > 0) {
             // One measure of one of the roles exists.
             // And so, either it is always bar or always line...
-            var constDataPart = this._getMappingAttrInfosByRole("measures") ? "0" : "1";
+            var constDataPart = this._getAttributeInfosOfRole("measures") ? "0" : "1";
             calculation = function(datum, atoms) {
               atoms.dataPart = constDataPart;
             };
