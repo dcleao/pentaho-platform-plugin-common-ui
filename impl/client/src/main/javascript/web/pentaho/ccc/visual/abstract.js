@@ -323,12 +323,11 @@ define([
             "width", this.width || 400,
             "dimensions", {},
             "visualRoles", {},
-            "readers", [],
-            "calculations", []);
+            "readers", []);
         },
         // endregion
 
-        // region VISUAL MAP
+        // region ATTRIBUTE INFOS / VISUAL MAP
         _getAttributeInfosOfRole: function(roleName, excludeMeasureDiscrim) {
           var attrInfos = def.getOwn(this.visualMap, roleName, null);
           if(attrInfos !== null && excludeMeasureDiscrim) {
@@ -355,15 +354,6 @@ define([
           var rolePropType = this.model.$type.get(roleName);
           var level = rolePropType.levelEffectiveOn(this.model);
           return !level || MeasurementLevel.type.isQualitative(level);
-        },
-
-        _selectGenericMeasureAttributeInfos: function() {
-
-          var roleNames = this._getRolesMappedToCccRole(this._genericMeasureCccVisualRole) || [];
-
-          return def.query(roleNames)
-              .selectMany(this._getAttributeInfosOfRole, this)
-              .where(def.notNully);
         },
 
         _getRolesMappedToCccRole: function(cccRoleName) {
@@ -506,6 +496,9 @@ define([
           // Multiple ways to store and index MappingAttributeInfo...
           var attributeInfos = [];
 
+          // attributeName -> MappingAttributeInfo
+          var attributeInfosByName = {};
+
           // axisId -> MappingAttributeInfo[]
           var axes = {
             key: [],
@@ -531,6 +524,7 @@ define([
             }
 
             attributeInfos.push(mappingAttrInfo);
+            attributeInfosByName[mappingAttrInfo.name] = mappingAttrInfo;
 
             axes[mappingAttrInfo.axis].push(mappingAttrInfo);
 
@@ -610,17 +604,11 @@ define([
             rolesByCccVisualRole[cccRoleName].sort();
           });
 
-          // Generic Measure Mode?
-          if((this._isGenericMeasureMode = genericMeasuresCount > 1)) {
-            // Create the measure discriminator attribute.
-            // Will be the last attribute of its discrete role.
-            addMappingAttrInfo(this._createGenericMeasureDiscriminator());
-          }
-
           // ----
 
           // Publish the created stores/indexes.
           this.attributeInfos = attributeInfos; // list
+          this.attributeInfosByName = attributeInfosByName; // map by name
           this.axes = axes; // index by axis
           this.visualMap = visualMap; // index by role
 
@@ -629,13 +617,26 @@ define([
 
           // ----
 
+          // Generic Measure Mode?
+          // Needs to be done after publishing _rolesByCccVisualRole.
+          if((this._isGenericMeasureMode = genericMeasuresCount > 1)) {
+            // Create the measure discriminator attribute.
+            // Will be the last attribute of its discrete role.
+            addMappingAttrInfo(this._createGenericMeasureDiscriminator());
+          }
+
+          // ----
+
           // 1. Hide columns not bound to visual roles and reorder attributes of the plain data table.
           this._transformData(attributeInfos);
 
-          // 2. Configure CCC dimensions and visual roles.
-          this._configureCccDimsVisualRoles(attributeInfos);
+          // 2. Configure CCC dimensions.
+          this._configureCccDimensions(attributeInfos);
 
-          // 3. Determine if there is a multi-chart role and if it is bound.
+          // 3. Configure CCC visual roles.
+          this._configureCccVisualRoles(attributeInfos);
+
+          // 4. Determine if there is a multi-chart role and if it is bound.
           // (ignoring the measure discrim, if any)
           this._isMultiChartMode = !!this._multiRole && this.model.get(this._multiRole).isMapped;
         },
@@ -746,14 +747,13 @@ define([
         },
 
         /**
-         * Configure CCC `dimensions` and `visualRoles`.
+         * Configure CCC `dimensions`.
          *
-         * @param {!MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
          */
-        _configureCccDimsVisualRoles: function(attrInfos) {
+        _configureCccDimensions: function(attrInfos) {
 
           var cccDimSpecs = this.options.dimensions;
-          var cccRoleSpecs = this.options.visualRoles;
 
           // MappingAttrInfos is filled above, in visual role mapping attribute order.
           // This enables its use for configuring the CCC visual roles.
@@ -772,16 +772,28 @@ define([
                 cccDimSpec.formatter = function(v) { return v == null ? "" : v.toString(); };
               }
             }
-
-            addCCCDimToVisualRole(attrInfo.name, attrInfo.cccRole);
           }, this);
+        },
 
-          function addCCCDimToVisualRole(dimName, cccRoleName) {
+        /**
+         * Configure CCC `visualRoles`.
+         *
+         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @overridable
+         * @protected
+         */
+        _configureCccVisualRoles: function(attrInfos) {
 
-            var cccRoleSpec = def.lazy(cccRoleSpecs, cccRoleName);
+          var cccRoleSpecs = this.options.visualRoles;
 
-            def.array.lazy(cccRoleSpec, "dimensions").push(dimName);
-          }
+          // MappingAttrInfos is filled above, in visual role mapping attribute order.
+          // This enables its use for configuring the CCC visual roles.
+          attrInfos.forEach(function(attrInfo) {
+
+            var cccRoleSpec = def.lazy(cccRoleSpecs, attrInfo.cccRole);
+
+            def.array.lazy(cccRoleSpec, "dimensions").push(attrInfo.name);
+          });
         },
         // endregion
 
@@ -1198,6 +1210,11 @@ define([
         },
 
         _getTooltipHtml: function(cccContext) {
+
+          if(this.isDirty) {
+            return;
+          }
+
           var tooltipLines = [];
           var msg;
 
@@ -1218,7 +1235,7 @@ define([
             var app = this.model.application;
             if(app && app.getDoubleClickTooltip) {
               // Drilling preferably uses the group, if it exists (e.g. scatter does not have it).
-              var drillOnFilter = this._getDrillFilter(cccContext);
+              var drillOnFilter = this._getExecuteFilter(cccContext);
               msg = app.getDoubleClickTooltip(drillOnFilter);
               if(msg) {
                 tooltipLines.push(msg);
@@ -1262,7 +1279,7 @@ define([
         _buildTooltipHtmlAttributeNonNumeric: function(lines, attrInfo, cccContext) {
           // Multi-chart formulas are not shown in the tooltip because
           // they're on the small chart's title.
-          if(attrInfo.role === this.chart._multiRole) {
+          if(attrInfo.role === this._multiRole) {
             return;
           }
 
@@ -1494,6 +1511,11 @@ define([
 
         _onUserSelection: function(cccContext, cccSelectingDatums, cccSelectingGroup) {
 
+          if(this.isDirty) {
+            // Explicitly cancel CCC's own selection handling.
+            return [];
+          }
+
           var selectFilter = this._getSelectFilter(cccSelectingDatums, cccSelectingGroup);
 
           var srcEvent = cccContext.event;
@@ -1577,6 +1599,10 @@ define([
         },
 
         _executeOn: function(cccContext) {
+
+          if(this.isDirty) {
+            return;
+          }
 
           var executeFilter = this._getExecuteFilter(cccContext);
           if(executeFilter === null) {

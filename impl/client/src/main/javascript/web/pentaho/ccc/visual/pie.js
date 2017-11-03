@@ -38,7 +38,7 @@ define(function() {
         },
 
         _genericMeasureCccVisualRole: "value",
-        _genericMeasureDiscrimCccVisualRole: "category",
+        _genericMeasureDiscrimCccVisualRole: "multiChart",
 
         _multiRole: "columns",
 
@@ -78,21 +78,21 @@ define(function() {
           // Change values mask according to each category's
           // discriminated measure being isPercent or not
           if(this._isGenericMeasureMode) {
-            var genericMeasureAttrInfosByName = this._selectGenericMeasureAttributeInfos()
-                  .uniqueIndex(function(attrInfo) { return attrInfo.attr.name; });
+            var attributeInfosByName = this.attributeInfosByName;
 
+            // e.g. sizeRole.dim
             var genericMeasureDiscrimName = this._genericMeasureDiscrimCccDimName;
 
             this.options.pie = {
               scenes: {
                 category: {
                   sliceLabelMask: function() {
-                    var meaDiscrimAtom = this.atoms[genericMeasureDiscrimName];
-                    var meaAttrName;
-                    var meaAttrInfo;
-                    if(meaDiscrimAtom && (meaAttrName = meaDiscrimAtom.value) &&
-                        (meaAttrInfo = genericMeasureAttrInfosByName[meaAttrName]) && meaAttrInfo.isPercent) {
-                      return "{value}"; // the value is the percentage itself;
+
+                    var meaAttrName = this.atoms[genericMeasureDiscrimName].value;
+
+                    if(attributeInfosByName[meaAttrName].isPercent) {
+                      // the value is the percentage itself;
+                      return "{value}";
                     }
 
                     return "{value} ({value.percent})";

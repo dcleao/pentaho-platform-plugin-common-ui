@@ -37,7 +37,7 @@ define([
           "rows": "category",
           "multi": "multiChart",
           "measures": "value",
-          "measuresLine": "value" // NOTE: maps to same dim group as "measures" role!
+          "measuresLine": "value" // NOTE: maps to same CCC visual role as the "measures" role!
         },
 
         _noRoleInTooltipMeasureRoles: {
@@ -46,47 +46,63 @@ define([
         },
 
         _options: {
-          plot2: true
+          plot2OrthoAxis: 2,
+
+          // Ensure that the ortho2 axis is positioned at the right,
+          // even when no ortho1 axis exists (happens when "measures" is not mapped).
+          ortho2AxisPosition: "right",
+
+          // Plot2 uses the same color scale as that of the main plot.
+          plot2ColorAxis: 1
+          // options.color2AxisTransform = null;
         },
 
         _setNullInterpolationMode: function(options, value) {
           options.plot2NullInterpolationMode = value;
         },
 
-        _initData: function() {
+        /**
+         * Configure CCC `visualRoles`.
+         *
+         * @param {MappingAttributeInfo[]} attrInfos - The array of mapping attribute info objects.
+         * @override
+         * @protected
+         */
+        _configureCccVisualRoles: function(attrInfos) {
 
-          this.base.apply(this, arguments);
+          var cccMainRoleSpecs = this.options.visualRoles;
+          var cccPlot2RoleSpecs = null;
 
-          // Data part codes
-          // 0 -> bars
-          // 1 -> lines
+          this.plot2 = this.model.measuresLine.isMapped;
+          if(this.plot2) {
+            // Creating this here prevents changing a shared nested object.
+            this.options.plots = [
+              {
+                name: "plot2",
+                visualRoles: {}
+              }
+            ];
 
-          var calculation;
-          if(this._isGenericMeasureMode) {
-            /* jshint laxbreak:true*/
-            var barAttrInfos = this._getAttributeInfosOfRole("measures");
-            var barAttrInfosByName = barAttrInfos
-                ? def.query(barAttrInfos).uniqueIndex(function(attrInfo) { return attrInfo.attr.name; })
-                : {};
-            var measureDiscrimDimName = this._genericMeasureDiscrimCccDimName;
-
-            calculation = function(datum, atoms) {
-              var meaAttrName = datum.atoms[measureDiscrimDimName].value;
-              atoms.dataPart = def.hasOwn(barAttrInfosByName, meaAttrName) ? "0" : "1";
-            };
-          } else if(this._genericMeasuresCount > 0) {
-            // One measure of one of the roles exists.
-            // And so, either it is always bar or always line...
-            var constDataPart = this._getAttributeInfosOfRole("measures") ? "0" : "1";
-            calculation = function(datum, atoms) {
-              atoms.dataPart = constDataPart;
-            };
+            cccPlot2RoleSpecs = this.options.plots[0].visualRoles;
           } else {
-            throw def.error("At least one of the measure roles must be specified");
+            this.options.plots = null;
           }
 
-          // Create the dataPart dimension calculation
-          this.options.calculations.push({names: "dataPart", calculation: calculation});
+          // MappingAttrInfos is filled above, in visual role mapping attribute order.
+          // This enables its use for configuring the CCC visual roles.
+          attrInfos.forEach(function(attrInfo) {
+            var cccRoleSpecs;
+            if(attrInfo.role === "measuresLine") {
+              // Plot2 visual role.
+              cccRoleSpecs = cccPlot2RoleSpecs;
+            } else {
+              cccRoleSpecs = cccMainRoleSpecs;
+            }
+
+            var cccRoleSpec = def.lazy(cccRoleSpecs, attrInfo.cccRole);
+
+            def.array.lazy(cccRoleSpec, "dimensions").push(attrInfo.name);
+          });
         },
 
         _readUserOptions: function(options) {
@@ -109,15 +125,10 @@ define([
           this._configureAxisRange(/* isPrimary: */false, "ortho2");
 
           this._configureAxisTitle("ortho2", "");
-
-          this.options.plot2OrthoAxis = 2;
-
-          // Plot2 uses same color scale
-          // options.plot2ColorAxis = 2;
-          // options.color2AxisTransform = null;
         },
 
         _configureLabels: function(options, model) {
+
           this.base.apply(this, arguments);
 
           // Plot2
@@ -135,6 +146,7 @@ define([
         },
 
         _configureDisplayUnits: function() {
+
           this.base();
 
           this._configureAxisDisplayUnits(/* isPrimary: */false, "ortho2");
