@@ -13,38 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 define([
   "module",
-  "pentaho/lang/UserError"
-], function(module, UserError) {
+  "./Simple",
+  "pentaho/i18n!types",
+  "pentaho/config!"
+], function(module, Simple, bundle, config) {
 
   "use strict";
 
   /**
-   * @classDesc The base class of errors associated with [values]{@link pentaho.type.Value} validation.
-   *
-   * @name ValidationError
-   * @memberOf pentaho.type
+   * @name pentaho.type.String
    * @class
-   * @extends pentaho.lang.UserError
-   * @see pentaho.type.Value#validate
+   * @extends pentaho.type.Simple
+   * @amd {pentaho.type.spec.UTypeModule<pentaho.type.String>} pentaho/type/string
    *
-   * @description Creates a validation error object.
-   * @constructor
-   * @param {string} message - The error message.
+   * @classDesc The class of textual values.
+   *
+   * @description Creates a string instance.
    */
-
-  return UserError.extend(module.id, /** @lends pentaho.type.ValidationError# */{
+  var PentahoString = Simple.extend({
     /**
-     * The name of the type of error.
-     *
-     * @type {string}
+     * Gets the underlying string primitive value of the value.
+     * @name pentaho.type.String#value
+     * @type string
      * @readonly
-     * @default "ValidationError"
      */
-    get name() {
-      return "ValidationError";
+
+    $type: {
+      id: module.id,
+      alias: "string",
+
+      cast: String
     }
-  });
+  })
+  .implement({$type: bundle.structured["string"]}) // eslint-disable-line dot-notation
+  .implement({$type: config});
+
+  return PentahoString;
 });

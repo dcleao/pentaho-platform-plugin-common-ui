@@ -58,22 +58,22 @@ define([
 
   var __standardIds = Object.freeze([
     // types
-    "instance",
-    "value",
-    "element",
-    "list",
-    "simple",
-    "string",
-    "number",
-    "boolean",
-    "date",
-    "complex",
-    "object",
-    "function",
-    "property",
-    "model",
-    "application",
-    "mixins/enum"
+    "Instance",
+    "Value",
+    "Element",
+    "List",
+    "Simple",
+    "String",
+    "Number",
+    "Boolean",
+    "Date",
+    "Complex",
+    "Object",
+    "Function",
+    "Property",
+    "Model",
+    "Application",
+    "mixins/Enum"
   ].map(function(id) { return "pentaho/type/" + id; }));
 
   /**
@@ -496,24 +496,24 @@ define([
      * The modules of standard types and mixins are preloaded and
      * can be requested _synchronously_. These are:
      *
-     * * [pentaho/type/instance]{@link pentaho.type.Instance}
-     *   * [pentaho/type/value]{@link pentaho.type.Value}
-     *     * [pentaho/type/list]{@link pentaho.type.List}
-     *     * [pentaho/type/element]{@link pentaho.type.Element}
-     *       * [pentaho/type/complex]{@link pentaho.type.Complex}
-     *         * [pentaho/type/application]{@link pentaho.type.Application}
-     *         * [pentaho/type/model]{@link pentaho.type.Model}
-     *       * [pentaho/type/simple]{@link pentaho.type.Simple}
-     *         * [pentaho/type/string]{@link pentaho.type.String}
-     *         * [pentaho/type/number]{@link pentaho.type.Number}
-     *         * [pentaho/type/date]{@link pentaho.type.Date}
-     *         * [pentaho/type/boolean]{@link pentaho.type.Boolean}
-     *         * [pentaho/type/function]{@link pentaho.type.Function}
-     *         * [pentaho/type/object]{@link pentaho.type.Object}
-     *         * [pentaho/type/mixins/enum]{@link pentaho.type.mixins.Enum}
-     *   * [pentaho/type/property]{@link pentaho.type.Property}
-     *     * [pentaho/type/mixins/discreteDomain]{@link pentaho.type.mixins.DiscreteDomain}
-     *     * [pentaho/type/mixins/ordinalDomain]{@link pentaho.type.mixins.OrdinalDomain}
+     * * [pentaho/type/Instance]{@link pentaho.type.Instance}
+     *   * [pentaho/type/Value]{@link pentaho.type.Value}
+     *     * [pentaho/type/List]{@link pentaho.type.List}
+     *     * [pentaho/type/Element]{@link pentaho.type.Element}
+     *       * [pentaho/type/Complex]{@link pentaho.type.Complex}
+     *         * [pentaho/type/Application]{@link pentaho.type.Application}
+     *         * [pentaho/type/Model]{@link pentaho.type.Model}
+     *       * [pentaho/type/Simple]{@link pentaho.type.Simple}
+     *         * [pentaho/type/String]{@link pentaho.type.String}
+     *         * [pentaho/type/Number]{@link pentaho.type.Number}
+     *         * [pentaho/type/Date]{@link pentaho.type.Date}
+     *         * [pentaho/type/Boolean]{@link pentaho.type.Boolean}
+     *         * [pentaho/type/Function]{@link pentaho.type.Function}
+     *         * [pentaho/type/Object]{@link pentaho.type.Object}
+     *         * [pentaho/type/mixins/Enum]{@link pentaho.type.mixins.Enum}
+     *   * [pentaho/type/Property]{@link pentaho.type.Property}
+     *     * [pentaho/type/mixins/DiscreteDomain]{@link pentaho.type.mixins.DiscreteDomain}
+     *     * [pentaho/type/mixins/OrdinalDomain]{@link pentaho.type.mixins.OrdinalDomain}
      *
      * For all of these, the `pentaho/type/` or `pentaho/type/mixins/` prefix is optional
      * (when requested to a _context_; the AMD module system requires the full module identifiers to be specified).

@@ -15,7 +15,7 @@
  */
 
 define([
-  "../../lang/Base"
+  "pentaho/lang/Base"
 ], function(Base) {
   "use strict";
 

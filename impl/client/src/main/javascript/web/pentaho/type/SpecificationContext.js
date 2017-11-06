@@ -15,9 +15,9 @@
  */
 define([
   "module",
-  "../lang/Base",
-  "../util/object",
-  "../util/error"
+  "pentaho/lang/Base",
+  "pentaho/util/object",
+  "pentaho/util/error"
 ], function(module, Base, O, error) {
 
   "use strict";

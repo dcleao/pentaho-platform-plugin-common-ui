@@ -20,8 +20,8 @@ define([
   "./Move",
   "./Sort",
   "./Clear",
-  "../../util/arg",
-  "../../util/object"
+  "pentaho/util/arg",
+  "pentaho/util/object"
 ], function(Changeset, Add, Remove, Move, Sort, Clear, arg, O) {
 
   "use strict";

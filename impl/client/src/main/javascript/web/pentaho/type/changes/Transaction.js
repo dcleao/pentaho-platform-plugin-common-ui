@@ -16,16 +16,40 @@
 define([
   "./ChangeRef",
   "./TransactionScope",
+  "./CommittedScope",
   "./TransactionRejectedError",
-  "../../lang/Base",
-  "../../lang/ActionResult",
-  "../../util/object",
-  "../../util/error"
-], function(ChangeRef, TransactionScope, TransactionRejectedError, Base, ActionResult, O, error) {
+  "pentaho/lang/Base",
+  "pentaho/lang/ActionResult",
+  "pentaho/util/object",
+  "pentaho/util/error"
+], function(ChangeRef, TransactionScope, CommittedScope, TransactionRejectedError, Base, ActionResult, O, error) {
 
   "use strict";
 
-  return Base.extend(/** @lends pentaho.type.changes.Transaction# */{
+  /**
+   * The ambient/current transaction, if any, or `null`.
+   *
+   * @type {pentaho.type.changes.Transaction}
+   */
+  var __txnCurrent = null;
+
+  /**
+   * The stack of transaction scopes.
+   *
+   * @type {Array.<pentaho.type.changes.AbstractTransactionScope>}
+   * @readOnly
+   */
+  var __txnScopes = [];
+
+  /**
+   * The version of the next committed/fulfilled transaction.
+   *
+   * @type {number}
+   * @default 1
+   */
+  var __nextVersion = 1;
+
+  var Transaction = Base.extend(/** @lends pentaho.type.changes.Transaction# */{
     /**
      * @alias Transaction
      * @memberOf pentaho.type.changes
@@ -278,7 +302,7 @@ define([
      * and the transaction is automatically rejected due to a concurrency error.
      */
     enter: function() {
-      return new TransactionScope(this.context, this);
+      return new TransactionScope(this);
     },
 
     /**
@@ -338,7 +362,7 @@ define([
      * @private
      * @internal
      *
-     * @see pentaho.type.Context#__setTransaction
+     * @see pentaho.type.changes.Transaction.__setCurrent
      */
     __enteringAmbient: function() {
 
@@ -355,7 +379,7 @@ define([
      * @private
      * @internal
      *
-     * @see pentaho.type.Context#__setTransaction
+     * @see pentaho.type.changes.Transaction.__setCurrent
      */
     __exitingAmbient: function() {
 
@@ -570,7 +594,7 @@ define([
     __applyChanges: function() {
       // Apply all changesets.
       // Includes setting owner versions to the new txn version.
-      var version = this.context.__takeNextVersion();
+      var version = __takeNextVersion();
 
       this.__crefs.forEach(function(cref) {
         cref.apply();
@@ -597,7 +621,7 @@ define([
       if(this.__scopeCount) {
         this.__scopeCount = 0;
         this.__exitingAmbient();
-        this.context.__transactionExit();
+        __transactionExit();
       }
 
       // Any new changes arising from notification create new transactions/changesets.
@@ -609,11 +633,153 @@ define([
           : function(cset) { cset.owner._onChangeDid(cset); };
 
       // Make sure to execute listeners without an active transaction.
-      this.context.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
+      Transaction.enterCommitted().using(this.__eachChangeset.bind(this, mapper));
 
       return reason;
     }
+  }, /** @lends pentaho.type.changes.Transaction */ {
+    /**
+     * Gets the ambient transaction, if any, or `null`.
+     *
+     * @type {pentaho.type.changes.Transaction}
+     * @readOnly
+     */
+    get current() {
+      return __txnCurrent;
+    },
+
+    /**
+     * Enters a scope of change.
+     *
+     * To mark the changes in the scope as error,
+     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     *
+     * To end the scope of change successfully,
+     * dispose the returned transaction scope,
+     * by calling its [dispose]{@link pentaho.type.changes.TransactionScope#scope} method.
+     *
+     * If the scope initiated a transaction,
+     * then that transaction is committed.
+     * Otherwise,
+     * if an ambient transaction already existed when the change scope was created,
+     * that transaction is left uncommitted.
+     *
+     * To end the scope with an error,
+     * call its [reject]{@link pentaho.type.changes.TransactionScope#reject} method.
+     *
+     * @return {!pentaho.type.changes.TransactionScope} The new transaction scope.
+     */
+    enter: function() {
+      var txn = __txnCurrent || new Transaction(); // <=> new this() :-)
+      return txn.enter();
+    },
+
+    /**
+     * Enters a read-committed scope.
+     *
+     * Within this scope there is no current transaction and
+     * reading the properties of instances obtains their committed values.
+     *
+     * @return {!pentaho.type.changes.CommittedScope} The read-committed scope.
+     */
+    enterCommitted: function() {
+      return new CommittedScope();
+    },
+
+    get __txnScopeCurrent() {
+      var scopes = __txnScopes;
+      return scopes.length ? scopes[scopes.length - 1] : null;
+    },
+
+    /**
+     * Called by a scope to make it become the new ambient scope.
+     *
+     * @param {!pentaho.type.changes.AbstractTransactionScope} scopeEnter - The new ambient scope.
+     *
+     * @private
+     * @internal
+     *
+     * @see pentaho.type.changes.AbstractTransactionScope
+     */
+    __scopeEnter: function(scopeEnter) {
+
+      __txnScopes.push(scopeEnter);
+
+      __setCurrent(scopeEnter.transaction);
+    },
+
+    /**
+     * Called by a scope to stop being the current scope.
+     *
+     * @private
+     * @internal
+     *
+     * @see pentaho.type.changes.AbstractTransactionScope#exit
+     */
+    __scopeExit: function() {
+
+      __txnScopes.pop();
+
+      var scopeResume = this.__txnScopeCurrent;
+
+      __setCurrent(scopeResume && scopeResume.transaction);
+    }
   });
+
+  return Transaction;
+
+  /**
+   * Sets the new ambient transaction.
+   *
+   * @memberOf pentaho.type.changes.Transaction
+   * @param {pentaho.type.changes.Transaction} txnNew - The new ambient transaction.
+   *
+   * @private
+   * @internal
+   */
+  function __setCurrent(txnNew) {
+    var txnExit = __txnCurrent;
+    if(txnExit !== txnNew) {
+      if(txnExit) txnExit.__exitingAmbient();
+      __txnCurrent = txnNew;
+      if(txnNew) txnNew.__enteringAmbient();
+    }
+  }
+
+  // @internal
+  function __transactionExit() {
+    // Local-exit all scopes of the exiting transaction.
+    // Null scopes or scopes of other txns remain non-exited.
+    var txnCurrent = __txnCurrent;
+
+    __txnCurrent = null;
+
+    // Initial scope must be a transaction scope.
+    var scopes = __txnScopes;
+    var i = scopes.length;
+    while(i--) {
+      var scope = scopes[i];
+      if(scope.transaction === txnCurrent) {
+        scopes.pop();
+        scope.__exitLocal();
+        if(scope.isRoot)
+          break;
+      }
+    }
+  }
+
+  /**
+   * Increments and returns the next version number for use in the
+   * [commit]{@link pentaho.type.changes.Transaction#__applyChanges} of a transaction.
+   *
+   * @memberOf pentaho.type.changes.Transaction
+   * @return {number} The next version number.
+   * @private
+   * @internal
+   */
+  function __takeNextVersion() {
+    return ++__nextVersion;
+  }
 
   function __compareChangesets(csa, csb) {
     return csb._netOrder - csa._netOrder;

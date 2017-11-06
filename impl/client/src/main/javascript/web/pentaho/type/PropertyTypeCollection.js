@@ -15,11 +15,12 @@
  */
 define([
   "module",
-  "../lang/Collection",
-  "../util/arg",
-  "../util/error",
-  "../util/object"
-], function(module, Collection, arg, error, O) {
+  "./Type",
+  "pentaho/lang/Collection",
+  "pentaho/util/arg",
+  "pentaho/util/error",
+  "pentaho/util/object"
+], function(module, Type, Collection, arg, error, O) {
 
   "use strict";
 
@@ -82,17 +83,6 @@ define([
     },
 
     /**
-     * The context of properties of this property collection.
-     *
-     * @type {pentaho.type.Context}
-     * @readOnly
-     * @private
-     */
-    get __context() {
-      return this.__cachedKeyArgs.declaringType.context;
-    },
-
-    /**
      * The property type in this property collection's context.
      *
      * @type {pentaho.type.Property.Type}
@@ -101,7 +91,7 @@ define([
      */
     get __propertyType() {
       var propertyType = this.__propType;
-      if(!propertyType) this.__propType = propertyType = this.__context.get("property").type;
+      if(!propertyType) this.__propType = propertyType = Type.get("property").type;
       return propertyType;
     },
 
@@ -196,7 +186,7 @@ define([
       if(!baseId) {
         basePropType = this.__propertyType;
       } else {
-        basePropType = this.__context.get(baseId).type;
+        basePropType = Type.get(baseId).type;
         if(!basePropType.isSubtypeOf(this.__propertyType))
           throw error.argInvalid("props[i]", "Property base type does not extend Property.");
       }

@@ -16,7 +16,7 @@
 
 define([
   "./PrimitiveChange",
-  "../../util/object"
+  "pentaho/util/object"
 ], function(PrimitiveChange, O) {
 
   "use strict";

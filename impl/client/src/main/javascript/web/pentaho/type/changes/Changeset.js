@@ -16,8 +16,8 @@
 
 define([
   "./Change",
-  "../../util/error",
-  "../../util/object"
+  "pentaho/util/error",
+  "pentaho/util/object"
 ], function(Change, error, O) {
 
   "use strict";

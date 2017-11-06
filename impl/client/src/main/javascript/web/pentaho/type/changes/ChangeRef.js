@@ -15,7 +15,7 @@
  */
 define([
   "../ReferenceList",
-  "../../lang/Base"
+  "pentaho/lang/Base"
 ], function(ReferenceList, Base) {
 
   "use strict";

@@ -19,7 +19,7 @@ define([
   "./ListChangeset",
   "./Replace",
   "./Transaction",
-  "../../util/object"
+  "pentaho/util/object"
 ], function(Changeset, ListChangeset, Replace, Transaction, O) {
 
   "use strict";
@@ -282,8 +282,7 @@ define([
 
       // -- New change.
 
-      var ctx = type.context;
-      var scope = ctx.enterChange();
+      var scope = Transaction.enter();
       var txn = scope.transaction;
       if(!cset) cset = complex._createChangeset(txn);
 

@@ -15,10 +15,10 @@
  */
 define([
   "./Transaction",
-  "../../lang/Base",
-  "../../util/object",
-  "../../util/error",
-  "../../util/logger"
+  "pentaho/lang/Base",
+  "pentaho/util/object",
+  "pentaho/util/error",
+  "pentaho/util/logger"
 ], function(Transaction, Base, O, error, logger) {
 
   "use strict";
@@ -37,7 +37,6 @@ define([
      * @constructor
      * @description Creates a `CommittedScope`.
      *
-     * @param {!pentaho.type.Context} context - The associated context.
      * @param {pentaho.type.changes.Transaction} [transaction] The associated transaction.
      *
      * @throws {pentaho.lang.OperationInvalidError} When the specified transaction is resolved.
@@ -45,19 +44,7 @@ define([
      * @throws {pentaho.type.changes.TransactionRejectedError} When this is the root scope of the specified transaction
      * and the transaction is automatically rejected due to a concurrency error.
      */
-    constructor: function(context, transaction) {
-      if(!context) throw error.argRequired("context");
-
-      /**
-       * Gets the associated context.
-       *
-       * @name context
-       * @memberOf pentaho.type.changes.AbstractTransactionScope#
-       * @type {!pentaho.type.Context}
-       * @readOnly
-       */
-      O.setConst(this, "context", context);
-
+    constructor: function(transaction) {
       /**
        * Gets the associated transaction, if any, or `null`.
        *
@@ -89,7 +76,7 @@ define([
 
       // Entering. May throw if already resolved or concurrency error.
       if(transaction) transaction.__scopeEnter();
-      context.__scopeEnter(this);
+      Transaction.__scopeEnter(this);
     },
 
     /**
@@ -146,7 +133,7 @@ define([
      * @readOnly
      */
     get isCurrent() {
-      return this.__isInside && (this === this.context.__txnScopeCurrent);
+      return this.__isInside && (this === Transaction.__txnScopeCurrent);
     },
 
     /**
@@ -216,7 +203,7 @@ define([
 
       if(this.transaction) this.transaction.__scopeExit();
 
-      this.context.__scopeExit();
+      Transaction.__scopeExit();
     },
 
     /**

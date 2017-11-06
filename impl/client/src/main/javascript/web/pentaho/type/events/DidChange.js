@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-  "../../lang/Event",
+  "pentaho/lang/Event",
   "../mixins/_mixinChangeset"
 ], function(Event, mixinChangeset) {
   "use strict";
