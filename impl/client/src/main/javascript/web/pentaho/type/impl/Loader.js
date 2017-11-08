@@ -105,9 +105,52 @@ define([
     },
     // endregion
 
-    // region getType* methods
+    // region Type methods
     /**
-     * Gets the instance constructor of a type.
+     * Registers a type dynamically, given its instance constructor.
+     *
+     * The type is dynamically
+     * registered with the [type info service]{@link pentaho.typeInfo.service} and
+     * defined as an AMD module.
+     *
+     * Optionally, any existing configuration can be applied to the type.
+     *
+     * A type registered this way can be later resolved. The first resolution can be synchronous.
+     *
+     * @param {!Class.<pentaho.type.Instance>} InstCtor - The instance constructor of the type.
+     * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {boolean} [keyArgs.configure=false] - Indicates that any existing configuration
+     * should be applied to the type.
+     *
+     * @return {!Promise.<Class.<pentaho.type.Instance>>} A promise for the given instance constructor.
+     */
+    registerTypeAsync: function(InstCtor, keyArgs) {
+
+      var id = InstCtor.type.id;
+
+      // 1. Register in type info.
+      __registerTypeInTypeInfo(InstCtor.type);
+
+      // 2. Define the AMD module.
+      if(O.getOwn(keyArgs, "configure", false)) {
+
+        define(id, ["pentaho/config!"], function(typeConfig) {
+          return InstCtor.configure({$type: typeConfig});
+        });
+      } else {
+
+        define(id, [], function() {
+          return InstCtor;
+        });
+      }
+
+      // 3. Capture the just defined module in the AMD context of localRequire.
+      // Not calling this, would end up defining the module in the default AMD context.
+      return promiseUtil.require(id, localRequire);
+    },
+
+    /**
+     * Resolves a type reference and returns its instance constructor.
      *
      * For more information on the `typeRef` argument,
      * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
@@ -144,12 +187,13 @@ define([
      * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
      * list type specification that has more than one child element type specification.
      */
-    getType: function(typeRef, keyArgs) {
-      return this.__getType(typeRef, O.getOwn(keyArgs, "defaultBase"), true);
+    resolveType: function(typeRef, keyArgs) {
+      return this.__resolveType(typeRef, O.getOwn(keyArgs, "defaultBase"), true);
     },
 
     /**
-     * Gets, asynchronously, the instance constructor of a type.
+     * Resolves a type reference, asynchronously, and returns a promise that
+     * resolves to type's instance constructor.
      *
      * For more information on the `typeRef` argument,
      * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
@@ -157,27 +201,21 @@ define([
      * This method can be used even if a generic type specification references types
      * whose modules have not yet been loaded by the AMD module system.
      *
-     * @see pentaho.type.Type.get
+     * @see pentaho.type.ILoader#resolveType
      *
      * @example
      * <caption>
-     *   Getting a <b>configured</b> type instance constructor, <b>asynchronously</b>, for a specific application.
+     *   Getting an instance constructor, <b>asynchronously</b>.
      * </caption>
      *
-     * require(["pentaho/type/Context"], function(Context) {
+     * require(["pentaho/type/loader"], function(loader) {
      *
-     *   Context
-     *     .createAsync({application: "data-explorer-101"})
-     *     .then(function(context) {
+     *   loader.getAsync("my/viz/chord").then(function(VizChordModel) {
      *
-     *       context.getAsync("my/viz/chord").then(function(VizChordModel) {
+     *     var model = new VizChordModel({outerRadius: 200});
      *
-     *         var model = new VizChordModel({outerRadius: 200});
-     *
-     *         // ...
-     *       });
-     *
-     *     });
+     *     // ...
+     *   });
      * });
      *
      * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
@@ -209,9 +247,9 @@ define([
      *
      * @rejects {Error} When any other unexpected error occurs.
      */
-    getTypeAsync: function(typeRef, keyArgs) {
+    resolveTypeAsync: function(typeRef, keyArgs) {
       try {
-        return this.__getType(typeRef, O.getOwn(keyArgs, "defaultBase"), false);
+        return this.__resolveType(typeRef, O.getOwn(keyArgs, "defaultBase"), false);
       } catch(ex) {
         /* istanbul ignore next : really hard to test safeguard */
         return Promise.reject(ex);
@@ -219,24 +257,22 @@ define([
     },
 
     /**
-     * Gets the **instance constructors** of
-     * all of the loaded types that are subtypes of a given base type.
+     * Gets the instance constructors of all of the types which are known to be subtypes of a given base type.
      *
      * This method is a synchronous version of {@link pentaho.type.ILoader#getSubtypesOfAsync}
      *
-     * If it is not known whether all known subtypes of `baseTypeId` have already been loaded
-     * (for example, by a previous call to `getSubtypesOfAsync`),
+     * If it is not known whether all known subtypes of `baseTypeId` have already been loaded,
      * the asynchronous method version, `getSubtypesOfAsync`,
      * should be used instead.
      *
      * @example
      * <caption>
-     *   Getting all browsable <code>"my/component"</code> subtypes.
+     *   Getting all browsable subtypes of <code>"my/component"</code>.
      * </caption>
      *
      * require(["pentaho/type/loader"], function(loader) {
      *
-     *   var ComponentModels = loader.getTypes("my/component", {isBrowsable: true});
+     *   var ComponentModels = loader.getSubtypesOf("my/component", {isBrowsable: true});
      *
      *   ComponentModels.forEach(function(ComponentModel) {
      *     console.log("Will display menu entry for: " + ComponentModel.type.label);
@@ -257,8 +293,8 @@ define([
      * has not loaded yet.
      *
      * @see pentaho.type.ILoader#getSubtypesOfAsync
-     * @see pentaho.type.ILoader#getType
-     * @see pentaho.type.ILoader#getTypeAsync
+     * @see pentaho.type.ILoader#resolveType
+     * @see pentaho.type.ILoader#resolveTypeAsync
      */
     getSubtypesOf: function(baseTypeId, keyArgs) {
       if(!baseTypeId) throw error.argRequired("baseTypeId");
@@ -270,7 +306,7 @@ define([
 
       // Throws if any subtype is not loaded.
       var InstCtors = subtypeIds.map(function(subtypeId) {
-        return this.getType(subtypeId);
+        return this.resolveType(subtypeId);
       }, this);
 
       if(predicate) {
@@ -283,14 +319,14 @@ define([
     },
 
     /**
-     * Gets a promise for the **instance constructors** of
-     * all of the types that are subtypes of a given base type.
+     * Gets a promise for the instance constructors of
+     * all of the types which are known to be subtypes of a given base type.
      *
-     * Any errors that may occur will result in a rejected promise.
+     * Any errors that occur result in a rejected promise.
      *
      * @example
      * <caption>
-     *   Getting all browsable <code>"my/component"</code> subtypes.
+     *   Getting all browsable subtypes of <code>"my/component"</code>.
      * </caption>
      *
      * require(["pentaho/type/loader"], function(loader) {
@@ -312,8 +348,8 @@ define([
      *
      * @return {Promise.<Array.<Class.<pentaho.type.Instance>>>} A promise for an array of instance constructors.
      *
-     * @see pentaho.type.ILoader#getType
-     * @see pentaho.type.ILoader#getTypeAsync
+     * @see pentaho.type.ILoader#resolveType
+     * @see pentaho.type.ILoader#resolveTypeAsync
      */
     getSubtypesOfAsync: function(baseTypeId, keyArgs) {
       try {
@@ -325,7 +361,7 @@ define([
             typeInfo.getSubtypesOf(baseTypeId, {includeSelf: true, includeDescendants: true}) || [baseTypeId];
 
         var promises = subtypeIds.map(function(subtypeId) {
-          return this.getTypeAsync(subtypeId);
+          return this.resolveTypeAsync(subtypeId);
         }, this);
 
         return Promise.all(promises).then(function(InstCtors) {
@@ -345,9 +381,9 @@ define([
     },
 
     /**
-     * Gets the instance constructor of a type.
+     * Resolves a type reference.
      *
-     * Internal get method shared by `get` and `getAsync`.
+     * Internal get method shared by `resolveType` and `resolveTypeAsync`.
      * Uses `sync` argument to distinguish between the two modes.
      *
      * Main dispatcher according to the type and class of `typeRef`:
@@ -365,7 +401,7 @@ define([
      *
      * @private
      */
-    __getType: function(typeRef, defaultBase, sync) {
+    __resolveType: function(typeRef, defaultBase, sync) {
       if(typeRef == null || typeRef === "") {
         return promiseUtil.error(error.argRequired("typeRef"), sync);
       }
@@ -375,8 +411,8 @@ define([
         case "string": return this.__getTypeById(typeRef, sync);
         case "function": return this.__getTypeByFun(typeRef, sync);
         case "object": return Array.isArray(typeRef)
-            ? this.__getTypeByListSpec(typeRef, sync)
-            : this.__getTypeByObject(typeRef, defaultBase, sync);
+            ? this.__resolveTypeByListSpec(typeRef, sync)
+            : this.__resolveTypeByObject(typeRef, defaultBase, sync);
       }
 
       return promiseUtil.error(error.argInvalid("typeRef"), sync);
@@ -400,7 +436,7 @@ define([
      * If sync, AMD throws if a module with the given identifier is not yet loaded or is not defined.
      *
      * When the resulting module is returned by AMD,
-     * its result is passed on, _recursively_, to `__getType`,
+     * its result is passed on, _recursively_, to `__resolveType`,
      * and, thus, the module can return any of the supported type reference formats.
      * The usual is to return a factory function.
      *
@@ -426,20 +462,30 @@ define([
      */
     __getTypeById: function(id, sync) {
 
+      if(SpecificationContext.isIdTemporary(id)) {
+        var currentSpecContext = SpecificationContext.current;
+        if(!currentSpecContext) {
+          return promiseUtil.error(
+              error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
+              sync);
+        }
+
+        // Id must exist in the specification context, or it's invalid.
+        var type = currentSpecContext.get(id);
+        if(!type) {
+          return promiseUtil.error(
+              error.argInvalid("typeRef", "Temporary id does not correspond to a known type."),
+              sync);
+        }
+
+        return promiseUtil["return"](type.instance.constructor, sync);
+      }
+
       // Translate alias.
-      id = __translateTypeAlias(id);
+      id = typeInfo.getIdOf(id) || id;
 
-      var result = __getTypeByIdTemporary(id, sync);
-      if(result !== null) {
-        return result;
-      }
-
-      // Load
-      if(sync) {
-        return localRequire(id);
-      }
-
-      return promiseUtil.require(id, localRequire);
+      // Load.
+      return sync ? localRequire(id) : promiseUtil.require(id, localRequire);
     },
 
     /**
@@ -453,7 +499,6 @@ define([
      *   returns the instance constructor; while, when async, returns a promise for it.
      *
      * @throws {pentaho.lang.ArgumentInvalidError} When `fun` is not an `Instance` constructor.
-     * @throws {Error} Other errors, thrown by {@link pentaho.type.Context#__getByInstCtor}.
      *
      * @private
      */
@@ -474,7 +519,7 @@ define([
      *  <=>
      *  {base: "list", of: {props: { ...}}}
      */
-    __getTypeByListSpec: function(typeSpec, sync) {
+    __resolveTypeByListSpec: function(typeSpec, sync) {
 
       var elemTypeSpec;
       if(typeSpec.length !== 1 || !(elemTypeSpec = typeSpec[0]))
@@ -483,10 +528,10 @@ define([
             sync);
 
       // Expand compact list type spec syntax and delegate to the generic handler.
-      return this.__getTypeByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
+      return this.__resolveTypeByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
     },
 
-    __getTypeByObject: function(typeSpec, defaultBase, sync) {
+    __resolveTypeByObject: function(typeSpec, defaultBase, sync) {
 
       if(typeSpec.constructor !== Object) {
 
@@ -506,61 +551,65 @@ define([
             error.argInvalid("typeRef", "Object is not a 'pentaho.type.Type' instance or a plain object."), sync);
       }
 
-      return this.__getTypeByObjectSpec(typeSpec, defaultBase, sync);
+      return this.__resolveTypeByObjectSpec(typeSpec, defaultBase, sync);
     },
 
-    // Inline type spec: {[base: "complex"], [id: ]}
-    __getTypeByObjectSpec: function(typeSpec, defaultBase, sync) {
+    // Inline type spec: {[base: "complex"], [id: "_:1"]}
+    __resolveTypeByObjectSpec: function(typeSpec, defaultBase, sync) {
 
-      var id = typeSpec.id;
-      if(id) {
-        id = __translateTypeAlias(id);
+      var temporaryId = typeSpec.id || null;
+      if(temporaryId !== null) {
 
-        var result = __getTypeByIdTemporary(id, sync, /* canDefineSpecId: */true);
-        if(result) {
-          return result;
+        // Ensure this is a new temporary id.
+
+        if(!SpecificationContext.isIdTemporary(temporaryId)) {
+          return promiseUtil.error(
+              error.argInvalid("typeRef", "Generic type specifications cannot have a permanent id."),
+              sync);
+        }
+
+        var currentSpecContext = SpecificationContext.current;
+        if(currentSpecContext !== null && currentSpecContext.get(temporaryId) !== null) {
+          return promiseUtil.error(
+            error.argInvalid("typeRef", "Temporary id '" + temporaryId + "' is already defined."),
+            sync);
         }
       }
 
       if(sync) {
         // Throws if any referenced id is not already loaded.
-        return this.__createTypeByObjectSpec(id, typeSpec, defaultBase);
+        return this.__createTypeByObjectSpec(temporaryId, typeSpec, defaultBase);
       }
 
       // Get the referenced dependencies first and only then create the type.
       return this.__getTypeSpecDependenciesAsync(typeSpec).then(function() {
-        return this.__createTypeByObjectSpec(id, typeSpec, defaultBase);
+        return this.__createTypeByObjectSpec(temporaryId, typeSpec, defaultBase);
       }.bind(this));
     },
 
     // Creates a type once its dependencies have been resolved.
     // Note the switch to sync mode here, whatever the outer `sync` value.
-    // Only the outermost __getTypeByObjectSpec call may be async.
+    // Only the outermost __resolveTypeByObjectSpec call may be async.
     // All following "reentries" will be sync.
     // So, it works to use the above introduced ambient specification context to
     // handle all contained temporary ids.
-    __createTypeByObjectSpec: function(id, typeSpec, defaultBase) {
+    __createTypeByObjectSpec: function(temporaryId, typeSpec, defaultBase) {
 
       // A root generic type spec initiates a specification context.
       // Each root generic type spec has a separate specification context.
       return O.using(new SpecificationScope(), function(specScope) {
 
-        // 1. Resolve the base type.
+        // Resolve the base type.
         var baseTypeSpec = typeSpec.base || defaultBase || DEFAULT_BASE_TYPE;
 
-        var BaseInstCtor = this.__getType(baseTypeSpec, null, /* sync: */true);
+        var BaseInstCtor = this.__resolveType(baseTypeSpec, null, /* sync: */true);
 
-        // 2. Extend the base type.
+        // Extend the base type.
         var InstCtor = BaseInstCtor.extend({$type: typeSpec});
 
-        // 3. Register and configure the new type.
-        if(id) {
-          if(SpecificationContext.isIdTemporary(id)) {
-            // Register also in the specification context, under the temporary id.
-            specScope.specContext.add(InstCtor.type, id);
-          } else {
-            // TODO: Define the module in the current AMD context.
-          }
+        // Register the new type in the specification context.
+        if(temporaryId !== null) {
+          specScope.specContext.add(InstCtor.type, temporaryId);
         }
 
         return InstCtor;
@@ -612,7 +661,7 @@ define([
      * @see pentaho.type.Instance.getAsync
      * @see pentaho.type.Type#create
      */
-    getInstance: function(instRef, instKeyArgs, typeBase) {
+    resolveInstance: function(instRef, instKeyArgs, typeBase) {
 
       var InstCtor;
       var typeRef;
@@ -629,7 +678,7 @@ define([
         // 2. Type in inline type property {_: "type"}
         if((typeRef = instRef._)) {
 
-          InstCtor = this.getType(typeRef);
+          InstCtor = this.resolveType(typeRef);
 
           var type = InstCtor.type;
           if(typeBase) typeBase.__assertSubtype(type);
@@ -645,9 +694,9 @@ define([
 
           /* eslint default-case: 0 */
           switch(typeof instRef) {
-            case "string": InstCtor = __String || (__String = this.getType("string")); break;
-            case "number": InstCtor = __Number || (__Number = this.getType("number")); break;
-            case "boolean": InstCtor = __Boolean || (__Boolean = this.getType("boolean")); break;
+            case "string": InstCtor = __String || (__String = this.resolveType("string")); break;
+            case "number": InstCtor = __Number || (__Number = this.resolveType("number")); break;
+            case "boolean": InstCtor = __Boolean || (__Boolean = this.resolveType("boolean")); break;
           }
 
           // Must still respect the base type.
@@ -715,11 +764,11 @@ define([
             elemTypeId = value;
           } else {
             // better not be a list type...
-            elemTypeId = this.getType(value).type.id;
+            elemTypeId = this.resolveType(value).type.id;
           }
         } else {
           // Assume a typeRef of some kind
-          var type = this.getType(value).type;
+          var type = this.resolveType(value).type;
           if(type.isList) {
             isList = true;
             listType = type;
@@ -740,7 +789,7 @@ define([
           var getListCtorSync = function() {
             return listType
                 ? listType.instance.constructor
-                : this.getType([elemTypeId]);
+                : this.resolveType([elemTypeId]);
           };
 
           var createList = function(ListCtor, results) {
@@ -813,8 +862,7 @@ define([
     },
 
     /**
-     * Gets all of the instances of the given type which are already successfully loaded and that, optionally,
-     * match a specified filter.
+     * Gets all of the instances of the given type that, optionally, match a specified filter.
      *
      * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
      * the instance constructor or type of an identified type.
@@ -889,13 +937,13 @@ define([
      * @rejects {pentaho.lang.OperationInvalidError} When the type of the resolved value is not a subtype of `typeBase`.
      *
      * @rejects {Error} Other errors, as documented in:
-     * [ILoader#getType]{@link pentaho.type.ILoader#getType},
+     * [ILoader#resolveType]{@link pentaho.type.ILoader#resolveType},
      * [ILoader#getDependencyAsync]{@link pentaho.type.ILoader#getDependencyAsync} and
      * [ILoader#getInstanceByTypeAsync]{@link pentaho.type.ILoader#.getInstanceByTypeAsync}.
      *
      * @see pentaho.type.Type#createAsync
      */
-    getInstanceAsync: function(instSpec, instKeyArgs, typeBase) {
+    resolveInstanceAsync: function(instSpec, instKeyArgs, typeBase) {
 
       if(instSpec && typeof instSpec === "object") {
 
@@ -904,7 +952,7 @@ define([
           return this.__getInstanceSpecial(instSpec.$instance, instKeyArgs, typeBase, /* sync: */ false);
         }
 
-        // Follow the generic path of loading all found dependencies first and calling `getInstance` later.
+        // Follow the generic path of loading all found dependencies first and calling `resolveInstance` later.
         return this.__getInstanceSpecDependenciesAsync(instSpec).then(getSync.bind(this));
       }
 
@@ -912,7 +960,7 @@ define([
       return promiseUtil.wrapCall(getSync, this);
 
       function getSync() {
-        return this.getInstance(instSpec, instKeyArgs, typeBase);
+        return this.resolveInstance(instSpec, instKeyArgs, typeBase);
       }
     },
 
@@ -937,7 +985,6 @@ define([
      * there is no matching result.
      */
     getInstanceOfTypeAsync: function(baseTypeId, keyArgs) {
-
       try {
         // Loads all instances of type and then filters.
         return this.__getInstancesOfTypeAsync(baseTypeId, keyArgs).then(function(instances) {
@@ -969,7 +1016,6 @@ define([
      * there are no matching results.
      */
     getInstancesOfTypeAsync: function(baseTypeId, keyArgs) {
-
       try {
         return this.__getInstancesOfTypeAsync(baseTypeId, keyArgs);
       } catch(ex) {
@@ -989,9 +1035,10 @@ define([
         var predicate = __buildGetInstancePredicate(keyArgs);
 
         promiseAll = Promise.all(instanceInfos.map(function(instanceInfo) {
-          // Convert failed instances to null
+
           var promise = promiseUtil.require(instanceInfo.id, localRequire);
 
+          // Convert failed instances to null
           return promise["catch"](function() { return null; });
         }))
         .then(function(instances) {
@@ -1063,55 +1110,26 @@ define([
     return __Instance || (__Instance = localRequire(INSTANCE_TYPE));
   }
 
-  // region getType* support
-  function __translateTypeAlias(id) {
-    if(id) {
-      if(!SpecificationContext.isIdTemporary(id)) {
-        var id2 = typeInfo.getIdOf(id);
-        if(id2) {
-          id = id2;
-        }
+  // region get Type* support
+
+  function __registerTypeInTypeInfo(type) {
+
+    var id = type.id;
+
+    if(typeInfo.getIdOf(id) === undefined) {
+
+      // Find first base with an id.
+      var baseType = type.ancestor;
+      while(baseType !== null && !baseType.id) {
+        baseType = baseType.ancestor;
+      }
+
+      if(baseType !== null) {
+        __registerTypeInTypeInfo(baseType);
+
+        typeInfo.declare(id, {base: baseType.id});
       }
     }
-
-    return id;
-  }
-
-  function __getTypeByIdTemporary(id, sync, canDefineSpecId) {
-
-    // assert id
-
-    // Deserializing?
-
-    // Is it a temporary id?
-    if(SpecificationContext.isIdTemporary(id)) {
-      var currentSpecContext = SpecificationContext.current;
-      if(!currentSpecContext) {
-        if(canDefineSpecId) {
-          return null;
-        }
-
-        return promiseUtil.error(
-            error.argInvalid("typeRef", "Temporary ids cannot occur outside of a generic type specification."),
-            sync);
-      }
-
-      // id must exist at the specification context, or it's invalid.
-      var type = currentSpecContext.get(id);
-      if(!type) {
-        if(canDefineSpecId) {
-          return null;
-        }
-
-        return promiseUtil.error(
-            error.argInvalid("typeRef", "Temporary id does not correspond to an existing type."),
-            sync);
-      }
-
-      return promiseUtil["return"](type.instance.constructor, sync);
-    }
-
-    return null;
   }
 
   function __buildGetSubtypesOfPredicate(keyArgs) {
@@ -1126,7 +1144,7 @@ define([
   }
   // endregion
 
-  // region getInstance* support
+  // region get Instance* support
   function __processInstanceType(baseTypeId) {
 
     if(!baseTypeId) throw error.argRequired("baseTypeId");
@@ -1199,11 +1217,11 @@ define([
         // Assume type id string
         if(!O_hasOwn.call(depIdsSet, depSpec)) {
           depIdsSet[depSpec] = 1;
-          depPromises.push(loader.getTypeAsync(depSpec));
+          depPromises.push(loader.resolveTypeAsync(depSpec));
         }
       } else {
         // Assume special instance spec.
-        depPromises.push(loader.getInstanceAsync(depSpec));
+        depPromises.push(loader.resolveInstanceAsync(depSpec));
       }
     }
   }
