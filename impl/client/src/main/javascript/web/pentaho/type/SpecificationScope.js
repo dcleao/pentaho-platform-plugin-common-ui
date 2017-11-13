@@ -27,7 +27,7 @@ define([
      * @alias SpecificationScope
      * @memberOf pentaho.type
      * @class
-     * @implements pentaho.lang.IDisposable
+     * @implements {pentaho.lang.IDisposable}
      *
      * @amd pentaho/type/SpecificationScope
      *

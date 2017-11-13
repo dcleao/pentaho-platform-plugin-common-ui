@@ -16,7 +16,7 @@
 
 /**
  * The `spec.IInstanceResolve` interface describes a special syntax used
- * for resolving instances from a Type API [instance container]{@link pentaho.type.InstancesContainer}.
+ * for resolving instances from a Type API [loader]{@link pentaho.type.ILoader}.
  *
  * ##### Resolve instance by id syntax
  *

@@ -840,7 +840,7 @@ define([
 
       switch(typeof depRef) {
         case "string":
-          depRef = typeUtil.__absolutizeDependencyOf(depRef, O.getOwn(keyArgs, "dependentId"));
+          depRef = typeUtil.__absolutizeIdRelativeToSibling(depRef, O.getOwn(keyArgs, "dependentId"));
 
           return sync ? this.get(depRef) : this.getAsync(depRef);
 

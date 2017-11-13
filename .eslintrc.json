@@ -57,7 +57,13 @@
     "padded-blocks": "off",
     "quotes": ["error", "double", { "avoidEscape": true }],
     "object-curly-spacing": ["error", "never"],
-    "block-scoped-var": 0
+    "block-scoped-var": 0,
+    "valid-jsdoc": [
+      "error", {
+        "preferType": { "Boolean": "boolean", "Number": "number", "String": "string" },
+        "requireReturn": false
+      }
+    ]
   },
   "globals": {
     "inject": true,

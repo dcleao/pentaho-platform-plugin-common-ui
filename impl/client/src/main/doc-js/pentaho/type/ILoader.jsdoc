@@ -1,0 +1,447 @@
+/*!
+ * Copyright 2017 Hitachi Vantara. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The `ILoader` interface describes a type and instance loader of the Type API.
+ *
+ * @name pentaho.type.ILoader
+ *
+ * @interface
+ */
+
+// region Type methods
+/**
+ * Registers a type dynamically, given its instance constructor.
+ *
+ * The type is dynamically
+ * registered with the [type information service]{@link pentaho.typeInfo.service}, if not registered yet.
+ *
+ * Additionally,
+ * the type is dynamically defined as an AMD module whose value is its instance constructor.
+ *
+ * Optionally, any existing configuration can be applied to the type.
+ *
+ * A type registered in this way can be later resolved by the loader or using AMD directly.
+ * The first resolution can be performed synchronously.
+ *
+ * @name registerTypeAsync
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @param {!Class.<pentaho.type.Instance>} InstCtor - The instance constructor of the type.
+ * @param {Object} [keyArgs] - The keyword arguments.
+ * @param {boolean} [keyArgs.configure=false] - Indicates that any existing configuration
+ * should be applied to the type.
+ *
+ * @return {!Promise.<Class.<pentaho.type.Instance>>} A promise for the given instance constructor.
+ */
+
+/**
+ * Resolves a type reference and returns its instance constructor.
+ *
+ * For more information on the `typeRef` argument,
+ * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
+ *
+ * If it is not known whether all types that are referenced by identifier within `typeRef`
+ * have already been loaded,
+ * the asynchronous method version, [resolveTypeAsync]{@link pentaho.type.ILoader#resolveTypeAsync},
+ * should be used instead.
+ *
+ * @name resolveType
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @see pentaho.type.ILoader#resolveTypeAsync
+ *
+ * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
+ * @param {Object} [keyArgs] The keyword arguments.
+ * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
+ * of `typeRef` when it is an immediate generic object specification.
+ *
+ * @return {!Class.<pentaho.type.Instance>} The instance constructor.
+ *
+ * @throws {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
+ * not a string, function, array or object.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is a type constructor
+ * (e.g. [Type]{@link pentaho.type.Type})
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance of `pentaho.type.Instance`.
+ *
+ * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system
+ * (specified directly in `typeRef`, or present in an generic type specification).
+ *
+ * @throws {Error} When an identifier is of a module that the AMD module system
+ * has not loaded yet (specified directly in `typeRef`, or present in an generic type specification).
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
+ * list type specification that has more than one child element type specification.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a permanent identifier.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a temporary identifier which is already defined.
+ */
+
+/**
+ * Resolves a type reference, asynchronously, and returns a promise that
+ * resolves to type's instance constructor.
+ *
+ * For more information on the `typeRef` argument,
+ * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
+ *
+ * This method can be used even if a generic type specification references types
+ * whose modules have not yet been loaded by the AMD module system.
+ *
+ * @name resolveTypeAsync
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @see pentaho.type.ILoader#resolveType
+ *
+ * @example
+ * <caption>
+ *   Getting an instance constructor, <b>asynchronously</b>.
+ * </caption>
+ *
+ * require(["pentaho/type/loader"], function(loader) {
+ *
+ *   loader.getAsync("my/viz/chord").then(function(VizChordModel) {
+ *
+ *     var model = new VizChordModel({outerRadius: 200});
+ *
+ *     // ...
+ *   });
+ * });
+ *
+ * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
+ * @param {Object} [keyArgs] The keyword arguments.
+ * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
+ * of `typeRef` when it is an immediate generic object specification.
+ *
+ * @return {!Promise.<!Class.<pentaho.type.Instance>>} A promise for the instance constructor.
+ *
+ * @rejects {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
+ * not a string, function, array or object.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is a type constructor
+ * (e.g. [Type]{@link pentaho.type.Type})
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance.
+ *
+ * @rejects {Error} When the identifier of a type is not defined as a module in the AMD module system
+ * (specified directly in `typeRef`, or present in an generic type specification).
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
+ * an instance constructor of a subtype of `Instance`
+ * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its identifier).
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a list type specification
+ * with an invalid structure.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a permanent identifier.
+ *
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a generic object type
+ * specification that has a temporary identifier which is already defined.
+ *
+ * @rejects {Error} When any other unexpected error occurs.
+ */
+
+/**
+ * Gets the instance constructors of all of the types which are known to be subtypes of a given base type.
+ *
+ * This method is a synchronous version of {@link pentaho.type.ILoader#getSubtypesOfAsync}
+ *
+ * If it is not known whether all known subtypes of `baseTypeId` have already been loaded,
+ * the asynchronous method version, `getSubtypesOfAsync`,
+ * should be used instead.
+ *
+ * @name getSubtypesOf
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @example
+ * <caption>
+ *   Getting all browsable subtypes of <code>"my/component"</code>.
+ * </caption>
+ *
+ * require(["pentaho/type/loader"], function(loader) {
+ *
+ *   var ComponentModels = loader.getSubtypesOf("my/component", {isBrowsable: true});
+ *
+ *   ComponentModels.forEach(function(ComponentModel) {
+ *     console.log("Will display menu entry for: " + ComponentModel.type.label);
+ *   });
+ * });
+ *
+ * @param {string} baseTypeId - The identifier of the base type.
+ * @param {object} [keyArgs] Keyword arguments.
+ * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
+ *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
+ * @param {?boolean} [keyArgs.isAbstract=null] - Indicates that only types with the specified
+ *   [isAbstract]{@link pentaho.type.Value.Type#isAbstract} value are returned.
+ *
+ * @return {!Array.<Class.<pentaho.type.Value>>} An array of instance constructors.
+ *
+ * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system.
+ * @throws {Error} When the identifier of a **non-standard type** is from a module that the AMD module system
+ * has not loaded yet.
+ *
+ * @see pentaho.type.ILoader#getSubtypesOfAsync
+ * @see pentaho.type.ILoader#resolveType
+ * @see pentaho.type.ILoader#resolveTypeAsync
+ */
+
+/**
+ * Gets a promise for the instance constructors of
+ * all of the types which are known to be subtypes of a given base type.
+ *
+ * Any errors that occur result in a rejected promise.
+ *
+ * @name getSubtypesOfAsync
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @example
+ * <caption>
+ *   Getting all browsable subtypes of <code>"my/component"</code>.
+ * </caption>
+ *
+ * require(["pentaho/type/loader"], function(loader) {
+ *
+ *   loader.getSubtypesOfAsync("my/component", {isBrowsable: true})
+ *     .then(function(ComponentModels) {
+ *       ComponentModels.forEach(function(ComponentModel) {
+ *         console.log("Will display menu entry for: " + ComponentModel.type.label);
+ *       });
+ *     });
+ * });
+ *
+ * @param {string} baseTypeId - The identifier of the base type.
+ * @param {object} [keyArgs] Keyword arguments.
+ * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
+ *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
+ * @param {?boolean} [keyArgs.isAbstract=null] - Indicates that only types with the specified
+ *   [isAbstract]{@link pentaho.type.Value.Type#isAbstract} value are returned.
+ *
+ * @return {Promise.<Array.<Class.<pentaho.type.Instance>>>} A promise for an array of instance constructors.
+ *
+ * @see pentaho.type.ILoader#resolveType
+ * @see pentaho.type.ILoader#resolveTypeAsync
+ */
+// endregion
+
+// region Instance methods
+/**
+ * Resolves a reference to an instance.
+ *
+ * This method can be used for:
+ *
+ * * creating a new instance - when given an [instance specification]{@link pentaho.type.spec.UInstance}
+ * * resolving instances from the instances' container -
+ *   when given a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve}.
+ *
+ * @name resolveInstance
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+ *
+ * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+ * @param {pentaho.type.Type} [baseType] - The base type of which returned instances must be an instance and,
+ * also, the default type used when type information is not available in `instRef`.
+ *
+ * @return {pentaho.type.Instance} An instance, or `null`
+ *
+ * @throws {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
+ * based on `instRef` and `baseType` is not specified.
+ *
+ * @throws {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
+ * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
+ *
+ * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+ * but it is not possible to determine the type to resolve against and `baseType` is not specified.
+ *
+ * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+ * but the corresponding "element type" is an anonymous type.
+ *
+ * @throws {pentaho.lang.OperationInvalidError} When the type of the resolved value is not a subtype of `baseType`.
+ *
+ * @throws {Error} Other errors, as documented in:
+ * [resolveType]{@link pentaho.type.ILoader#resolveType}  and
+ * [getInstanceOfType]{@link pentaho.type.ILoader#getInstanceOfType}.
+ *
+ * @see pentaho.type.ILoader#resolveInstanceAsync
+ * @see pentaho.type.Type#create
+ */
+
+/**
+ * Resolves an instance reference, asynchronously.
+ *
+ * This method can be used for:
+ *
+ * * creating a new instance - when given an [instance specification]{@link pentaho.type.spec.UInstance}
+ * * resolving instances by identifier or by type -
+ *   when given a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve}.
+ *
+ * @name resolveInstanceAsync
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
+ *
+ * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
+ * @param {pentaho.type.Type} [baseType] - The base type of which returned instances must be an instance and,
+ * also, the default type used when type information is not available in `instRef`.
+ *
+ * @return {!Promise.<pentaho.type.Instance>} A promise to an instance.
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
+ * based on `instRef` and `baseType` is not specified.
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
+ * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+ * but it is not possible to determine the type to resolve against and `baseType` is not specified.
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+ * but the corresponding "element type" is an anonymous type.
+ *
+ * @rejects {pentaho.lang.OperationInvalidError} When the type of the resolved value is not a subtype of `baseType`.
+ *
+ * @rejects {Error} Other errors, as documented in:
+ * [resolveType]{@link pentaho.type.ILoader#resolveType},
+ * [getInstanceOfTypeAsync]{@link pentaho.type.ILoader#getInstanceOfTypeAsync} and
+ * [getInstancesOfTypeAsync]{@link pentaho.type.ILoader#getInstancesOfTypeAsync}.
+ *
+ * @see pentaho.type.ILoader#resolveInstance
+ * @see pentaho.type.Type#createAsync
+ */
+
+/**
+ * Gets the highest ranking instance among the instances of the given type and that,
+ * optionally, match a specified filter.
+ *
+ * If it is not known whether all instances of the given type have already been loaded,
+ * the asynchronous method version, `getInstanceOfTypeAsync`,
+ * should be used instead.
+ *
+ * @name getInstanceOfType
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeRef - The identifier of the base type or
+ * the instance constructor or type of an *identified* type.
+ * @param {Object} [keyArgs] - The keyword arguments.
+ * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
+ * whether an instance can be the result.
+ * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there is no matching
+ * result.
+ *
+ * @return {pentaho.type.Instance} A matching loaded instance, or `null`.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidTypeError} When `baseTypeRef` is not a string,
+ * an `Instance` constructor or `Type` instance.
+ * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeRef` resolves to an anonymous type.
+ * @throws {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and there is no matching result.
+ *
+ * @see pentaho.type.ILoader#getInstanceOfTypeAsync
+ */
+
+/**
+ * Gets a promise for the highest ranking instance among the instances of the given type and that,
+ * optionally, match a specified filter.
+ *
+ * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeRef - The identifier of the base type or
+ * the instance constructor or type of an identified type.
+ *
+ * @param {Object} [keyArgs] - The keyword arguments.
+ * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
+ * whether an instance can be the result.
+ * @param {boolean} [keyArgs.isRequired=false] - Indicates that the promise should be rejected
+ * if there is no matching result.
+ *
+ * @return {!Promise.<pentaho.type.Instance>} A promise for: a matching instance or `null`.
+ *
+ * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeRef` is an empty string or {@link Nully}.
+ * @rejects {pentaho.lang.ArgumentInvalidTypeError} When `baseTypeRef` is not a string, an `Instance` constructor or
+ * `Type` instance.
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeRef` resolves to an anonymous type.
+ * @rejects {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and
+ * there is no matching result.
+ *
+ * @see pentaho.type.ILoader#getInstanceOfType
+ */
+
+/**
+ * Gets all of the instances of the given type that, optionally, match a specified filter.
+ *
+ * If it is not known whether all instances of the given type have already been loaded,
+ * the asynchronous method version, `getInstancesOfTypeAsync`,
+ * should be used instead.
+ *
+ * @name getInstancesOfType
+ * @memberOf pentaho.type.ILoader#
+ * @method
+ *
+ * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeRef - The identifier of the base type or
+ * the instance constructor or type of an *identified* type.
+ *
+ * @param {Object} [keyArgs] - The keyword arguments.
+ * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
+ * whether an instance can be part of the result.
+ * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there are no matching
+ * results.
+ *
+ * @return {!Array.<!pentaho.type.Instance>} An array of matching instances, possibly empty.
+ *
+ * @throws {pentaho.lang.ArgumentInvalidTypeError} When `baseTypeRef` is not a string, an `Instance` constructor or `Type` instance.
+ * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeRef` resolves to an anonymous type.
+ * @throws {pentaho.lang.OperationInvalidError} When there is no matching result and `keyArgs.isRequired` is `true`.
+ *
+ * @see pentaho.type.ILoader#getInstancesOfTypeAsync
+ */
+
+/**
+ * Gets a promise for all of the instances of the given type and that, optionally, match a specified filter.
+ *
+ * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeRef - The identifier of the base type or
+ * the instance constructor or type of an identified type.
+ *
+ * @param {Object} [keyArgs] - The keyword arguments.
+ * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
+ * whether an instance can be part of the result.
+ * @param {boolean} [keyArgs.isRequired=false] - Indicates that the promise should be rejected
+ * if there is no matching result.
+ *
+ * @return {!Promise.<Array.<!pentaho.type.Instance>>} A promise for an array of matching instances, possibly empty.
+ *
+ * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeRef` is an empty string or {@link Nully}.
+ * @rejects {pentaho.lang.ArgumentInvalidTypeError} When `baseTypeRef` is not a string, an `Instance` constructor or `Type` instance.
+ * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeRef` resolves to an anonymous type.
+ * @rejects {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and
+ * there are no matching results.
+ *
+ * @see pentaho.type.ILoader#getInstancesOfType
+ */
+// endregion

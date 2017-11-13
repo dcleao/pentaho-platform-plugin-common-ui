@@ -26,10 +26,11 @@ define([
   "pentaho/util/fun",
   "pentaho/util/text",
   "pentaho/util/spec",
+  "pentaho/util/module",
   "pentaho/i18n!types",
   "./theme/model"
 ], function(localRequire, baseLoader, SpecificationScope, SpecificationContext, typeUtil, Base,
-            error, arg, O, F, text, specUtil, bundle) {
+            error, arg, O, F, text, specUtil, moduleUtil, bundle) {
 
   "use strict";
 
@@ -452,7 +453,7 @@ define([
      * @see pentaho.type.Type#sourceId
      */
     buildSourceRelativeId: function(id) {
-      return typeUtil.__absolutizeDependencyOf(id, this.sourceId);
+      return moduleUtil.absolutizeIdRelativeToSibling(id, this.sourceId);
     },
 
     // -> nonEmptyString, Optional(null), Immutable, Shared (note: not Inherited)

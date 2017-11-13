@@ -35,7 +35,7 @@ define([
      * @alias Service
      * @memberOf pentaho.typeInfo.impl
      * @class
-     * @implements pentaho.typeInfo.IService
+     * @implements {pentaho.typeInfo.IService}
      * @private
      */
     constructor: function() {

@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+  "pentaho/type/impl/Loader"
+], function(Loader) {
 
-/**
- * The `spec.InstancesContainer` interface is the configuration of a
- * Type API [instances container]{@link pentaho.type.InstancesContainer}
- * and is part of a [spec.IContext]{@link pentaho.type.IContext} specification.
- *
- * An object whose keys are instance identifiers and whose values are instance declarations.
- *
- * @typedef {Object.<string, pentaho.type.spec.IInstanceConfiguration>} pentaho.type.spec.InstancesContainer
- */
+  "use strict";
+
+});

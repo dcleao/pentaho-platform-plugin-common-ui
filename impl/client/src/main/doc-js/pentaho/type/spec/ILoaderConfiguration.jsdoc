@@ -15,10 +15,10 @@
  */
 
 /**
- * The `spec.IContext` interface describes the configuration of a Type API [context]{@link pentaho.type.Context}.
+ * The `spec.ILoaderConfiguration` interface describes the configuration of a Type API [ILoader]{@link pentaho.type.ILoader}.
  *
  * The following is a sample [configuration rule set]{@link pentaho.config.spec.IRuleSet} that
- * configures the Type API context for the Analyzer application with the ranking of the hypothetical
+ * configures the main Type API loader for the Analyzer application with the ranking of the hypothetical
  * instance `"my/customSpecialService"`:
  *
  * ```json
@@ -27,7 +27,7 @@
  *     {
  *       "select": {
  *         "application": "pentaho-analyzer",
- *         "type": "pentaho/type/Context"
+ *         "type": "pentaho/type/loader"
  *       },
  *       "apply": {
  *         "instances": {
@@ -41,16 +41,16 @@
  * }
  * ```
  *
- * @name pentaho.type.spec.IContext
+ * @name pentaho.type.spec.ILoaderConfiguration
  * @interface
  *
- * @see pentaho.type.spec.InstancesContainer
+ * @see pentaho.type.ILoader
  */
 
 /**
- * The instances' container configuration of the context.
+ * The configuration of instances in this loader.
  *
  * @name instances
- * @memberOf pentaho.type.spec.IContext#
- * @type {pentaho.type.spec.InstancesContainer}
+ * @memberOf pentaho.type.spec.ILoaderConfiguration#
+ * @type {Object.<string, pentaho.type.spec.IInstanceConfiguration>}
  */

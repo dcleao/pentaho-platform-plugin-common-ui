@@ -34,7 +34,7 @@ define([
      * @alias Service
      * @memberOf pentaho.instanceInfo.impl
      * @class
-     * @implements pentaho.instanceInfo.IService
+     * @implements {pentaho.instanceInfo.IService}
      * @private
      */
     constructor: function() {
@@ -95,7 +95,7 @@ define([
     },
 
     /** @inheritDoc */
-    getAllByType: function(typeIdOrAlias, keyArgs) {
+    getAllOfType: function(typeIdOrAlias, keyArgs) {
 
       var instances = [];
 

@@ -38,8 +38,8 @@ define([
    * @memberOf pentaho.data
    * @class
    * @abstract
-   * @implements pentaho.lang.ISpecifiable
-   * @implements pentaho.data.ITable
+   * @implements {pentaho.lang.ISpecifiable}
+   * @implements {pentaho.data.ITable}
    * @amd pentaho/data/AbstractTable
    *
    * @classdesc The `AbstractTable` class is the abstract base class of

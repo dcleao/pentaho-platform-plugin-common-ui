@@ -43,9 +43,9 @@ define([
    *
    * @abstract
    *
-   * @implements pentaho.lang.IWithKey
-   * @implements pentaho.lang.IListElement
-   * @implements pentaho.lang.ICollectionElement
+   * @implements {pentaho.lang.IWithKey}
+   * @implements {pentaho.lang.IListElement}
+   * @implements {pentaho.lang.ICollectionElement}
    *
    * @classDesc The type of a property of a complex type.
    *

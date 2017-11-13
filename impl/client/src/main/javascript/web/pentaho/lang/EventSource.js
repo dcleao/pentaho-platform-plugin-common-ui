@@ -39,7 +39,7 @@ define([
    *
    * @name pentaho.lang.EventRegistrationHandle
    * @class
-   * @implements pentaho.lang.IEventRegistrationHandle
+   * @implements {pentaho.lang.IEventRegistrationHandle}
    * @private
    */
 
@@ -88,7 +88,7 @@ define([
    * @name EventSource
    * @memberOf pentaho.lang
    * @class
-   * @implements pentaho.lang.IEventSource
+   * @implements {pentaho.lang.IEventSource}
    * @amd pentaho/lang/EventSource
    *
    * @description This class was not designed to be constructed directly.

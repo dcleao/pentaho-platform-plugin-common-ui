@@ -301,11 +301,10 @@ define([
     describe("selecting", function() {
 
       describe("types", function() {
+        var configurationService;
 
-        var config;
-
-        beforeEach(function(done) {
-          var configurationService = new ConfigurationService();
+        beforeEach(function() {
+          configurationService = new ConfigurationService();
 
           configurationService.add({
             rules: [
@@ -327,29 +326,23 @@ define([
               }
             ]
           });
-
-          configurationService.getAsync()
-              .then(function(_config) {
-                config = _config;
-              })
-              .then(done, done.fail);
         });
 
         it("should return null if no rule applies to type", function() {
-          expect(config.selectType("C")).toBeNull();
+          expect(configurationService.selectType("C")).toBeNull();
         });
 
         it("should return config if rule applies to type", function() {
-          expect(config.selectType("A").testId).toEqual("A");
+          expect(configurationService.selectType("A").testId).toEqual("A");
         });
       });
 
       describe("instances", function() {
 
-        var config;
+        var configurationService;
 
-        beforeEach(function(done) {
-          var configurationService = new ConfigurationService();
+        beforeEach(function() {
+          configurationService = new ConfigurationService();
 
           configurationService.add({
             rules: [
@@ -379,111 +372,88 @@ define([
               }
             ]
           });
-
-          configurationService.getAsync()
-              .then(function(_config) {
-                config = _config;
-              })
-              .then(done, done.fail);
         });
 
         it("should return null if no rule applies to instance", function() {
-          expect(config.selectInstance("C")).toBeNull();
+          expect(configurationService.selectInstance("C")).toBeNull();
         });
 
         it("should return null if no rule applies to instance and there is a type with the same id", function() {
-          expect(config.selectInstance("D")).toBeNull();
+          expect(configurationService.selectInstance("D")).toBeNull();
         });
 
         it("should return config if rule applies to instance", function() {
-          expect(config.selectInstance("A").testId).toEqual("A");
+          expect(configurationService.selectInstance("A").testId).toEqual("A");
         });
       });
 
       describe("filtering", function() {
-        var configurationService;
-
-        beforeEach(function() {
-          configurationService = new ConfigurationService();
-
-          configurationService.add(
+        var ruleSet =  {
+          rules: [
             {
-              rules: [
-                {
-                  select: {
-                    type: "A",
-                    user: "1"
-                  },
-                  apply: {
-                    testId: "A1"
-                  }
-                },
-                {
-                  select: {
-                    type: "A",
-                    user: "2"
-                  },
-                  apply: {
-                    testId: "A2"
-                  }
-                },
-                {
-                  select: {
-                    type: "A",
-                    user: ["3", "4"]
-                  },
-                  apply: {
-                    testId: "A3"
-                  }
-                },
-                {
-                  select: {
-                    type: "A",
-                    user: ["4", "5"],
-                    theme: "white"
-                  },
-                  apply: {
-                    testId: "A4"
-                  }
-                },
-                {
-                  select: {
-                    type: "B"
-                  },
-                  apply: {
-                    testId: "B"
-                  }
-                }
-              ]
+              select: {
+                type: "A",
+                user: "1"
+              },
+              apply: {
+                testId: "A1"
+              }
+            },
+            {
+              select: {
+                type: "A",
+                user: "2"
+              },
+              apply: {
+                testId: "A2"
+              }
+            },
+            {
+              select: {
+                type: "A",
+                user: ["3", "4"]
+              },
+              apply: {
+                testId: "A3"
+              }
+            },
+            {
+              select: {
+                type: "A",
+                user: ["4", "5"],
+                theme: "white"
+              },
+              apply: {
+                testId: "A4"
+              }
+            },
+            {
+              select: {
+                type: "B"
+              },
+              apply: {
+                testId: "B"
+              }
             }
-          );
+          ]
+        };
+
+        it("should return null if no select rule applies to criteria", function() {
+          var configurationService = new ConfigurationService({user: "-1", theme: "white"});
+          configurationService.add(ruleSet);
+          expect(configurationService.selectType("A")).toBeNull();
         });
 
-        it("should return null if no select rule applies to criteria", function(done) {
-
-          configurationService.getAsync({user: "-1", theme: "white"})
-              .then(function(config) {
-                expect(config.selectType("A")).toBeNull();
-              })
-              .then(done, done.fail);
+        it("should return config if single-value select rule applies to criteria", function() {
+          var configurationService = new ConfigurationService({user: "2", theme: "white"});
+          configurationService.add(ruleSet);
+          expect(configurationService.selectType("A")).not.toBeNull();
         });
 
-        it("should return config if single-value select rule applies to criteria", function(done) {
-
-          configurationService.getAsync({user: "2", theme: "white"})
-              .then(function(config) {
-                expect(config.selectType("A")).not.toBeNull();
-              })
-              .then(done, done.fail);
-        });
-
-        it("should return config if multi-value select rule applies to criteria", function(done) {
-
-          configurationService.getAsync({user: "3", theme: "white"})
-              .then(function(config) {
-                expect(config.selectType("A")).not.toBeNull();
-              })
-              .then(done, done.fail);
+        it("should return config if multi-value select rule applies to criteria", function() {
+          var configurationService = new ConfigurationService({user: "3", theme: "white"});
+          configurationService.add(ruleSet);
+          expect(configurationService.selectType("A")).not.toBeNull();
         });
       });
     });
@@ -523,13 +493,7 @@ define([
 
         configurationService = new ConfigurationService();
 
-        configurationService.add(
-          {
-            rules: [
-              baseRule
-            ]
-          }
-        );
+        configurationService.add({rules: [baseRule]});
       });
 
       describe("default merge handlers", function() {
@@ -537,7 +501,7 @@ define([
 
         var config;
 
-        beforeEach(function(done) {
+        beforeEach(function() {
           otherRule = {
             select: {
               type: "test/type"
@@ -558,19 +522,9 @@ define([
             }
           };
 
-          configurationService.add(
-            {
-              rules: [
-                otherRule
-              ]
-            }
-          );
+          configurationService.add({rules: [otherRule]});
 
-          configurationService.getAsync()
-              .then(function(_config) {
-                config = _config.selectType("test/type");
-              })
-              .then(done, done.fail);
+          config = configurationService.selectType("test/type");
         });
 
         it("should replace the value of the simple value property", function() {
@@ -592,7 +546,6 @@ define([
           expect(config.arrayComplexValue[0].id).toBe("ALT_AC1");
           expect(config.arrayComplexValue[0].otherProp).toBeUndefined();
         });
-
       });
 
       describe("replace merge handler", function() {
@@ -600,7 +553,7 @@ define([
 
         var config;
 
-        beforeEach(function(done) {
+        beforeEach(function() {
           otherRule = {
             select: {
               type: "test/type"
@@ -633,19 +586,9 @@ define([
             }
           };
 
-          configurationService.add(
-            {
-              rules: [
-                otherRule
-              ]
-            }
-          );
+          configurationService.add({rules: [otherRule]});
 
-          configurationService.getAsync()
-              .then(function(_config) {
-                config = _config.selectType("test/type");
-              })
-              .then(done, done.fail);
+          config = configurationService.selectType("test/type");
         });
 
         it("should replace the value of the simple value property", function() {
@@ -667,7 +610,6 @@ define([
           expect(config.arrayComplexValue[0].id).toBe("ALT_AC1");
           expect(config.arrayComplexValue[0].otherProp).toBeUndefined();
         });
-
       });
 
       describe("merge merge handler", function() {
@@ -675,7 +617,7 @@ define([
 
         var config;
 
-        beforeEach(function(done) {
+        beforeEach(function() {
           otherRule = {
             select: {
               type: "test/type"
@@ -708,19 +650,9 @@ define([
             }
           };
 
-          configurationService.add(
-            {
-              rules: [
-                otherRule
-              ]
-            }
-          );
+          configurationService.add({rules: [otherRule]});
 
-          configurationService.getAsync()
-              .then(function(_config) {
-                config = _config.selectType("test/type");
-              })
-              .then(done, done.fail);
+          config = configurationService.selectType("test/type");
         });
 
         it("should replace the value of the simple value property", function() {
@@ -742,7 +674,6 @@ define([
           expect(config.arrayComplexValue[0].id).toBe("ALT_AC1");
           expect(config.arrayComplexValue[0].otherProp).toBeUndefined();
         });
-
       });
 
       describe("add merge handler", function() {
@@ -750,7 +681,7 @@ define([
 
         var config;
 
-        beforeEach(function(done) {
+        beforeEach(function() {
           otherRule = {
             select: {
               type: "test/type"
@@ -783,19 +714,9 @@ define([
             }
           };
 
-          configurationService.add(
-            {
-              rules: [
-                otherRule
-              ]
-            }
-          );
+          configurationService.add({rules: [otherRule]});
 
-          configurationService.getAsync()
-              .then(function(_config) {
-                config = _config.selectType("test/type");
-              })
-              .then(done, done.fail);
+          config = configurationService.selectType("test/type");
         });
 
         it("should replace the value of the simple value property", function() {
@@ -827,7 +748,6 @@ define([
           expect(config.arrayComplexValue[2].id).toBe("ALT_AC1");
           expect(config.arrayComplexValue[2].otherProp).toBeUndefined();
         });
-
       });
 
       describe("invalid merge handler", function() {
@@ -848,26 +768,14 @@ define([
             }
           };
 
-          configurationService.add(
-            {
-              rules: [
-                otherRule
-              ]
-            }
-          );
+          configurationService.add({rules: [otherRule]});
         });
 
-        it("should throw when merge operation is invalid", function(done) {
-
-          configurationService.getAsync()
-              .then(function(_config) {
-                expect(function() {
-                  config = _config.selectType("test/type");
-                }).toThrow(errorMatch.operInvalid());
-              })
-              .then(done, done.fail);
+        it("should throw when merge operation is invalid", function() {
+          expect(function() {
+            config = configurationService.selectType("test/type");
+          }).toThrow(errorMatch.operInvalid());
         });
-
       });
 
       describe("handling inconsistent types", function() {
@@ -877,7 +785,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -889,19 +797,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the array of simple values property", function() {
@@ -922,7 +820,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -934,19 +832,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -967,7 +855,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -979,19 +867,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1012,7 +890,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1024,19 +902,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1051,7 +919,6 @@ define([
               expect(config.complexValue[0].id).toBe("ALT_C1");
             });
           });
-
         });
 
         describe("replace merge handler", function() {
@@ -1060,7 +927,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1081,19 +948,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the array of simple values property", function() {
@@ -1114,7 +971,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1135,19 +992,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1168,7 +1015,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1189,19 +1036,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1222,7 +1059,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1243,19 +1080,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1270,7 +1097,6 @@ define([
               expect(config.complexValue[0].id).toBe("ALT_C1");
             });
           });
-
         });
 
         describe("merge merge handler", function() {
@@ -1279,7 +1105,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1300,19 +1126,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the array of simple values property", function() {
@@ -1333,7 +1149,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1354,19 +1170,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1387,7 +1193,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1408,19 +1214,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1441,7 +1237,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1462,19 +1258,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1498,7 +1284,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1519,19 +1305,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the array of simple values property", function() {
@@ -1552,7 +1328,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1573,19 +1349,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1615,7 +1381,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1636,19 +1402,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {
@@ -1669,7 +1425,7 @@ define([
 
             var config;
 
-            beforeEach(function(done) {
+            beforeEach(function() {
               otherRule = {
                 select: {
                   type: "test/type"
@@ -1690,19 +1446,9 @@ define([
                 }
               };
 
-              configurationService.add(
-                {
-                  rules: [
-                    otherRule
-                  ]
-                }
-              );
+              configurationService.add({rules: [otherRule]});
 
-              configurationService.getAsync()
-                  .then(function(_config) {
-                    config = _config.selectType("test/type");
-                  })
-                  .then(done, done.fail);
+              config = configurationService.selectType("test/type");
             });
 
             it("should replace the value of the simple value property", function() {

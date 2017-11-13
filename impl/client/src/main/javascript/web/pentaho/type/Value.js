@@ -32,7 +32,7 @@ define([
    * @name pentaho.type.Value.Type
    * @class
    * @extends pentaho.type.Type
-   * @implements pentaho.lang.ISpecifiable
+   * @implements {pentaho.lang.ISpecifiable}
    *
    * @classDesc The base type class of value types.
    *
@@ -47,8 +47,8 @@ define([
    * @abstract
    * @class
    * @extends pentaho.type.Instance
-   * @implements pentaho.lang.IConfigurable
-   * @implements pentaho.lang.ISpecifiable
+   * @implements {pentaho.lang.IConfigurable}
+   * @implements {pentaho.lang.ISpecifiable}
    * @amd {pentaho.type.spec.UTypeModule<pentaho.type.Value>} pentaho/type/value
    *
    * @classDesc The base, abstract class of [instances]{@link pentaho.type.Instance} which

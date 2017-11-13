@@ -27,7 +27,33 @@ define([
   "pentaho/util/fun",
   "pentaho/util/promise",
   "pentaho/util/error"
-], function(localRequire, module, Base, SpecificationScope, SpecificationContext, typeUtil,
+],
+// While the {typeof A} syntax is recognized by IntelliJ, eslint and jsdoc3 do not recognize it.
+// see https://github.com/jsdoc3/jsdoc/issues/1349
+// see https://youtrack.jetbrains.com/issue/WEB-17325
+// see https://stackoverflow.com/questions/33150924/jsdoc-es6-and-param-constructor
+//
+// eslint-disable-next-line valid-jsdoc
+/**
+ * Constructs an `pentaho.type.impl.Loader` class.
+ * @ignore
+ * @param {require} localRequire - The AMD module contextual `require` function.
+ * @param {module} module - The AMD module object.
+ * @param {typeof pentaho.lang.Base} Base - The Base class.
+ * @param {typeof pentaho.type.SpecificationScope} SpecificationScope - The `SpecificationScope` class.
+ * @param {typeof pentaho.type.SpecificationContext} SpecificationContext - The `SpecificationContext` class.
+ * @param {typeof pentaho.type.util} typeUtil - The type utility.
+ * @param {typeof pentaho.typeInfo.service} typeInfo - The type information service.
+ * @param {typeof pentaho.instanceInfo.service} instanceInfo - The instance information service.
+ * @param {typeof pentaho.lang.SortedList} SortedList - The `SortedList` class.
+ * @param {typeof pentaho.util.object} O - The object utility.
+ * @param {typeof pentaho.util.fun} F - The function utility.
+ * @param {typeof pentaho.util.promise} promiseUtil - The promise utility.
+ * @param {typeof pentaho.util.error} error - The error utility.
+ *
+ * @return {typeof pentaho.type.impl.Loader} The `Loader` class.
+ */
+function(localRequire, module, Base, SpecificationScope, SpecificationContext, typeUtil,
             typeInfo, instanceInfo, SortedList, O, F, promiseUtil, error) {
 
   "use strict";
@@ -37,8 +63,6 @@ define([
   var DEFAULT_BASE_TYPE = "pentaho/type/Complex";
   var INSTANCE_TYPE = "pentaho/type/Instance";
 
-  var O_hasOwn = Object.prototype.hasOwnProperty;
-
   var __nextInstanceIndex = 1;
 
   var __Instance = null;
@@ -46,13 +70,41 @@ define([
   var __Number = null;
   var __Boolean = null;
 
+  /**
+   * @name pentaho.type.impl.IInstanceInfo
+   * @interface
+   * @private
+   *
+   * @property {string} id - The instance's identifier.
+   * @property {number} index - The instance registration index.
+   * @property {string} typeId - The identifier of the instance's type.
+   * @property {number} ranking - The ranking of the instance.
+   * An instance with a higher rank is given before one with a lower rank.
+   */
+
   var Loader = Base.extend(module.id, /** @lends pentaho.type.impl.Loader# */ {
+
     // region Initialization
+
+    /**
+     * @classDesc The `ILoader` implementation.
+     *
+     * @alias Loader
+     * @memberOf pentaho.type.impl
+     *
+     * @class
+     * @extends pentaho.lang.Base
+     * @implements {pentaho.type.ILoader}
+     *
+     * @constructor
+     * @description Creates an instance.
+     * @param {pentaho.type.spec.ILoaderConfiguration} [config] - The loader configuration.
+     */
     constructor: function(config) {
       /**
-       * Map of instance infos by instance identifier.
+       * Map of `InstanceInfo` by instance identifier.
        *
-       * @type {!Object.<string, InstanceInfo>}
+       * @type {!Object.<string, pentaho.type.impl.IInstanceInfo>}
        * @private
        * @readOnly
        */
@@ -61,75 +113,88 @@ define([
       /**
        * Map from type id to a list of instance infos.
        *
-       * @type {!Object.<string, Array.<InstanceInfo>>}
+       * @type {!Object.<string, Array.<pentaho.type.impl.IInstanceInfo>>}
        * @private
        * @readonly
        */
       this.__instancesByType = Object.create(null);
 
-      this.__importKnownInstances(config);
+      /* At the moment, only instances have a loader configuration.
+       * However, it would also make sense for types to have a loader ranking.
+       */
+
+      this.__importKnownInstances(config && config.instances);
     },
 
+    /**
+     * Imports instances of subtypes of `pentaho.type.Instance` which are
+     * declared with the Instance Info API, at this time.
+     *
+     * Its configuration for this loader, if any, as provided in `config`,
+     * is used to configure the instance with this loader.
+     *
+     * @param {Object.<string, pentaho.type.spec.ILoaderInstanceConfiguration>} config - A map of
+     * instance configurations by instance identifier.
+     *
+     * @private
+     */
     __importKnownInstances: function(config) {
       // We need to know the type of the instances.
       // So only those registered with instanceInfo are recognized and searched for in config.
-      var instanceIds = instanceInfo.getAllByType(INSTANCE_TYPE, {includeDescendants: true});
+      var instanceIds = instanceInfo.getAllOfType(INSTANCE_TYPE, {includeDescendants: true});
       if(instanceIds) {
         instanceIds.forEach(function(instanceId) {
           var typeId = instanceInfo.getTypeOf(instanceId);
-          var instanceDecl = O.getOwn(config, instanceId);
+          var instanceConfig = O.getOwn(config, instanceId);
 
-          this.__importKnownInstance(instanceId, typeId, instanceDecl);
+          this.__importKnownInstance(instanceId, typeId, instanceConfig);
         }, this);
       }
     },
 
-    __importKnownInstance: function(id, typeId, instanceDecl) {
+    /**
+     * Import an instance of a subtype of `pentaho.type.Instance`,
+     * given its id, type id and loader configuration.
+     *
+     * Its configuration for this loader, if any, as provided in `instanceConfig`,
+     * is used to configure the instance with this loader.
+     *
+     * @param {string} id - The instance identifier.
+     * @param {string} typeId - The instance's type identifier.
+     * @param {pentaho.type.spec.ILoaderInstanceConfiguration} instanceConfig - The instance configuration
+     * for this loader.
+     *
+     * @private
+     */
+    __importKnownInstance: function(id, typeId, instanceConfig) {
 
       if(O.getOwn(this.__instanceById, id))
         throw error.argInvalid("id", "An instance with identifier '" + id + "' is already defined.");
 
-      var info = {
+      var info = /** @type pentaho.type.impl.IInstanceInfo */{
         id: id,
         index: __nextInstanceIndex++,
         typeId: typeInfo.getIdOf(typeId) || typeId,
-        ranking: (instanceDecl && +instanceDecl.ranking) || 0
+        ranking: (instanceConfig && +instanceConfig.ranking) || 0
       };
 
       this.__instanceById[info.id] = info;
 
       var infos = (this.__instancesByType[info.typeId] ||
-          (this.__instancesByType[info.typeId] = new SortedList({comparer: __infoComparer})));
+          (this.__instancesByType[info.typeId] = new SortedList({comparer: __instanceInformationComparer})));
 
       infos.push(info);
     },
     // endregion
 
     // region Type methods
-    /**
-     * Registers a type dynamically, given its instance constructor.
-     *
-     * The type is dynamically
-     * registered with the [type info service]{@link pentaho.typeInfo.service} and
-     * defined as an AMD module.
-     *
-     * Optionally, any existing configuration can be applied to the type.
-     *
-     * A type registered this way can be later resolved. The first resolution can be synchronous.
-     *
-     * @param {!Class.<pentaho.type.Instance>} InstCtor - The instance constructor of the type.
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {boolean} [keyArgs.configure=false] - Indicates that any existing configuration
-     * should be applied to the type.
-     *
-     * @return {!Promise.<Class.<pentaho.type.Instance>>} A promise for the given instance constructor.
-     */
+    /** @inheritDoc */
     registerTypeAsync: function(InstCtor, keyArgs) {
 
       var id = InstCtor.type.id;
 
       // 1. Register in type info.
-      __registerTypeInTypeInfo(InstCtor.type);
+      __registerTypeWithTypeInfoApi(InstCtor.type);
 
       // 2. Define the AMD module.
       if(O.getOwn(keyArgs, "configure", false)) {
@@ -149,104 +214,12 @@ define([
       return promiseUtil.require(id, localRequire);
     },
 
-    /**
-     * Resolves a type reference and returns its instance constructor.
-     *
-     * For more information on the `typeRef` argument,
-     * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
-     *
-     * If it is not known whether all types that are referenced by identifier have already been loaded,
-     * the asynchronous method version, [getAsync]{@link pentaho.type.Type.getAsync},
-     * should be used instead.
-     *
-     * @see pentaho.type.Type.getAsync
-     *
-     * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
-     * @param {Object} [keyArgs] The keyword arguments.
-     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
-     * of `typeRef` when it is an immediate generic object specification.
-     *
-     * @return {!Class.<pentaho.type.Instance>} The instance constructor.
-     *
-     * @throws {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
-     * not a string, function, array or object.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is a type constructor
-     * (e.g. [Type]{@link pentaho.type.Type})
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance.
-     *
-     * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system
-     * (specified directly in `typeRef`, or present in an generic type specification).
-     *
-     * @throws {Error} When an identifier is of a module that the AMD module system
-     * has not loaded yet (specified directly in `typeRef`, or present in an generic type specification).
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
-     * list type specification that has more than one child element type specification.
-     */
+    /** @inheritDoc */
     resolveType: function(typeRef, keyArgs) {
       return this.__resolveType(typeRef, O.getOwn(keyArgs, "defaultBase"), true);
     },
 
-    /**
-     * Resolves a type reference, asynchronously, and returns a promise that
-     * resolves to type's instance constructor.
-     *
-     * For more information on the `typeRef` argument,
-     * see [UTypeReference]{@link pentaho.type.spec.UTypeReference}.
-     *
-     * This method can be used even if a generic type specification references types
-     * whose modules have not yet been loaded by the AMD module system.
-     *
-     * @see pentaho.type.ILoader#resolveType
-     *
-     * @example
-     * <caption>
-     *   Getting an instance constructor, <b>asynchronously</b>.
-     * </caption>
-     *
-     * require(["pentaho/type/loader"], function(loader) {
-     *
-     *   loader.getAsync("my/viz/chord").then(function(VizChordModel) {
-     *
-     *     var model = new VizChordModel({outerRadius: 200});
-     *
-     *     // ...
-     *   });
-     * });
-     *
-     * @param {!pentaho.type.spec.UTypeReference} typeRef - A type reference.
-     * @param {Object} [keyArgs] The keyword arguments.
-     * @param {pentaho.type.spec.UTypeReference} [keyArgs.defaultBase] The default base type
-     * of `typeRef` when it is an immediate generic object specification.
-     *
-     * @return {!Promise.<!Class.<pentaho.type.Instance>>} A promise for the instance constructor.
-     *
-     * @rejects {pentaho.lang.ArgumentRequiredError} When `typeRef` is an empty string or {@link Nully}.
-     *
-     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is of an unsupported JavaScript type:
-     * not a string, function, array or object.
-     *
-     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is a type constructor
-     * (e.g. [Type]{@link pentaho.type.Type})
-     *
-     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance.
-     *
-     * @rejects {Error} When the identifier of a type is not defined as a module in the AMD module system
-     * (specified directly in `typeRef`, or present in an generic type specification).
-     *
-     * @rejects {pentaho.lang.OperationInvalidError} When the value returned by a factory function is not
-     * an instance constructor of a subtype of `Instance`
-     * (specified directly in `typeRef`, or obtained indirectly by loading a type's module given its identifier).
-     *
-     * @rejects {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, a list type specification
-     * with an invalid structure.
-     *
-     * @rejects {Error} When any other unexpected error occurs.
-     */
+    /** @inheritDoc */
     resolveTypeAsync: function(typeRef, keyArgs) {
       try {
         return this.__resolveType(typeRef, O.getOwn(keyArgs, "defaultBase"), false);
@@ -256,46 +229,7 @@ define([
       }
     },
 
-    /**
-     * Gets the instance constructors of all of the types which are known to be subtypes of a given base type.
-     *
-     * This method is a synchronous version of {@link pentaho.type.ILoader#getSubtypesOfAsync}
-     *
-     * If it is not known whether all known subtypes of `baseTypeId` have already been loaded,
-     * the asynchronous method version, `getSubtypesOfAsync`,
-     * should be used instead.
-     *
-     * @example
-     * <caption>
-     *   Getting all browsable subtypes of <code>"my/component"</code>.
-     * </caption>
-     *
-     * require(["pentaho/type/loader"], function(loader) {
-     *
-     *   var ComponentModels = loader.getSubtypesOf("my/component", {isBrowsable: true});
-     *
-     *   ComponentModels.forEach(function(ComponentModel) {
-     *     console.log("Will display menu entry for: " + ComponentModel.type.label);
-     *   });
-     * });
-     *
-     * @param {string} baseTypeId - The identifier of the base type.
-     * @param {object} [keyArgs] Keyword arguments.
-     * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
-     *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
-     * @param {?boolean} [keyArgs.isAbstract=null] - Indicates that only types with the specified
-     *   [isAbstract]{@link pentaho.type.Value.Type#isAbstract} value are returned.
-     *
-     * @return {!Array.<Class.<pentaho.type.Value>>} An array of instance constructors.
-     *
-     * @throws {Error} When the identifier of a type is not defined as a module in the AMD module system.
-     * @throws {Error} When the identifier of a **non-standard type** is from a module that the AMD module system
-     * has not loaded yet.
-     *
-     * @see pentaho.type.ILoader#getSubtypesOfAsync
-     * @see pentaho.type.ILoader#resolveType
-     * @see pentaho.type.ILoader#resolveTypeAsync
-     */
+    /** @inheritDoc */
     getSubtypesOf: function(baseTypeId, keyArgs) {
       if(!baseTypeId) throw error.argRequired("baseTypeId");
 
@@ -318,39 +252,7 @@ define([
       return InstCtors;
     },
 
-    /**
-     * Gets a promise for the instance constructors of
-     * all of the types which are known to be subtypes of a given base type.
-     *
-     * Any errors that occur result in a rejected promise.
-     *
-     * @example
-     * <caption>
-     *   Getting all browsable subtypes of <code>"my/component"</code>.
-     * </caption>
-     *
-     * require(["pentaho/type/loader"], function(loader) {
-     *
-     *   loader.getSubtypesOfAsync("my/component", {isBrowsable: true})
-     *     .then(function(ComponentModels) {
-     *       ComponentModels.forEach(function(ComponentModel) {
-     *         console.log("Will display menu entry for: " + ComponentModel.type.label);
-     *       });
-     *     });
-     * });
-     *
-     * @param {string} baseTypeId - The identifier of the base type.
-     * @param {object} [keyArgs] Keyword arguments.
-     * @param {?boolean} [keyArgs.isBrowsable=null] - Indicates that only types with the specified
-     *   [isBrowsable]{@link pentaho.type.Value.Type#isBrowsable} value are returned.
-     * @param {?boolean} [keyArgs.isAbstract=null] - Indicates that only types with the specified
-     *   [isAbstract]{@link pentaho.type.Value.Type#isAbstract} value are returned.
-     *
-     * @return {Promise.<Array.<Class.<pentaho.type.Instance>>>} A promise for an array of instance constructors.
-     *
-     * @see pentaho.type.ILoader#resolveType
-     * @see pentaho.type.ILoader#resolveTypeAsync
-     */
+    /** @inheritDoc */
     getSubtypesOfAsync: function(baseTypeId, keyArgs) {
       try {
         if(!baseTypeId) return Promise.resolve(error.argRequired("baseTypeId"));
@@ -512,12 +414,25 @@ define([
       return promiseUtil["return"](fun, sync);
     },
 
-    /*
+    /**
+     * Resolves a type given by an array-shorthand specification.
+     *
      * Example: a list of complex type elements
      *
      *  [{props: { ...}}]
      *  <=>
      *  {base: "list", of: {props: { ...}}}
+     *
+     * @param {Array} typeSpec - The list specification.
+     * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+     *   returns the instance constructor; while, when async, returns a promise for it.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is, or contains, an array-shorthand,
+     * list type specification that has more than one child element type specification.
+     *
+     * @private
      */
     __resolveTypeByListSpec: function(typeSpec, sync) {
 
@@ -531,18 +446,35 @@ define([
       return this.__resolveTypeByObjectSpec({base: "list", of: elemTypeSpec}, null, sync);
     },
 
-    __resolveTypeByObject: function(typeSpec, defaultBase, sync) {
+    /**
+     * Resolves a type given by an object: either a type object or
+     * a generic object specification.
+     *
+     * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
+     * @param {pentaho.type.spec.UTypeReference} defaultBase - The default base type
+     * of `typeRef` when it is a generic object specification.
+     *
+     * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+     *   returns the instance constructor; while, when async, returns a promise for it.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeRef` is an instance of `pentaho.type.Instance`.
+     *
+     * @private
+     */
+    __resolveTypeByObject: function(typeRef, defaultBase, sync) {
 
-      if(typeSpec.constructor !== Object) {
+      if(typeRef.constructor !== Object) {
 
         var Instance = __getInstanceClass();
 
         // An instance of Type ?
-        if(typeSpec instanceof Instance.Type) {
-          return promiseUtil["return"](typeSpec.instance.constructor, sync);
+        if(typeRef instanceof Instance.Type) {
+          return promiseUtil["return"](typeRef.instance.constructor, sync);
         }
 
-        if(typeSpec instanceof Instance) {
+        if(typeRef instanceof Instance) {
           return promiseUtil.error(
               error.argInvalid("typeRef", "Instances are not supported as type references."), sync);
         }
@@ -551,10 +483,40 @@ define([
             error.argInvalid("typeRef", "Object is not a 'pentaho.type.Type' instance or a plain object."), sync);
       }
 
-      return this.__resolveTypeByObjectSpec(typeSpec, defaultBase, sync);
+      return this.__resolveTypeByObjectSpec(typeRef, defaultBase, sync);
     },
 
-    // Inline type spec: {[base: "complex"], [id: "_:1"]}
+    /**
+     * Resolves a type given a generic object specification of it.
+     *
+     * If the type specification contains an identifier,
+     * then it must be a temporary identifier, and one which is not yet registered
+     * with the ambient specification context.
+     *
+     * Example generic object type specification:
+     *
+     * ```json
+     * {
+     *   "id": "_:1",
+     *   "base": "complex",
+     *   ...
+     * }
+     * ```
+     *
+     * @param {!pentaho.type.spec.ITypeProto} typeSpec - A type specification.
+     * @param {pentaho.type.spec.UTypeReference} defaultBase - The default base type.
+     * @param {boolean} [sync=false] Whether to perform a synchronous resolve.
+     *
+     * @return {!Promise.<!Class.<pentaho.type.Instance>>|!Class.<pentaho.type.Instance>} When sync,
+     *   returns the instance constructor; while, when async, returns a promise for it.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeSpec` has a permanent identifier.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `typeSpec` has a temporary identifier
+     * which is already defined.
+     *
+     * @private
+     */
     __resolveTypeByObjectSpec: function(typeSpec, defaultBase, sync) {
 
       var temporaryId = typeSpec.id || null;
@@ -582,21 +544,35 @@ define([
       }
 
       // Get the referenced dependencies first and only then create the type.
-      return this.__getTypeSpecDependenciesAsync(typeSpec).then(function() {
+      return this.__loadTypeDependenciesAsync(typeSpec).then(function() {
         return this.__createTypeByObjectSpec(temporaryId, typeSpec, defaultBase);
       }.bind(this));
     },
 
-    // Creates a type once its dependencies have been resolved.
-    // Note the switch to sync mode here, whatever the outer `sync` value.
-    // Only the outermost __resolveTypeByObjectSpec call may be async.
-    // All following "reentries" will be sync.
-    // So, it works to use the above introduced ambient specification context to
-    // handle all contained temporary ids.
+    /**
+     * Synchronously creates a type with a given temporary identifier,
+     * generic object reference and default base type.
+     *
+     * All dependencies must have been loaded.
+     *
+     * Ensures that an ambient specification context exists,
+     * creating one if not.
+     *
+     * Note the switch to sync mode here, whatever the outer `sync` value.
+     * Only the outermost __resolveTypeByObjectSpec call may be async.
+     * All types created within a root type given by a generic object type specification
+     * will use the ambient specification context installed by it.
+     *
+     * @param {?string} temporaryId - The temporary identifier of the type, if any.
+     * @param {!pentaho.type.spec.ITypeProto} typeSpec - A type specification.
+     * @param {pentaho.type.spec.UTypeReference} [defaultBase] - The default base type.
+     *
+     * @return {!pentaho.type.Instance} The type's instance constructor.
+     *
+     * @private
+     */
     __createTypeByObjectSpec: function(temporaryId, typeSpec, defaultBase) {
 
-      // A root generic type spec initiates a specification context.
-      // Each root generic type spec has a separate specification context.
       return O.using(new SpecificationScope(), function(specScope) {
 
         // Resolve the base type.
@@ -616,52 +592,24 @@ define([
       }, this);
     },
 
-    __getTypeSpecDependenciesAsync: function(typeSpec) {
-      return __getSpecDependenciesAsync(this, typeSpec, __eachTypeSpecDependencies);
+    /**
+     * Gets a promise for the completion of the loading of all type or instance dependencies
+     * present in a given type reference.
+     *
+     * @param {pentaho.type.spec.UTypeReference} typeRef - The type reference.
+     *
+     * @return {!Promise} The promise for all dependencies.
+     *
+     * @private
+     */
+    __loadTypeDependenciesAsync: function(typeRef) {
+      return __loadDependenciesAsync(this, typeRef, __eachTypeDependency);
     },
     // endregion
 
-    // region getInstance* methods
-    /**
-     * Resolves an instance reference.
-     *
-     * This method can be used for:
-     *
-     * * creating a new instance - when given an [instance specification]{@link pentaho.type.spec.UInstance}
-     * * resolving instances from the instances' container -
-     *   when given a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve}.
-     *
-     * @param {pentaho.type.spec.UInstanceReference} [instRef] - An instance reference.
-     *
-     * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
-     * @param {pentaho.type.Type} [typeBase] - The base type of which returned instances must be an instance and,
-     * also, the default type used when type information is not available in `instRef`.
-     *
-     * @return {pentaho.type.Instance} An instance, or `null`
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
-     * based on `instRef` and `baseType` is not specified.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
-     * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
-     * but it is not possible to determine the type to resolve against and `baseType` is not specified.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
-     * but the corresponding "element type" is an anonymous type.
-     *
-     * @throws {pentaho.lang.OperationInvalidError} When the type of the resolved value is not a subtype of `typeBase`.
-     *
-     * @throws {Error} Other errors, as documented in:
-     * [Type.get]{@link pentaho.type.Type.get},
-     * [getById]{@link pentaho.type.Instance.getById} and
-     * [getByType]{@link pentaho.type.Instance.getByType}.
-     *
-     * @see pentaho.type.Instance.getAsync
-     * @see pentaho.type.Type#create
-     */
-    resolveInstance: function(instRef, instKeyArgs, typeBase) {
+    // region Instance methods
+    /** @inheritDoc */
+    resolveInstance: function(instRef, instKeyArgs, baseType) {
 
       var InstCtor;
       var typeRef;
@@ -672,7 +620,7 @@ define([
 
         // 1. A special instance
         if(instRef.$instance) {
-          return this.__getInstanceSpecial(instRef.$instance, instKeyArgs, typeBase, /* sync: */ true);
+          return this.__getInstanceSpecial(instRef.$instance, instKeyArgs, baseType, /* sync: */ true);
         }
 
         // 2. Type in inline type property {_: "type"}
@@ -681,16 +629,16 @@ define([
           InstCtor = this.resolveType(typeRef);
 
           var type = InstCtor.type;
-          if(typeBase) typeBase.__assertSubtype(type);
+          if(baseType) baseType.__assertSubtype(type);
 
           if(type.isAbstract) { type.__throwAbstractType(); }
         }
       }
 
       // 3. Default the type from one of String, Number, or Boolean,
-      //    if one of these is the type of `instRef` and typeBase is respected.
+      //    if one of these is the type of `instRef` and baseType is respected.
       if(!InstCtor) {
-        if(!typeBase || typeBase.isAbstract) {
+        if(!baseType || baseType.isAbstract) {
 
           /* eslint default-case: 0 */
           switch(typeof instRef) {
@@ -700,13 +648,13 @@ define([
           }
 
           // Must still respect the base type.
-          if(InstCtor && typeBase && !InstCtor.type.isSubtypeOf(typeBase)) {
+          if(InstCtor && baseType && !InstCtor.type.isSubtypeOf(baseType)) {
             InstCtor = null;
           }
 
           if(!InstCtor) {
-            if(typeBase) {
-              typeBase.__throwAbstractType();
+            if(baseType) {
+              baseType.__throwAbstractType();
             } else {
               throw error.operInvalid("Cannot create instance of unspecified type.");
             }
@@ -714,7 +662,7 @@ define([
 
           // These types are never abstract
         } else {
-          InstCtor = typeBase.instance.constructor;
+          InstCtor = baseType.instance.constructor;
         }
       }
 
@@ -723,6 +671,31 @@ define([
       return new InstCtor(instRef, instKeyArgs);
     },
 
+    /**
+     * Gets the instance denoted by a given instance resolve specification.
+     *
+     * @param {pentaho.type.spec.IInstanceResolve} specialSpec - An instance resolve specification.
+     *
+     * @param {Object} instKeyArgs - The key arguments to pass a list constructor,
+     * when list instance is requested.
+     *
+     * @param {pentaho.type.spec.UTypeReference} typeDefault The default instance type,
+     * for when neither {@link pentaho.type.spec.IInstanceResolve#id} or
+     * {@link pentaho.type.spec.IInstanceResolve#type} are specified.
+     *
+     * @param {boolean} [sync=false] Whether to perform a synchronous get.
+     *
+     * @return {!Promise.<pentaho.type.Instance>|!pentaho.type.Instance} When sync,
+     *   returns an instance; while, when async, returns a promise for it.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+     * but it is not possible to determine the type to resolve against and `typeDefault` is not specified.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
+     * but the corresponding "element type" is an anonymous type.
+     *
+     * @private
+     */
     __getInstanceSpecial: function(specialSpec, instKeyArgs, typeDefault, sync) {
 
       var value;
@@ -814,31 +787,24 @@ define([
       return promiseUtil.error(error.operInvalid("Cannot resolve instance for an unspecified type."), sync);
     },
 
-    __getInstanceSpecDependenciesAsync: function(instSpec) {
-      return __getSpecDependenciesAsync(this, instSpec, __eachInstanceSpecDependencies);
+    /**
+     * Gets a promise for the completion of the loading of all type or instance dependencies
+     * present in a given instance reference.
+     *
+     * @param {pentaho.type.spec.UInstance} instRef - An instance reference.
+     *
+     * @return {!Promise} The promise for all dependencies.
+     *
+     * @private
+     */
+    __loadInstanceDependenciesAsync: function(instRef) {
+      return __loadDependenciesAsync(this, instRef, __eachInstanceDependency);
     },
 
-    /**
-     * Gets the highest ranking instance among the instances of the given type which are successfully loaded and
-     * that, optionally, match a specified filter.
-     *
-     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
-     * the instance constructor or type of an identified type.
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
-     * whether an instance can be the result.
-     * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there is no matching
-     * result.
-     *
-     * @return {pentaho.type.Instance} A matching loaded instance, or `null`.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
-     * an anonymous type.
-     * @throws {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and there is no matching result.
-     */
-    getInstanceOfType: function(baseTypeId, keyArgs) {
+    /** @inheritDoc */
+    getInstanceOfType: function(baseTypeRef, keyArgs) {
 
-      baseTypeId = __processInstanceType(baseTypeId);
+      var baseTypeId = __getInstanceBaseTypeId(baseTypeRef);
 
       var instanceInfos = this.__getInstanceInfos(baseTypeId);
       if(instanceInfos) {
@@ -861,27 +827,10 @@ define([
       return null;
     },
 
-    /**
-     * Gets all of the instances of the given type that, optionally, match a specified filter.
-     *
-     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
-     * the instance constructor or type of an identified type.
-     *
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
-     * whether an instance can be part of the result.
-     * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there are no matching
-     * results.
-     *
-     * @return {!Array.<!pentaho.type.Instance>} An array of matching instances, possibly empty.
-     *
-     * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
-     * an anonymous type.
-     * @throws {pentaho.lang.OperationInvalidError} When there is no matching result and `keyArgs.isRequired` is `true`.
-     */
-    getInstancesOfType: function(baseTypeId, keyArgs) {
+    /** @inheritDoc */
+    getInstancesOfType: function(baseTypeRef, keyArgs) {
 
-      baseTypeId = __processInstanceType(baseTypeId);
+      var baseTypeId = __getInstanceBaseTypeId(baseTypeRef);
 
       var instanceInfos = this.__getInstanceInfos(baseTypeId);
       if(instanceInfos) {
@@ -905,85 +854,29 @@ define([
       return [];
     },
 
-    /**
-     * Resolves an instance reference, asynchronously.
-     *
-     * This method can be used for:
-     *
-     * * creating a new instance - when given an [instance specification]{@link pentaho.type.spec.UInstance}
-     * * resolving instances by identifier or by type -
-     *   when given a [resolve instance specification]{@link pentaho.type.spec.IInstanceResolve}.
-     *
-     * @param {pentaho.type.spec.UInstanceReference} [instSpec] - An instance reference.
-     *
-     * @param {Object} [instKeyArgs] - The keyword arguments passed to the instance constructor, when one is created.
-     * @param {pentaho.type.Type} [typeBase] - The base type of which returned instances must be an instance and,
-     * also, the default type used when type information is not available in `instSpec`.
-     *
-     * @return {!Promise.<pentaho.type.Instance>} A promise to an instance.
-     *
-     * @rejects {pentaho.lang.OperationInvalidError} When it is not possible to determine the type of instance to create
-     * based on `instSpec` and `baseType` is not specified.
-     *
-     * @rejects {pentaho.lang.OperationInvalidError} When an instance should be created but its determined type
-     * is [abstract]{@link pentaho.type.Value.Type#isAbstract}.
-     *
-     * @rejects {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
-     * but it is not possible to determine the type to resolve against and `baseType` is not specified.
-     *
-     * @rejects {pentaho.lang.OperationInvalidError} When the special "resolve instance by type" syntax is used
-     * but the corresponding "element type" is an anonymous type.
-     *
-     * @rejects {pentaho.lang.OperationInvalidError} When the type of the resolved value is not a subtype of `typeBase`.
-     *
-     * @rejects {Error} Other errors, as documented in:
-     * [ILoader#resolveType]{@link pentaho.type.ILoader#resolveType},
-     * [ILoader#getDependencyAsync]{@link pentaho.type.ILoader#getDependencyAsync} and
-     * [ILoader#getInstanceByTypeAsync]{@link pentaho.type.ILoader#.getInstanceByTypeAsync}.
-     *
-     * @see pentaho.type.Type#createAsync
-     */
-    resolveInstanceAsync: function(instSpec, instKeyArgs, typeBase) {
+    /** @inheritDoc */
+    resolveInstanceAsync: function(instSpec, instKeyArgs, baseType) {
 
       if(instSpec && typeof instSpec === "object") {
 
         // A special $instance form
         if(instSpec.constructor === Object && instSpec.$instance) {
-          return this.__getInstanceSpecial(instSpec.$instance, instKeyArgs, typeBase, /* sync: */ false);
+          return this.__getInstanceSpecial(instSpec.$instance, instKeyArgs, baseType, /* sync: */ false);
         }
 
         // Follow the generic path of loading all found dependencies first and calling `resolveInstance` later.
-        return this.__getInstanceSpecDependenciesAsync(instSpec).then(getSync.bind(this));
+        return this.__loadInstanceDependenciesAsync(instSpec).then(getSync.bind(this));
       }
 
       // Behave asynchronously as requested.
       return promiseUtil.wrapCall(getSync, this);
 
       function getSync() {
-        return this.resolveInstance(instSpec, instKeyArgs, typeBase);
+        return this.resolveInstance(instSpec, instKeyArgs, baseType);
       }
     },
 
-    /**
-     * Gets a promise for the first instance of the given type and that, optionally, matches a specified filter.
-     *
-     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
-     * the instance constructor or type of an identified type.
-     *
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
-     * whether an instance can be the result.
-     * @param {boolean} [keyArgs.isRequired=false] - Indicates that the promise should be rejected
-     * if there is no matching result.
-     *
-     * @return {!Promise.<pentaho.type.Instance>} A promise for: a matching instance or `null`.
-     *
-     * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeId` is an empty string or {@link Nully}.
-     * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
-     * an anonymous type.
-     * @rejects {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and
-     * there is no matching result.
-     */
+    /** @inheritDoc */
     getInstanceOfTypeAsync: function(baseTypeId, keyArgs) {
       try {
         // Loads all instances of type and then filters.
@@ -995,26 +888,7 @@ define([
       }
     },
 
-    /**
-     * Gets a promise for all of the instances of the given type and that, optionally, match a specified filter.
-     *
-     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeId - The identifier of the base type or
-     * the instance constructor or type of an identified type.
-     *
-     * @param {Object} [keyArgs] - The keyword arguments.
-     * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
-     * whether an instance can be part of the result.
-     * @param {boolean} [keyArgs.isRequired=false] - Indicates that the promise should be rejected
-     * if there is no matching result.
-     *
-     * @return {!Promise.<Array.<!pentaho.type.Instance>>} A promise for an array of matching instances, possibly empty.
-     *
-     * @rejects {pentaho.lang.ArgumentRequiredError} When `baseTypeId` is an empty string or {@link Nully}.
-     * @rejects {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
-     * an anonymous type.
-     * @rejects {pentaho.lang.OperationInvalidError} When `keyArgs.isRequired` is `true` and
-     * there are no matching results.
-     */
+    /** @inheritDoc */
     getInstancesOfTypeAsync: function(baseTypeId, keyArgs) {
       try {
         return this.__getInstancesOfTypeAsync(baseTypeId, keyArgs);
@@ -1023,9 +897,42 @@ define([
       }
     },
 
-    __getInstancesOfTypeAsync: function(baseTypeId, keyArgs) {
+    /**
+     * Core method of `getInstanceOfTypeAsync` and `getInstancesOfTypeAsync`.
+     *
+     * 1. Gets the instance information of all instances of types which are subtypes
+     * of the given base type.
+     *
+     * 2. Obtains all instance modules through AMD.
+     *
+     * 3. Filters out instance modules that failed loading and which do not
+     *    satisfy the given `filter` function, if any.
+     *
+     * 4. Throws if keyArgs.isRequired and there are no results.
+     *
+     * Instances are returned sorted by ranking and then by registration order.
+     *
+     * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeRef - The identifier of the base type or
+     * the instance constructor or type of an *identified* type.
+     *
+     * @param {Object} [keyArgs] - The keyword arguments.
+     * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
+     * whether an instance can be part of the result.
+     * @param {boolean} [keyArgs.isRequired=false] - Indicates that an error should be thrown if there are no matching
+     * results.
+     *
+     * @return {!Promise.<pentaho.type.Instance[]>} A promise for an array of matching instances, possibly empty.
+     *
+     * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeId` is an instance constructor or type object of
+     * an anonymous type.
+     *
+     * @throws {pentaho.lang.OperationInvalidError} When there is no matching result and `keyArgs.isRequired` is `true`.
+     *
+     * @private
+     */
+    __getInstancesOfTypeAsync: function(baseTypeRef, keyArgs) {
 
-      baseTypeId = __processInstanceType(baseTypeId);
+      var baseTypeId = __getInstanceBaseTypeId(baseTypeRef);
 
       var promiseAll;
       var isRequired = O.getOwn(keyArgs, "isRequired");
@@ -1038,7 +945,7 @@ define([
 
           var promise = promiseUtil.require(instanceInfo.id, localRequire);
 
-          // Convert failed instances to null
+          // Convert failed instances to null.
           return promise["catch"](function() { return null; });
         }))
         .then(function(instances) {
@@ -1061,8 +968,20 @@ define([
       return promiseAll;
     },
 
-    // Infos are already sorted by ranking.
-    // It is assumed that the resulting array cannot be modified/made public.
+    /**
+     * Gets an array with instance information of all instances of types which are subtypes
+     * of the given base type.
+     *
+     * Infos are already sorted by ranking and then registration order.
+     *
+     * The resulting array cannot be modified/made public.
+     *
+     * @param {string} baseTypeId - The identifier of the base type.
+     *
+     * @return {pentaho.type.impl.IInstanceInfo[]} An array of instance information instances, or `null` if none.
+     *
+     * @private
+     */
     __getInstanceInfos: function(baseTypeId) {
 
       var instsByType = this.__instancesByType;
@@ -1078,7 +997,7 @@ define([
             // Don't modify a list stored in __instancesByType.
             if(!hasCloned) {
               hasCloned = true;
-              var infosClone = new SortedList({comparer: __infoComparer});
+              var infosClone = new SortedList({comparer: __instanceInformationComparer});
               infosClone.addMany(instanceInfos);
               instanceInfos = infosClone;
             }
@@ -1104,15 +1023,31 @@ define([
    * This must be obtained lazily, to break the cyclic dependency.
    * The `Loader` must be used from a context where `Instance` has been loaded.
    *
+   * @memberOf pentaho.type.impl.Loader~
+   *
    * @return {!Class.<pentaho.type.Instance>} The instance constructor.
+   *
+   * @private
    */
   function __getInstanceClass() {
     return __Instance || (__Instance = localRequire(INSTANCE_TYPE));
   }
 
-  // region get Type* support
-
-  function __registerTypeInTypeInfo(type) {
+  // region Type support
+  /**
+   * Registers a Type API type with the Type Information API.
+   *
+   * The type is registered with a base type which is its closest
+   * ancestor type which is identified.
+   * If the base type is not registered, the function is then called on it, recursively.
+   *
+   * @memberOf pentaho.type.impl.Loader~
+   *
+   * @param {!pentaho.type.Type} type - The type to register.
+   *
+   * @private
+   */
+  function __registerTypeWithTypeInfoApi(type) {
 
     var id = type.id;
 
@@ -1125,13 +1060,27 @@ define([
       }
 
       if(baseType !== null) {
-        __registerTypeInTypeInfo(baseType);
+        __registerTypeWithTypeInfoApi(baseType);
 
         typeInfo.declare(id, {base: baseType.id});
       }
     }
   }
 
+  /**
+   * Builds a function which filters type results for the getSubtypesOf* methods.
+   *
+   * @memberOf pentaho.type.impl.Loader~
+   *
+   * @param {Object} [keyArgs] - The keyword arguments.
+   * @param {?boolean} [keyArgs.isBrowsable] - The desired `isBrowsable` value.
+   * @param {?boolean} [keyArgs.isAbstract] - The desired `isAbstract` value.
+   *
+   * @return {?(function(!pentaho.type.Type) : boolean)} A function that returns `true` if the type is selected
+   * and returns `false`, otherwise; or `null`, if no keyword arguments were specified.
+   *
+   * @private
+   */
   function __buildGetSubtypesOfPredicate(keyArgs) {
     var filterSpec = null;
     if(keyArgs) {
@@ -1144,45 +1093,88 @@ define([
   }
   // endregion
 
-  // region get Instance* support
-  function __processInstanceType(baseTypeId) {
+  // region Instance support
+  /**
+   * Gets the identifier of an instance's base type, given a particular type of reference to it.
+   *
+   * @memberOf pentaho.type.impl.Loader~
+   *
+   * @param {string|Class.<pentaho.type.Instance>|pentaho.type.Type} baseTypeRef - The identifier of the base type or
+   * the instance constructor or type of an *identified* type.
+   *
+   * @return {string} The identifier of the given type.
+   *
+   * @throws {pentaho.lang.ArgumentRequiredError} When `baseTypeRef` is an empty string or {@link Nully}.
+   * @throws {pentaho.lang.ArgumentInvalidTypeError} When `baseTypeRef` is not a string,
+   * an `Instance` constructor or `Type` instance.
+   * @throws {pentaho.lang.ArgumentInvalidError} When `baseTypeRef` resolves to an anonymous type.
+   *
+   * @private
+   */
+  function __getInstanceBaseTypeId(baseTypeRef) {
 
-    if(!baseTypeId) throw error.argRequired("baseTypeId");
+    if(!baseTypeRef) throw error.argRequired("baseTypeRef");
 
-    switch(typeof baseTypeId) {
+    switch(typeof baseTypeRef) {
       case "string":
-        return baseTypeId;
+        return baseTypeRef;
 
       case "function":
-        if(baseTypeId.prototype instanceof __getInstanceClass()) {
-          return __validateTypeId(baseTypeId.type.id);
+        if(baseTypeRef.prototype instanceof __getInstanceClass()) {
+          return __validateInstanceBaseTypeId(baseTypeRef.type.id);
         }
         break;
 
       case "object":
-        if(baseTypeId instanceof __getInstanceClass().Type) {
-          return __validateTypeId(baseTypeId.id);
+        if(baseTypeRef instanceof __getInstanceClass().Type) {
+          return __validateInstanceBaseTypeId(baseTypeRef.id);
         }
         break;
     }
 
     throw error.argInvalidType(
-        "baseTypeId",
+        "baseTypeRef",
         ["string", "Class<pentaho.type.Instance>", "pentaho.type.Type"],
-        typeof baseTypeId);
+        typeof baseTypeRef);
   }
 
-  function __validateTypeId(baseTypeId) {
-    if(!baseTypeId) throw error.argInvalid("baseTypeId", "Type is anonymous.");
+  /**
+   * Validates the the given base type identifier is not `Nully`.
+   *
+   * @memberOf pentaho.type.impl.Loader~
+   *
+   * @param {?string} baseTypeId - A base type identifier.
+   *
+   * @return {string} The given identifier.
+   *
+   * @throws {pentaho.lang.ArgumentRequiredError} When `baseTypeId` is an empty string or {@link Nully}.
+   *
+   * @private
+   */
+  function __validateInstanceBaseTypeId(baseTypeId) {
+    if(!baseTypeId) throw error.argInvalid("baseTypeRef", "Type is anonymous.");
     return baseTypeId;
   }
 
+  /**
+   * Creates an error for when there are no instances of a given type.
+   *
+   * @memberOf pentaho.type.impl.Loader~
+   *
+   * @param {string} baseTypeId - The type identifier.
+   *
+   * @return {!pentaho.lang.OperationInvalidError} The error instance.
+   *
+   * @private
+   */
   function __createNoInstancesOfTypeError(baseTypeId) {
     return error.operInvalid("There is no defined matching instance of type '" + baseTypeId + "'.");
   }
 
   /**
-   * Gets a function which filters instance results.
+   * Builds a function which filters instance results.
+   *
+   * @memberOf pentaho.type.impl.Loader~
    *
    * @param {Object} [keyArgs] - The keyword arguments.
    * @param {function(!pentaho.type.Instance) : boolean} [keyArgs.filter] - A predicate function that determines
@@ -1190,6 +1182,7 @@ define([
    *
    * @return {function(!pentaho.type.Instance) : boolean} A function that returns `true` if the instance is selected
    * and returns `false`, otherwise.
+   *
    * @private
    */
   function __buildGetInstancePredicate(keyArgs) {
@@ -1202,35 +1195,53 @@ define([
   }
   // endregion
 
-  // region Spec Dependencies
-  function __getSpecDependenciesAsync(loader, spec, eachMethod) {
+  // region Ref Dependencies
+  /**
+   * Loads the dependencies of a given type or instance reference,
+   * using a given dependency enumerator method.
+   *
+   * Helper method of `__loadInstanceDependenciesAsync` and `__loadTypeDependenciesAsync`.
+   *
+   * @memberOf pentaho.type.impl.Loader~
+   *
+   * @param {!pentaho.type.ILoader} loader - The loader.
+   * @param {pentaho.type.spec.UTypeReference|pentaho.type.spec.UInstanceReference} reference -
+   * The type or instance reference.
+   * @param {function} eachMethod - One of `__eachTypeDependency` or `__eachInstanceDependency`.
+   *
+   * @return {!Promise} A promise that gets resolved when all dependencies have been loaded.
+   *
+   * @private
+   */
+  function __loadDependenciesAsync(loader, reference, eachMethod) {
 
     var depPromises = [];
     var depIdsSet = Object.create(null);
 
-    eachMethod(spec, collectDependency);
+    eachMethod(reference, collectDependency);
 
-    return Promise.all(depPromises);
+    return Promise.all(depPromises).then(function() { return null; });
 
-    function collectDependency(isTypeDep, depSpec) {
+    function collectDependency(isTypeDep, depRef) {
       if(isTypeDep) {
         // Assume type id string
-        if(!O_hasOwn.call(depIdsSet, depSpec)) {
-          depIdsSet[depSpec] = 1;
-          depPromises.push(loader.resolveTypeAsync(depSpec));
+        if(!O.hasOwn(depIdsSet, depRef)) {
+          depIdsSet[depRef] = 1;
+          depPromises.push(loader.resolveTypeAsync(depRef));
         }
       } else {
         // Assume special instance spec.
-        depPromises.push(loader.resolveInstanceAsync(depSpec));
+        depPromises.push(loader.resolveInstanceAsync(depRef));
       }
     }
   }
 
   /**
-   * Recursively collects the module ids of custom types used within a type specification.
+   * Calls `depFun` for each dependency of `typeRef`.
    *
    * @memberOf pentaho.type.impl.Loader#
-   * @param {pentaho.type.spec.ITypeProto} typeSpec - A type specification.
+   *
+   * @param {pentaho.type.spec.UTypeReference} typeRef - A type reference.
    *
    * @param {function(isTypeDep: boolean, depSpec: any)} depFun - A function that
    * is called for each dependency with two arguments,
@@ -1238,65 +1249,81 @@ define([
    * and the type or instance specification.
    *
    * @private
-   * @internal
    */
-  function __eachTypeSpecDependencies(typeSpec, depFun) {
-    if(!typeSpec) return;
+  function __eachTypeDependency(typeRef, depFun) {
+    if(!typeRef) return;
 
     /* eslint default-case: 0 */
-    switch(typeof typeSpec) {
+    switch(typeof typeRef) {
       case "string":
-        if(SpecificationContext.isIdTemporary(typeSpec)) return;
+        if(SpecificationContext.isIdTemporary(typeRef)) return;
 
         // A standard type that is surely loaded?
-        if(O_hasOwn.call(this.__byTypeId, typeSpec)) return;
+        if(O.hasOwn(this.__byTypeId, typeRef)) return;
 
-        depFun(typeSpec);
+        depFun(typeRef);
         return;
 
       case "object":
-        if(Array.isArray(typeSpec)) {
+        if(Array.isArray(typeRef)) {
           // Shorthand list type notation
           // Example: [{props: { ...}}]
-          if(typeSpec.length)
-            __eachTypeSpecDependencies(typeSpec[0], depFun);
+          if(typeRef.length) {
+            __eachTypeDependency(typeRef[0], depFun);
+          }
           return;
         }
 
-        __eachTypeSpecDependenciesGeneric(typeSpec, depFun);
+        if(typeRef.constructor === Object) {
+          __eachTypeDependencyGeneric(typeRef, depFun);
+        }
         return;
     }
   }
 
-  function __eachTypeSpecDependenciesGeneric(typeSpec, depFun) {
-    // TODO: this method only supports standard types deserialization.
+  /**
+   * Calls `depFun` for each dependency of a generic object specification of a type, `typeSpec`.
+   *
+   * @memberOf pentaho.type.impl.Loader#
+   *
+   * @param {pentaho.type.spec.ITypeProto} typeSpec - A generic object type specification.
+   *
+   * @param {function(isTypeDep: boolean, depSpec: any)} depFun - A function that
+   * is called for each dependency with two arguments,
+   * a boolean that indicates if the dependency is a type or an instance,
+   * and the type or instance specification.
+   *
+   * @private
+   */
+  function __eachTypeDependencyGeneric(typeSpec, depFun) {
+    // TODO: this method only supports deserialization of standard types.
     //   Custom types with own type attributes would need special handling.
     //   Something like a two phase protocol?
 
     // {[base: "complex", ] [of: "..."] , [props: []]}
-    __eachTypeSpecDependencies(typeSpec.base, depFun);
+    __eachTypeDependency(typeSpec.base, depFun);
 
-    __eachTypeSpecDependencies(typeSpec.of, depFun);
+    __eachTypeDependency(typeSpec.of, depFun);
 
     var props = typeSpec.props;
     if(props) {
       if(Array.isArray(props)) {
         props.forEach(function(propSpec) {
           if(propSpec) {
-            __eachInstanceSpecDependencies(propSpec.defaultValue, depFun);
+            __eachInstanceDependency(propSpec.defaultValue, depFun);
 
-            __eachTypeSpecDependencies(propSpec.valueType, depFun);
-            __eachTypeSpecDependencies(propSpec.base, depFun);
+            __eachTypeDependency(propSpec.valueType, depFun);
+            __eachTypeDependency(propSpec.base, depFun);
           }
         });
       } else {
         Object.keys(props).forEach(function(propName) {
           var propSpec = props[propName];
           if(propSpec) {
-            __eachInstanceSpecDependencies(propSpec.defaultValue, depFun);
+            __eachInstanceDependency(propSpec.defaultValue, depFun);
 
-            __eachTypeSpecDependencies(propSpec.valueType, depFun);
-            __eachTypeSpecDependencies(propSpec.base, depFun);
+            __eachTypeDependency(propSpec.valueType, depFun);
+            __eachTypeDependency(propSpec.base, depFun);
           }
         });
       }
@@ -1311,31 +1338,45 @@ define([
 
       mixins.forEach(function(mixinIdOrClass) {
         if(typeof mixinIdOrClass === "string") {
-          __eachTypeSpecDependencies(mixinIdOrClass, depFun);
+          __eachTypeDependency(mixinIdOrClass, depFun);
         }
       });
     }
   }
 
-  function __eachInstanceSpecDependencies(instSpec, depFun) {
+  /**
+   * Calls `depFun` for each dependency of `instRef`.
+   *
+   * @memberOf pentaho.type.impl.Loader#
+   *
+   * @param {pentaho.type.spec.UInstanceReference} instRef - An instance reference.
+   *
+   * @param {function(isTypeDep: boolean, depSpec: any)} depFun - A function that
+   * is called for each dependency with two arguments,
+   * a boolean that indicates if the dependency is a type or an instance,
+   * and the type or instance specification.
+   *
+   * @private
+   */
+  function __eachInstanceDependency(instRef, depFun) {
 
-    if(instSpec && typeof instSpec === "object") {
+    if(instRef && typeof instRef === "object") {
 
-      if(Array.isArray(instSpec)) {
-        instSpec.forEach(function(elemRef) {
-          __eachInstanceSpecDependencies(elemRef, depFun);
+      if(Array.isArray(instRef)) {
+        instRef.forEach(function(elemRef) {
+          __eachInstanceDependency(elemRef, depFun);
         }, this);
-      } else if(instSpec.constructor === Object) {
-        if(instSpec.$instance) {
-          depFun(instSpec);
+      } else if(instRef.constructor === Object) {
+        if(instRef.$instance) {
+          depFun(instRef);
         } else {
           // A generic object instance specification.
-          Object.keys(instSpec).forEach(function(name) {
+          Object.keys(instRef).forEach(function(name) {
             // Inline type.
             if(name === "_") {
-              __eachTypeSpecDependencies(instSpec[name], depFun);
+              __eachTypeDependency(instRef[name], depFun);
             } else {
-              __eachInstanceSpecDependencies(instSpec[name], depFun);
+              __eachInstanceDependency(instRef[name], depFun);
             }
           });
         }
@@ -1344,8 +1385,21 @@ define([
   }
   // endregion
 
-  // By Descending ranking and then By Ascending definition index.
-  function __infoComparer(infoA, infoB) {
+  /**
+   * Compares two instance information objects.
+   *
+   * Orders by descending ranking and then by ascending registration index.
+   *
+   * @memberOf pentaho.type.impl.Loader#
+   *
+   * @param {!pentaho.type.impl.IInstanceInfo} infoA - The first instance information.
+   * @param {!pentaho.type.impl.IInstanceInfo} infoB - The second instance information.
+   *
+   * @return {number} The numbers `-1`, `0`, or `1`.
+   *
+   * @private
+   */
+  function __instanceInformationComparer(infoA, infoB) {
     return F.compare(infoB.ranking, infoA.ranking) || F.compare(infoA.index, infoB.index);
   }
 });

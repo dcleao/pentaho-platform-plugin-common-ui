@@ -19,11 +19,10 @@
  *
  * ## Overview
  *
- * The **Pentaho Service Locator API** is constituted by an AMD/RequireJS loader plugin, {@link pentaho.service.ILocator},
+ * The **Pentaho Service Locator API** is constituted by
+ * an AMD/RequireJS loader plugin, {@link pentaho.service.locator},
  * which allows JavaScript components to depend on logical services.
  * Other modules may declare to "implement" these services through AMD/RequireJS configuration.
- *
- * The main service locator service, and AMD/RequireJS loader plugin, is {@link pentaho.service.locator}.
  *
  * @name pentaho.service
  * @namespace

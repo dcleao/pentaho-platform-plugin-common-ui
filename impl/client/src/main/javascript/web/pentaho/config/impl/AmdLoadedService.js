@@ -41,12 +41,14 @@ define([
    *
    * @description Creates a configuration service instance that is pre-loaded with registered
    * value type configuration modules.
+   *
+   * @param {!pentaho.environment.IEnvironment} environment - The environment used to select configuration rules.
    */
   var AmdLoadedService = ConfigurationService.extend(module.id, {
 
-    constructor: function() {
+    constructor: function(environment) {
 
-      this.base();
+      this.base(environment);
 
       configurations.forEach(function(configuration) {
         this.add(configuration.value);

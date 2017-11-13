@@ -18,7 +18,7 @@
  * The `spec.UInstanceReference` union represents the set of JS types that can be used to reference an instance.
  *
  * Instance references are the main arguments of methods such as
- * [InstancesContainer#get]{@link pentaho.type.InstancesContainer#get}
+ * [ILoader#resolveInstance]{@link pentaho.type.ILoader#resolveInstance}
  * and
  * [Type#createAsync]{@link pentaho.type.Type#createAsync}.
  *

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 define([
-  "./AmdLoadedService"
-], function(AmdLoadedService) {
+  "./AmdLoadedService",
+  "../../environment"
+], function(AmdLoadedService, environment) {
 
   "use strict";
 
@@ -23,9 +24,9 @@ define([
    * An instance of {@link pentaho.config.impl.AmdLoadedService}.
    *
    * @name pentaho.config.impl.instanceOfAmdLoadedService
-   * @type {pentaho.config.impl.AmdLoadedService}
+   * @type {!pentaho.config.impl.AmdLoadedService}
    * @amd pentaho/config/impl/instanceOfAmdLoadedService
    * @private
    */
-  return new AmdLoadedService();
+  return new AmdLoadedService(environment);
 });

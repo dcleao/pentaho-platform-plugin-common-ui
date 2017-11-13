@@ -17,10 +17,11 @@ define([
   "module",
   "../../lang/Base",
   "../../util/spec",
+  "../../util/object",
   "../../lang/ArgumentRequiredError",
   "../../lang/SortedList",
   "../../shim/es6-promise"
-], function(module, Base, specUtil, ArgumentRequiredError, SortedList) {
+], function(module, Base, specUtil, O, ArgumentRequiredError, SortedList) {
 
   "use strict";
 
@@ -30,10 +31,10 @@ define([
    *
    * @type {string[]}
    * @see pentaho.environment.IEnvironment
-   * @see _ruleComparer
-   * @see _ruleFilterer
+   * @see __ruleComparer
+   * @see __ruleFilterer
    */
-  var _selectCriteria = [
+  var __selectCriteria = [
     "user", // TODO: is now user.id and will not have effect as is
     "theme",
     "locale",
@@ -47,111 +48,50 @@ define([
    * Ensures sorting algorithm stability, because insertion order would be lost during a re-sort.
    *
    * @type {number}
-   * @see pentaho.config.Service#addRule
+   *
+   * @see pentaho.config.IService#addRule
    */
-  var _ruleCounter = 0;
+  var __ruleCounter = 0;
 
-  var Configuration = Base.extend("pentaho.config.impl.Configuration", /** @lends pentaho.config.impl.Configuration# */{
-
-    /**
-     * @classDesc The `Configuration` class is an in-memory implementation of the
-     * {@link pentaho.config.IConfiguration} interface.
-     *
-     * @class
-     * @alias Configuration
-     * @memberOf pentaho.config.impl
-     *
-     * @extends pentaho.lang.Base
-     * @implements pentaho.config.IConfiguration
-     * @private
-     *
-     * @description Creates a configuration for the given service and environment.
-     * @param {!pentaho.config.impl.Service} service - The configuration service.
-     * @param {!pentaho.environment.IEnvironment} env - The platform environment.
-     */
-    constructor: function(service, env) {
-      this.__service = service;
-      this.__env = env;
-    },
-
-    /** @inheritDoc */
-    selectType: function(typeId) {
-      return this.__service.__selectType(typeId, this.__env);
-    },
-
-    /** @inheritDoc */
-    selectInstance: function(instanceId) {
-      return this.__service.__selectInstance(instanceId, this.__env);
-    },
-
-    __cloneEnv: function() {
-      var env = this.__env;
-      var clone = {};
-
-      _selectCriteria.forEach(function(p) {
-        clone[p] = env[p];
-      });
-
-      return clone;
-    },
-
-    __processConfig: function(config) {
-      if(!config) return config;
-
-      return config.map(function(rule) {
-        var ruleClone;
-        if(rule) {
-          ruleClone = {
-            select: this.__cloneEnv(),
-            apply:  rule.apply
-          };
-
-          var select = rule.select;
-          if(select) {
-            var select2 = ruleClone.select;
-            select2.type = select.type;
-            select2.instance = select.instance;
-          }
-        }
-        return ruleClone;
-      });
-    },
-
-    // This implementation makes sure to ignore the environment variables in config.select
-    /** @inheritDoc */
-    add: function(config) {
-      this.__service.add(this.__processConfig(config));
-    }
-  });
-
-  /**
-   * @classDesc The `Service` class is an in-memory implementation of the {@link pentaho.config.IService} interface.
-   *
-   * @class
-   * @alias Service
-   * @memberOf pentaho.config.impl
-   * @amd pentaho/config/impl/Service
-   *
-   * @extends pentaho.lang.Base
-   * @implements pentaho.config.IService
-   *
-   * @description Creates a configuration service instance with no registrations.
-   */
   var ConfigurationService = Base.extend(module.id, /** @lends pentaho.config.impl.Service# */{
 
-    constructor: function() {
+    /**
+     * @classDesc The `Service` class is an in-memory implementation of
+     * the {@link pentaho.config.IService} interface.
+     *
+     * @alias Service
+     * @memberOf pentaho.config.impl
+     * @class
+     * @extends pentaho.lang.Base
+     * @implements {pentaho.config.IService}
+     *
+     * @amd pentaho/config/impl/Service
+     *
+     * @description Creates a configuration service instance with no registrations for a given environment.
+     *
+     * @param {pentaho.environment.IEnvironment} environment - The environment used to select configuration rules.
+     */
+    constructor: function(environment) {
+
+      /**
+       * The environment used to select configuration rules.
+       * @type {!pentaho.environment.IEnvironment}
+       * @readOnly
+       */
+      this.__environment = environment || {};
+
       /**
        * A map connecting a type or instance identifier to the applicable configuration rules,
        * ordered from least to most specific.
        *
-       * @type {Object.<string, Array.<pentaho.config.spec.IRule>>}
+       * @type {!Object.<string, Array.<pentaho.config.spec.IRule>>}
        * @private
        */
-      this.__ruleStore = {};
+      this.__ruleStore = Object.create(null);
     },
 
     /**
-     * Adds an configuration rule set.
+     * Adds a configuration rule set.
      *
      * @param {!pentaho.config.spec.IRuleSet} config - A configuration rule set to add.
      */
@@ -176,9 +116,9 @@ define([
      * @param {!pentaho.config.spec.IRule} rule - The configuration rule to add.
      */
     addRule: function(rule) {
-      // Assuming the Service takes ownership of
-      // the rules, so mutating it directly is ok
-      rule._ordinal = _ruleCounter++;
+      // Assuming the Service takes ownership of the rules,
+      // so mutating it directly is ok.
+      rule._ordinal = __ruleCounter++;
 
       var select = rule.select || {};
 
@@ -191,22 +131,24 @@ define([
         itemIds = select[itemKey];
       }
 
-      if(!itemIds)
+      if(!itemIds) {
         throw new ArgumentRequiredError("rule.select.type");
+      }
 
       if(!Array.isArray(itemIds)) {
         itemIds = [itemIds];
       }
 
       itemIds.forEach(function(itemId) {
-        if(!itemId)
+        if(!itemId) {
           throw new ArgumentRequiredError("rule.select." + itemKey);
+        }
 
         var fullItemId = itemKey + ":" + itemId;
 
         var list = this.__ruleStore[fullItemId];
         if(!list) {
-          this.__ruleStore[fullItemId] = list = new SortedList({"comparer": _ruleComparer});
+          this.__ruleStore[fullItemId] = list = new SortedList({comparer: __ruleComparer});
         }
 
         list.push(rule);
@@ -214,22 +156,33 @@ define([
     },
 
     /** @inheritDoc */
-    getAsync: function(env) {
-      return Promise.resolve(new Configuration(this, env || {}));
+    selectType: function(typeId) {
+      return this.__selectItem("type:" + typeId);
     },
 
-    __selectType: function(typeId, env) {
-      return this.__selectItem("type:" + typeId, env);
+    /** @inheritDoc */
+    selectInstance: function(instanceId) {
+      return this.__selectItem("instance:" + instanceId);
     },
 
-    __selectInstance: function(instanceId, env) {
-      return this.__selectItem("instance:" + instanceId, env);
-    },
+    /**
+     * Selects a type or instance given its full identifier.
+     *
+     * @param {string} fullItemId - The full identifier of the item.
+     *
+     * @return {Object} The configuration, if any; `null` otherwise.
+     * @private
+     */
+    __selectItem: function(fullItemId) {
 
-    __selectItem: function(fullItemId, env) {
-      var rules = this.__ruleStore[fullItemId] || [];
-      var filtered_rules = rules.filter(_ruleFilterer, env);
-      var configs = filtered_rules.map(function(rule) {
+      var rules = O.getOwn(this.__ruleStore, fullItemId);
+      if(!rules) {
+        return null;
+      }
+
+      var filteredRules = rules.filter(__ruleFilterer, this.__environment);
+
+      var configs = filteredRules.map(function(rule) {
         return rule.apply;
       });
 
@@ -237,6 +190,7 @@ define([
         return null;
       }
 
+      // Merge configurations.
       return configs.reduce(specUtil.merge.bind(specUtil), {});
     }
   });
@@ -245,16 +199,16 @@ define([
 
   // region compare and select
   /**
-   * Compares two type-configuration rules according to specificity.
+   * Compares two type configuration rules according to specificity.
    *
-   * @param {pentaho.config.spec.IRule} r1 - The first type configuration rule.
-   * @param {pentaho.config.spec.IRule} r2 - The second type configuration rule.
+   * @param {!pentaho.config.spec.IRule} r1 - The first type configuration rule.
+   * @param {!pentaho.config.spec.IRule} r2 - The second type configuration rule.
    *
    * @return {number} `-1`, if `r1` is more specific than `r2`,
    * `1`, if `r2` is more specific than `r1`,
    * and `0` if they have the same specificity.
    */
-  function _ruleComparer(r1, r2) {
+  function __ruleComparer(r1, r2) {
     var priority1 = r1.priority || 0;
     var priority2 = r2.priority || 0;
 
@@ -265,8 +219,8 @@ define([
     var s1 = r1.select || {};
     var s2 = r2.select || {};
 
-    for(var i = 0, ic = _selectCriteria.length; i !== ic; ++i) {
-      var key = _selectCriteria[i];
+    for(var i = 0, ic = __selectCriteria.length; i !== ic; ++i) {
+      var key = __selectCriteria[i];
 
       var isDefined1 = s1[key] != null;
       var isDefined2 = s2[key] != null;
@@ -282,27 +236,33 @@ define([
   /**
    * Determines if a given rule is selected by the current context.
    *
-   * @param {pentaho.config.spec.IRule} rule - A type configuration rule to check.
    * @this pentaho.environment.IEnvironment
+   *
+   * @param {!pentaho.config.spec.IRule} rule - A type configuration rule to check.
+   *
    * @return {boolean} `true` if `rule` is selected, `false`, otherwise.
    */
-  function _ruleFilterer(rule) {
+  function __ruleFilterer(rule) {
 
     /* jshint validthis:true*/
 
-    var select = rule.select || {};
-    for(var i = 0, ic = _selectCriteria.length; i !== ic; ++i) {
-      var key = _selectCriteria[i];
+    var select = rule.select;
+    if(select) {
+      // Doing it backwards because `application` is the most common criteria...
+      var i = __selectCriteria.length;
+      while(i--) {
+        var key = __selectCriteria[i];
 
-      var possibleValues = select[key];
+        var possibleValues = select[key];
+        if(possibleValues != null) {
 
-      if(possibleValues != null) {
-        var criteriaValue = this[key];
+          var criteriaValue = this[key];
 
-        var multi = Array.isArray(possibleValues);
-        if(!multi && possibleValues !== criteriaValue ||
-            multi && possibleValues.indexOf(criteriaValue) === -1) {
-          return false;
+          if(Array.isArray(possibleValues)
+              ? possibleValues.indexOf(criteriaValue) === -1
+              : possibleValues !== criteriaValue) {
+            return false;
+          }
         }
       }
     }

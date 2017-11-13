@@ -41,10 +41,10 @@ define([
      *
      * @ignore
      * @abstract
-     * @implements pentaho.lang.ISpecifiable
-     * @implements pentaho.lang.IAnnotatable
+     * @implements {pentaho.lang.ISpecifiable}
+     * @implements {pentaho.lang.IAnnotatable}
      *
-     * @classdesc The `Cell` class represents a location or position,
+     * @classDesc The `Cell` class represents a location or position,
      * in which the value of an attribute, for a given subject, is stored.
      *
      * ### AMD
@@ -82,7 +82,7 @@ define([
      * they should be created by using their attribute's
      * {@link pentaho.data.Attribute#toCellOf} method.
      *
-     * @param {pentaho.data.spec.ICell|pentaho.data.Atomic} cell A cell specification
+     * @param {pentaho.data.spec.ICell|pentaho.data.Atomic} spec A cell specification
      *     or, directly, a cell's value, possibly _nully_.
      */
     constructor: function(spec) {

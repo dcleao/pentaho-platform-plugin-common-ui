@@ -29,7 +29,7 @@ define([
   /**
    * @name pentaho.type.SpecificationContext
    * @class
-   * @implements pentaho.lang.IDisposable
+   * @implements {pentaho.lang.IDisposable}
    *
    * @amd pentaho/type/SpecificationContext
    *

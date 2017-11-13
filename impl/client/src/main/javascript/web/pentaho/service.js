@@ -15,36 +15,56 @@
  */
 
 /**
- * The _main_ service locator service of the JavaScript Pentaho platform.
+ * The service locator of the JavaScript Pentaho platform.
  *
- * This service uses the [Instance Info API]{@link pentaho.instanceInfo} to query for instances that
- * provide a given service type.
+ * The service locator allows JavaScript components to declare dependency on other
+ * components in terms of the name of a _logical_ service.
+ * Other modules that provide such logical service should register as such.
  *
- * Alternatively, the service can also be explicitly configured.
+ * **AMD Plugin Usage**: `"pentaho/service!{service-type}?type&single&meta&ids"`
  *
- * #### Configuration
+ * 1. `{service-type}` — the base type of the desired service instances or types.
+ * 2. `type` - if present, indicates that it is subtypes of `{service-type}` that are requested,
+ *             and not instances of subtypes of `{service-type}`, the default.
+ * 3. `single` — if present, the module resolves as a single value, the first declared dependency.
+ * 4. `meta` — if present, the module resolves as an array where each member is an object with two properties,
+ *             `moduleId` and `value`.
+ * 5. `ids` - if present, the module resolves as an array of the identifiers of the registered modules
+ *            and **does not load them**.
  *
- * To register a module that provides a service, you configure this module, `pentaho/service`.
- * For example, the following AMD/RequireJS configuration registers two modules,
+ * When instances are requested,
+ * the [Instance Info API]{@link pentaho.instanceInfo} is used to
+ * query for modules which provide *instances* of the requested service type (or subtypes of).
+ *
+ * Otherwise,
+ * when types are requested,
+ * the [Type Info API]{@link pentaho.typeInfo} is used to
+ * query for modules which provide *subtypes* of the requested service type.
+ *
+ * **Example**
+ *
+ * The following AMD/RequireJS configuration registers two instances,
  * `mine/homeScreen` and `yours/proHomeScreen`,
- * as providing the logical service named `IHomeScreen`:
+ * as providing the instances of the service type `IHomeScreen`:
+ *
  * ```js
  * require.config({
  *   config: {
- *     "pentaho/service": {
- *       "mine/homeScreen": "IHomeScreen",
- *       "yours/proHomeScreen": "IHomeScreen"
+ *     "pentaho/instanceInfo": {
+ *       "mine/homeScreen":     {type: "IHomeScreen"},
+ *       "yours/proHomeScreen": {type: "IHomeScreen"}
  *     }
  *   }
  * });
  * ```
  *
- * Later, some other component can request for all implementers of the logical service:
+ * Later, some other component can request for all registered instances of the
+ * service type `IHomeScreen`:
  *
  * ```js
- * define(["pentaho/service!IHomeScreen"], function(arrayOfHomeScreenModules) {
+ * define(["pentaho/service!IHomeScreen"], function(arrayOfHomeScreens) {
  *
- *   arrayOfHomeScreenModules.forEach(function(homeScreen) {
+ *   arrayOfHomeScreens.forEach(function(homeScreen) {
  *     // ...
  *   });
  * });
@@ -52,14 +72,15 @@
  *
  * @name locator
  * @memberOf pentaho.service
- * @type {pentaho.service.ILocator}
+ * @type {IAmdLoaderPlugin}
  * @amd pentaho/service
  */
 define([
   "module",
   "pentaho/util/object",
-  "pentaho/instanceInfo"
-], function(module, O, instanceInfo) {
+  "pentaho/instanceInfo",
+  "pentaho/typeInfo"
+], function(module, O, instanceInfo, typeInfo) {
   "use strict";
 
   var A_slice = Array.prototype.slice;
@@ -72,7 +93,7 @@ define([
 
   __processConfig();
 
-  return /** @type pentaho.service.ILocator */ {
+  return {
 
     load: function(name, require, onLoad, config) {
       if(config.isBuild) {
@@ -84,7 +105,8 @@ define([
         onLoad();
       } else {
         var nameAndOptions = __parseNameAndOptions(name);
-        var modules = __lookupLogicalModule(nameAndOptions.name);
+        var isType = nameAndOptions.options.type === "true";
+        var modules = __lookupLogicalModule(nameAndOptions.name, isType);
 
         var modulesCount = modules.length;
         var isSingle = nameAndOptions.options.single === "true";
@@ -149,10 +171,16 @@ define([
            (__logicalModules[logicalModuleName] = []);
   }
 
-  function __lookupLogicalModule(logicalModuleName) {
+  function __lookupLogicalModule(logicalModuleName, isType) {
+
     var localIds = O.getOwn(__logicalModules, logicalModuleName) || [];
-    var instIds = instanceInfo.getAllByType(logicalModuleName, {includeDescendants: true});
-    return localIds.concat(instIds);
+
+    // When isType, not including self because typically it is an interface...
+    var otherIds = isType
+        ? typeInfo.getSubtypesOf(logicalModuleName, {includeDescendants: true, includeSelf: false})
+        : instanceInfo.getAllOfType(logicalModuleName, {includeDescendants: true});
+
+    return localIds.concat(otherIds);
   }
 
   /**
@@ -161,13 +189,16 @@ define([
    *
    * Ignores a _nully_ module configuration value.
    * Ignores _falsy_ physical and logical module identifiers.
+   *
+   * @deprecated
    */
   function __processConfig() {
     var config = module.config();
     var logicalModule;
     for(var absModuleId in config) { // nully tolerant
-      if(absModuleId && (logicalModule = O.getOwn(config, absModuleId)))
+      if(absModuleId && (logicalModule = O.getOwn(config, absModuleId))) {
         __getLogicalModule(logicalModule).push(absModuleId);
+      }
     }
   }
 

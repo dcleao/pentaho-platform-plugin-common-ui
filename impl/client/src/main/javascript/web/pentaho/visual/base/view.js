@@ -87,8 +87,8 @@ define([
          *
          * @class
          * @extends pentaho.type.Complex
-         * @implements pentaho.lang.IDisposable
-         * @implements pentaho.type.action.ITarget
+         * @implements {pentaho.lang.IDisposable}
+         * @implements {pentaho.type.action.ITarget}
          *
          * @abstract
          * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.base.View>} pentaho/visual/base/view

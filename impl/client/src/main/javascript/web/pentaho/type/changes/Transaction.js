@@ -56,7 +56,7 @@ define([
      * @class
      * @friend {pentaho.type.Context}
      * @friend {pentaho.type.changes.TransactionScope}
-     * @implements pentaho.lang.IDisposable
+     * @implements {pentaho.lang.IDisposable}
      *
      * @amd pentaho/type/Transaction
      *
