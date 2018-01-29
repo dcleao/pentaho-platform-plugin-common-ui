@@ -15,20 +15,22 @@ If not, you should first read [Configuration API](../configuration) and
 
 Visualizations are constituted by one 
 [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) 
-type and (at least) one 
+type, (at least) one 
 [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}})
+type and (at least) one
+[`Viz`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Viz'}})
 type,
 any of which is a 
 [Type API]({{site.refDocsUrlPattern | replace: '$', 'pentaho.type'}}) complex type 
 that can be configured.
 
 Section [Identifiers of Stock Visualizations](#identifiers-of-stock-visualizations) contains the list
-of identifiers of stock `Model` and `View` types.
+of identifiers of stock `Model`, `View` and `Viz` types.
 Additionally, 
 section [Identifiers of Stock Color Palettes](#identifiers-of-stock-color-palettes) contains the list
 of identifiers of stock color palettes.
 
-The following sections show examples of typical `Model` and `View` configurations.
+The following sections show examples of typical `Model`, `View` and `Viz` configurations.
 A single [IRule]({{site.refDocsUrlPattern | replace: '$', 'pentaho.config.spec.IRule'}}) object 
 is provided in each example, 
 but it should be interpreted as being part of the following generic configuration module:
@@ -57,7 +59,7 @@ visualizations menu, effectively preventing the user from creating new visualiza
 ```js
 var ruleSpec = {
   select: {
-    type: "pentaho/visual/models/pie",
+    type: "pentaho/visual/vizs/pie",
     application: "pentaho-analyzer"
   },
   apply: {
@@ -130,7 +132,7 @@ affecting how it is displayed in the visualizations menu of the Analyzer and
 ```js
 var ruleSpec = {
   select: {
-    type:"pentaho/visual/models/bar",
+    type:"pentaho/visual/vizs/bar",
     application: [
       "pentaho-analyzer",
       "pentaho-det"
@@ -278,6 +280,9 @@ var ruleSpec = {
 
 ## Identifiers of Stock Visualizations
 
+The visualizations of stock visualizations are all sub-modules of `pentaho/visual/vizs`. 
+For example, `pentaho/visual/vizs/line`, is the identifier of the stock Line visualization.
+
 The models of stock visualizations are all sub-modules of `pentaho/visual/models`. 
 For example, `pentaho/visual/models/line`, is the identifier of the stock Line visualization model.
 
@@ -305,8 +310,9 @@ the stock Line visualization model.
 | sunburst                | Sunburst                 |
 
 The Geo Map visualization is the exception to these rules.
-Its model's identifier is `pentaho/visual/models/geoMap`
-and its view's identifier is `pentaho/geo/visual/map`.
+Its visualization and model identifiers are 
+`pentaho/visual/vizs/geoMap` and `pentaho/visual/models/geoMap`, respectively.
+Its view's identifier is `pentaho/geo/visual/map`.
 
 ## Identifiers of Stock Color Palettes
 

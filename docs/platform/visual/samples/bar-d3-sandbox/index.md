@@ -25,12 +25,13 @@ The complete code of this sample is available at
 This walk-through is divided in the following steps:
 
 1. [Preparing the environment](step1-environment-preparation)
-2. [Creating the model](step2-model-creation)
-3. [Creating the view](step3-view-creation)
-4. [Styling the view](step4-view-styling)
-5. [Styling the model for applications](step5-model-styling)
-6. [Adding interactivity to the view](step6-view-interactivity)
-7. [Adding a default configuration](step7-default-configuration)
-8. [Next steps](stepNext)
+2. [Creating the visualization](step2-viz-creation)
+3. [Creating the model](step3-model-creation)
+4. [Creating the view](step4-view-creation)
+5. [Styling the view](step5-view-styling)
+6. [Styling the model for applications](step6-viz-styling)
+7. [Adding interactivity to the view](step7-view-interactivity)
+8. [Adding a default configuration](step8-default-configuration)
+9. [Next steps](stepNext)
 
 **Start** with [Preparing the environment](step1-environment-preparation).

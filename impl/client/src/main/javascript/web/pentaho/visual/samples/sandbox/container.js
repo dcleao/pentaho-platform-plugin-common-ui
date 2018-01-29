@@ -33,12 +33,8 @@ define([
     ]
   });
 
-  var viewSpec = {
-    width:  100,
-    height: 100,
-    domContainer: sandboxContainer,
+  var vizSpec = {
     model: {
-      _: "pentaho/visual/samples/calc/model",
       data: dataTable,
       levels: {
         attributes: ["family"]
@@ -47,6 +43,11 @@ define([
         attributes: ["sales"]
       },
       operation: "avg"
+    },
+    view: {
+      width:  100,
+      height: 100,
+      domContainer: sandboxContainer
     }
   };
 
@@ -58,10 +59,10 @@ define([
 
         window.app.context = context;
 
-        return context.getAsync("pentaho/visual/base/view");
+        return context.getAsync("pentaho/visual/samples/calc/viz");
       })
-      .then(function(View) {
-        return View.createAsync(viewSpec);
+      .then(function(CalcViz) {
+        return CalcViz.createAsync(vizSpec);
       })
       .then(function(view) {
 
@@ -72,5 +73,4 @@ define([
       .then(function() {
         console.log("view update finished");
       });
-
 });

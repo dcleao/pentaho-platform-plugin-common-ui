@@ -1,0 +1,24 @@
+
+.pentaho-visual-vizs-bar.component-icon-sprite {
+  background-image: url("./images/bar-icon-sprite.svg");
+}
+
+.pentaho-visual-vizs-bar-horizontal.component-icon-sprite {
+  background-image: url("./images/bar-horizontal-icon-sprite.svg");
+}
+
+.pentaho-visual-vizs-bar-normalized.component-icon-sprite {
+  background-image: url("./images/bar-normalized-icon-sprite.svg");
+}
+
+.pentaho-visual-vizs-bar-normalized-horizontal.component-icon-sprite {
+  background-image: url("./images/bar-normalized-horizontal-icon-sprite.svg");
+}
+
+.pentaho-visual-vizs-bar-stacked.component-icon-sprite {
+  background-image: url("./images/bar-stacked-icon-sprite.svg");
+}
+
+.pentaho-visual-vizs-bar-stacked-horizontal.component-icon-sprite {
+  background-image: url("./images/bar-stacked-horizontal-icon-sprite.svg");
+}

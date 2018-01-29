@@ -46,14 +46,17 @@ npm install
     ./node_modules/@pentaho/viz-api/init-sandbox
   ```
 
-    To follow this tutorial you should use `pentaho-visual-samples-bar-d3` as your package name, as it will become your AMD/RequireJS module ID.
+    To follow this tutorial you should use `pentaho-visual-samples-bar-d3` as your package name, 
+    as it will become your AMD/RequireJS module ID.
 
-    Alternatively you can choose a different name but will have to change all references to `pentaho-visual-samples-bar-d3` throughout the tutorial.
+    Alternatively you can choose a different name but 
+    will have to change all references to `pentaho-visual-samples-bar-d3` throughout the tutorial.
 
 2. You should now have the `sandbox.html` and `sandbox-data.json` files.
 
     Those files provide a minimal sandbox from which sandboxes for specific samples or experiments may be derived.
-    As is, it simply displays the `pentaho/visual/samples/calc` visualization — the only visualization that comes bundled with the Visualization API.
+    As is, it simply displays the `pentaho/visual/samples/calc` visualization — 
+    the only visualization that comes bundled with the Visualization API.
 
     If you prefer you can create the files yourself:
 
@@ -96,77 +99,80 @@ npm install
 
           <!-- configure AMD for the sample visualization -->
           <script>
+          require([
+            "vizapi-dev-init",
+            "json!./package.json"
+          ], function(devInit, package) {
+          
+            devInit(package);
+          
             require([
-              "vizapi-dev-init",
-              "json!./package.json"
-            ], function (devInit, package) {
-              devInit(package);
-
-              require([
-                "pentaho/type/Context",
-                "pentaho/data/Table",
-                "json!./sandbox-data.json"
-              ], function (Context, Table, dataSpec) {
-
-                // Setup up a VizAPI context.
-                Context.createAsync({ application: "viz-api-sandbox" })
-                  .then(function (context) {
-                    // Get the model and base view types
-                    return context.getDependencyAsync({
-                      CalcModel: "pentaho/visual/samples/calc/model",
-                      BaseView: "pentaho/visual/base/view"
-                    });
-                  })
-                  .then(function (types) {
-
-                    // Create the visualization model.
-                    var modelSpec = {
+              "pentaho/type/Context",
+              "pentaho/data/Table",
+              "json!./sandbox-data.json"
+            ], function(Context, Table, dataSpec) {
+          
+              var domContainer = document.getElementById("viz_div");
+              var width = 400;
+              var height = 200;
+          
+              // Setup up a VizAPI context.
+              Context.createAsync({application: "viz-api-sandbox"})
+                .then(function(context) {
+          
+                  // Get the viz type.
+                  return context.getAsync("pentaho/visual/samples/calc/viz");
+                })
+                .then(function(BarViz) {
+          
+                  // Create the visualization, model and view.
+                  return BarViz.createAsync({
+                    model: {
                       "data": new Table(dataSpec),
                       "levels": {attributes: ["productFamily"]},
                       "measure": {attributes: ["sales"]},
                       "operation": "avg"
-                    };
-                                                
-                    var model = new types.CalcModel(modelSpec);
-                                              
-                    // Create the visualization view.
-                    var viewSpec = {
-                      width: 400,
-                      height: 200,
-                      domContainer: document.getElementById("viz_div"),
-                      model: model
-                    };
-                                                        
-                    // These are responsibilities of the visualization container application:
-                    // 1. Mark the container with the model's CSS classes, for styling purposes.
-                    viewSpec.domContainer.className = model.$type.inheritedStyleClasses.join(" ");
-                                                    
-                    // 2. Set the DOM container dimensions.
-                    viewSpec.domContainer.style.width = viewSpec.width + "px";
-                    viewSpec.domContainer.style.height = viewSpec.height + "px";
-                            
-                    return types.BaseView.createAsync(viewSpec);
-                  })
-                  .then(function (view) {
-                    // Handle the execute action.
-                    view.on("pentaho/visual/action/execute", {
-                      "do": function (event, action) {
-                        alert("Executed " + action.dataFilter.contentKey);
-                      }
-                    });
-
-                    // Handle the select action.
-                    view.on("pentaho/visual/action/select", {
-                      "finally": function (event, action) {
-                        document.getElementById("messages_div").innerText = "Selected: " + view.selectionFilter.contentKey;
-                      }
-                    });
-
-                    // Render the visualization.
-                    return view.update();
+                    },
+                    view: {
+                      width: width,
+                      height: height,
+                      domContainer: domContainer
+                    }
                   });
-              });
+                })
+                .then(function(viz) {
+          
+                  var view = viz.view;
+          
+                  // These are responsibilities of the visualization container application:
+                  // 1. Mark the container with the model's CSS classes, for styling purposes.
+                  domContainer.className = viz.model.$type.inheritedStyleClasses.join(" ") +
+                      " " + view.$type.inheritedStyleClasses.join(" ");
+          
+                  // 2. Set the DOM container dimensions.
+                  domContainer.style.width = width + "px";
+                  domContainer.style.height = height + "px";
+          
+                  // Handle the view's execute action.
+                  view.on("pentaho/visual/action/execute", {
+                    "do": function(event, action) {
+                      alert("Executed " + action.dataFilter.contentKey);
+                    }
+                  });
+          
+                  // Handle the view's select action.
+                  view.on("pentaho/visual/action/select", {
+                    "finally": function(event, action) {
+                      document.getElementById("messages_div").innerText =
+                          "Selected: " + view.selectionFilter.contentKey;
+                    }
+                  });
+          
+                  // Render the visualization.
+                  return view.update();
+                });
             });
+          });
           </script>
         </head>
 
@@ -214,5 +220,5 @@ After one of the above, you can open <a href='http://localhost:8000/sandbox.html
 " type="warning" %}
 
 
-**Continue** to [Creating the model](step2-model-creation).
+**Continue** to [Creating the model](step3-model-creation).
 

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 define([
-  "pentaho/i18n!model",
-  "./theme/model"
+  "pentaho/i18n!model"
 ], function(bundle) {
 
   "use strict";
@@ -28,13 +27,10 @@ define([
      * @name pentaho.visual.samples.calc.Model
      * @class
      * @extends pentaho.visual.base.Model
-     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc
+     * @amd {pentaho.type.spec.UTypeModule<pentaho.visual.samples.calc.Model>} pentaho/visual/samples/calc/model
      */
     return BaseModel.extend({
       $type: {
-        v2Id: "sample_calc",
-        defaultView: "./view",
-
         props: [
           {
             name: "levels",

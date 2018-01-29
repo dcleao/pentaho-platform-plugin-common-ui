@@ -209,21 +209,21 @@ This property allows changing the default discrete color palette.
 
 ### Correspondence between visualization identifiers
 
-| Current Vis. Id.      | Future Vis. Id.                               | Description          |
-|-----------------------|-----------------------------------------------|----------------------|
-| ccc_area              | pentaho/visual/models/areaStacked             | Area Stacked         |
-| ccc_line              | pentaho/visual/models/line                    | Line                 |
-| ccc_bar               | pentaho/visual/models/bar                     | Column               |
-| ccc_barstacked        | pentaho/visual/models/barStacked              | Column Stacked       |
-| ccc_barnormalized     | pentaho/visual/models/bar                     | Column Stacked 100%  |
-| ccc_horzbar           | pentaho/visual/models/barHorizontal           | Bar                  |
-| ccc_horzbarstacked    | pentaho/visual/models/barStackedHorizontal    | Bar Stacked          |
-| ccc_horzbarnormalized | pentaho/visual/models/barNormalizedHorizontal | Bar Stacked 100%     |
-| ccc_barline           | pentaho/visual/models/barLine                 | Column/Line Combo    |
-| ccc_scatter           | pentaho/visual/models/bubble                  | X/Y Scatter/Bubble   |
-| ccc_heatgrid          | pentaho/visual/models/heatGrid                | Heat-Grid            |
-| ccc_pie               | pentaho/visual/models/pie                     | Pie                  |
-| ccc_sunburst          | pentaho/visual/models/sunburst                | Sunburst             |
+| Current Vis. Id.      | Future Vis. Id.                             | Description          |
+|-----------------------|---------------------------------------------|----------------------|
+| ccc_area              | pentaho/visual/vizs/areaStacked             | Area Stacked         |
+| ccc_line              | pentaho/visual/vizs/line                    | Line                 |
+| ccc_bar               | pentaho/visual/vizs/bar                     | Column               |
+| ccc_barstacked        | pentaho/visual/vizs/barStacked              | Column Stacked       |
+| ccc_barnormalized     | pentaho/visual/vizs/bar                     | Column Stacked 100%  |
+| ccc_horzbar           | pentaho/visual/vizs/barHorizontal           | Bar                  |
+| ccc_horzbarstacked    | pentaho/visual/vizs/barStackedHorizontal    | Bar Stacked          |
+| ccc_horzbarnormalized | pentaho/visual/vizs/barNormalizedHorizontal | Bar Stacked 100%     |
+| ccc_barline           | pentaho/visual/vizs/barLine                 | Column/Line Combo    |
+| ccc_scatter           | pentaho/visual/vizs/bubble                  | X/Y Scatter/Bubble   |
+| ccc_heatgrid          | pentaho/visual/vizs/heatGrid                | Heat-Grid            |
+| ccc_pie               | pentaho/visual/vizs/pie                     | Pie                  |
+| ccc_sunburst          | pentaho/visual/vizs/sunburst                | Sunburst             |
 
 
 ### Correspondence between visualization property values

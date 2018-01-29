@@ -96,15 +96,15 @@ you would need:
 }
 ```
 
-Another use is to declare that a type such as that exported by the module `"my-viz/model.js"` is 
-a visualization model type.
+Another use is to declare that a type such as that exported by the module `"my-viz/viz.js"` is 
+a visualization type.
 ```json
 { 
   "name": "baz",
   "version": "1.0.0",
   "config": {
     "pentaho/typeInfo": {
-      "baz/my-viz/model": {"base": "pentaho/visual/base/model"}
+      "baz/my-viz/viz": {"base": "pentaho/visual/base/viz"}
     }
   }
 }

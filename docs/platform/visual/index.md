@@ -47,10 +47,9 @@ to [configuring it](#configuring-the-visualization).
 Creating a visualization boils down to creating:
 
 - One [`Model`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Model'}}) — 
-  which _identifies_ the visualization and 
-  _defines_ it in terms of its data requirements, 
+  which _defines_ the data requirements of the visualization, 
   such as the visual degrees of freedom it has (e.g. _X position_, _color_ and _size_) and 
-  any major options that affect its rendering, — and
+  any major options that affect its rendering, and
 
 - One [`View`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.View'}}) (at least) — 
   which implements the actual rendering using chosen technologies 
@@ -58,6 +57,11 @@ Creating a visualization boils down to creating:
   and handle user interaction, 
   dispatching [actions]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.action'}}) and, 
   for example, showing tooltips.
+  
+- One [`Viz`]({{site.refDocsUrlPattern | replace: '$', 'pentaho.visual.base.Viz'}}) (at least) —
+  which glues the `Model` and `View` together, 
+  allowing the pair to be registered and then offered to the end-user, 
+  for example, in the menu of an application.
 
 The [Create a Custom Visualization](create) walk-through shows you how to develop these and 
 how to create an OSGi artifact containing the visualization, 
