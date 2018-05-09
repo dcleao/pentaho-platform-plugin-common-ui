@@ -19,7 +19,6 @@
     java sources (sources classifier).</description>
   <properties>
     <js.project.list>common-ui-impl-client</js.project.list>
-    <webjars.target.directory>${prepared.assembly.directory}/webjars/META-INF/resources/webjars</webjars.target.directory>
     <js.assembly.directory>${project.build.directory}/${js.assembly.name}</js.assembly.directory>
     <prepared.assembly.name>extrated-resources</prepared.assembly.name>
     <handlebars.version>4.0.5</handlebars.version>

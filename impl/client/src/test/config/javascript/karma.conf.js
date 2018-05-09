@@ -13,11 +13,10 @@ module.exports = function(config) {
 
     files: [
       "${project.build.directory}/context-begin.js",
-
+      "${build.javascriptTestOutputDirectory}/web/common-ui-require-js-cfg.js",
       "${build.dependenciesDirectory}/cdf/cdf-require-js-cfg.js",
-      "${build.javascriptTestConfigDirectory}/require-test.js",
       "${project.build.directory}/require.config.js",
-
+      "${build.javascriptTestConfigDirectory}/require-test.js",
       "${project.build.directory}/context-end.js",
 
       {pattern: "${build.dependenciesDirectory}/*/**/*", included: false}, // /target/dependency/

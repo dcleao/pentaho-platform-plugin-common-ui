@@ -56,12 +56,13 @@ var basePath;
 var ENVIRONMENT_CONFIG = {
   paths: {
     "cdf": depDir + "/cdf/js",
-    "cdf/lib": depDir + "/cdf/js/lib"
+    "cdf/lib": depDir + "/cdf/js/lib",
+    "common-ui": basePath
   }
 };
 
 var KARMA_RUN = true;
-var CONTEXT_PATH = "/";
+var CONTEXT_PATH = undefined;
 var pen = {define: define, require: require};
 var SESSION_LOCALE = "en";
 var requireCfg = {

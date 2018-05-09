@@ -52,6 +52,8 @@
 
   skipDirOptimize: false,
 
+  fileExclusionRegExp: /^\.|^require\.js$|^common-ui-require-js-cfg\.js$|^require-cfg\.js$/,
+
   paths: {
     "cdf/lib/CCC/def": "empty:",
     "cdf/lib/CCC/pvc": "empty:",
@@ -79,7 +81,7 @@
   // the output of this file actually has to be adapted for this to work.
   // Again. Post-8.0, a smoother workflow can be devised.
 
-  bundlesConfigOutFile: '${basedir}/src/main/config/resources/requireCfg.bundles.js',
+  bundlesConfigOutFile: '${project.build.directory}/requireCfg.bundles.js',
 
   //If using UglifyJS2 for script optimization, these config options can be
   //used to pass configuration values to UglifyJS2.
