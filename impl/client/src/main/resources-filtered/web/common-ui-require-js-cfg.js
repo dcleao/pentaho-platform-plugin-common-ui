@@ -21,27 +21,25 @@
   // ATTENTION: the parts of this AMD information related with the Type API and the Viz API
   // are duplicated in cgg's define-cfg.js. Keep all in sync.
   // Also, it is duplicated in the testing require.config.js.
-  var useDebug = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0;
-  var minSuffix = useDebug ? "" : ".min";
-
-  var sourcePath;
   var basePath;
   var useBundle = false;
 
   // environment configured
   if((typeof ENVIRONMENT_CONFIG !== "undefined" && typeof ENVIRONMENT_CONFIG.paths !== "undefined" &&
       typeof ENVIRONMENT_CONFIG.paths["common-ui"] !== "undefined")) {
-    sourcePath = basePath = ENVIRONMENT_CONFIG.paths["common-ui"];
+    basePath = ENVIRONMENT_CONFIG.paths["common-ui"];
   } else if(typeof CONTEXT_PATH !== "undefined") {
+    var useDebug = typeof document === "undefined" || document.location.href.indexOf("debug=true") > 0;
+
     // production
-    sourcePath = basePath = CONTEXT_PATH + "content/common-ui/resources/web";
+    basePath = CONTEXT_PATH + "content/common-ui/resources/web";
     if(!useDebug) {
       basePath += "/compressed";
       useBundle = true;
     }
   } else {
     // build / test
-    sourcePath = basePath = "common-ui";
+    basePath = "common-ui";
   }
 
   var requirePaths = requireCfg.paths;
@@ -184,7 +182,7 @@
    If the same jquery file was used for both paths, a timeout might occur and the tests would fail.
    See the third bullet at http://requirejs.org/docs/errors.html#timeout for more information.
    */
-  requirePaths["common-ui/jquery-clean"] = sourcePath + "/jquery/jquery" + minSuffix;
+  requirePaths["common-ui/jquery-clean"] = basePath + "/jquery/jquery";
   requireShim["common-ui/jquery-clean"] = {
     exports: "$",
     init: function() {
@@ -210,7 +208,7 @@
   requireMap["*"]["underscore"] = "common-ui/underscore"; // deprecated
 
   // ANGULAR
-  requirePaths["common-ui/angular"] = sourcePath + "/angular/angular" + minSuffix;
+  requirePaths["common-ui/angular"] = basePath + "/angular/angular";
   requireShim["common-ui/angular"] = {
     deps: ["common-ui/jquery"],
     exports: "angular",
@@ -242,30 +240,30 @@
     }
   };
 
-  requirePaths["common-ui/angular-i18n"] = sourcePath + "/angular/i18n";
+  requirePaths["common-ui/angular-i18n"] = basePath + "/angular/i18n";
 
-  requirePaths["common-ui/angular-resource"] = sourcePath + "/angular/angular-resource" + minSuffix;
+  requirePaths["common-ui/angular-resource"] = basePath + "/angular/angular-resource";
   requireShim["common-ui/angular-resource"] = ["common-ui/angular"];
 
-  requirePaths["common-ui/angular-route"] = sourcePath + "/angular/angular-route" + minSuffix;
+  requirePaths["common-ui/angular-route"] = basePath + "/angular/angular-route";
   requireShim["common-ui/angular-route"] = ["common-ui/angular"];
 
-  requirePaths["common-ui/angular-animate"] = sourcePath + "/angular/angular-animate" + minSuffix;
+  requirePaths["common-ui/angular-animate"] = basePath + "/angular/angular-animate";
   requireShim["common-ui/angular-animate"] = ["common-ui/angular"];
 
-  requirePaths["common-ui/angular-sanitize"] = sourcePath + "/angular/angular-sanitize" + minSuffix;
+  requirePaths["common-ui/angular-sanitize"] = basePath + "/angular/angular-sanitize";
   requireShim["common-ui/angular-sanitize"] = ["common-ui/angular"];
 
   requirePaths["common-ui/properties-parser"] = basePath + "/angular-translate/properties-parser";
 
-  requirePaths["common-ui/angular-translate"] = sourcePath + "/angular-translate/angular-translate";
+  requirePaths["common-ui/angular-translate"] = basePath + "/angular-translate/angular-translate";
   requireShim["common-ui/angular-translate"] = ["pentaho/shim/es5", "common-ui/angular"];
 
-  requirePaths["common-ui/angular-translate-loader-partial"] = sourcePath +
+  requirePaths["common-ui/angular-translate-loader-partial"] = basePath +
       "/angular-translate/angular-translate-loader-partial";
   requireShim["common-ui/angular-translate-loader-partial"] = ["common-ui/angular-translate"];
 
-  requirePaths["common-ui/angular-translate-loader-static"] = sourcePath +
+  requirePaths["common-ui/angular-translate-loader-static"] = basePath +
       "/angular-translate/angular-translate-loader-static-files";
   requireShim["common-ui/angular-translate-loader-static"] = ["common-ui/angular-translate"];
 

@@ -14,17 +14,21 @@
 
     <fileSet>
       <directory>${build.javascriptSourceDirectory}/web</directory>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
     </fileSet>
 
     <fileSet>
       <directory>${basedir}/src/main/resources-filtered/web</directory>
       <filtered>true</filtered>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
     </fileSet>
 
     <fileSet>
       <directory>${webjars.target.directory}/jquery/${jquery.version}/dist</directory>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.map</exclude>
+      </excludes>
       <outputDirectory>jquery</outputDirectory>
     </fileSet>
     <fileSet>
@@ -42,6 +46,8 @@
       </includes>
       <excludes>
         <exclude>*.gzip</exclude>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
       </excludes>
     </fileSet>
     <fileSet>
@@ -51,6 +57,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-aria/${angular.version}</directory>
@@ -59,6 +69,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-cookies/${angular.version}</directory>
@@ -75,6 +89,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-message-format/${angular.version}</directory>
@@ -83,6 +101,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-messages/${angular.version}</directory>
@@ -91,6 +113,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-parse-ext/${angular.version}</directory>
@@ -99,6 +125,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-resource/${angular.version}</directory>
@@ -107,6 +137,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-route/${angular.version}</directory>
@@ -115,6 +149,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-sanitize/${angular.version}</directory>
@@ -123,6 +161,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-scenario/${angular.version}</directory>
@@ -131,6 +173,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-touch/${angular.version}</directory>
@@ -139,6 +185,10 @@
         <include>angular*</include>
         <include>LICENSE*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>${webjars.target.directory}/angular-i18n/${angular.version}</directory>
@@ -146,6 +196,10 @@
       <includes>
         <include>angular*</include>
       </includes>
+      <excludes>
+        <exclude>**/*.min.js</exclude>
+        <exclude>**/*.min.js.map</exclude>
+      </excludes>
     </fileSet>
 
     <fileSet>

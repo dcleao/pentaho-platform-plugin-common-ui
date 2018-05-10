@@ -35,7 +35,7 @@ var basePath;
   depWebJars = depDir + webjarsSubPath;
 
   baseTest = baseUrl + makeRelativeUrl("${build.javascriptTestSourceDirectory}");
-  basePath = baseUrl + makeRelativeUrl("${build.javascriptTestOutputDirectory}") + "/web";
+  basePath = baseUrl + makeRelativeUrl("${build.outputDirectory}") + "/web";
 
   function makeRelativeUrl(path) {
     var basePath = "${project.basedir}/".replace(/\\/g, "/");

@@ -21,7 +21,17 @@ module.exports = function(config) {
     reporters: ["progress", "junit", "coverage"],
 
     preprocessors: {
-      "${build.javascriptTestOutputDirectory}/**/*.js": ["coverage"]
+      "${build.outputDirectory}/web/pentaho/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/angular-directives/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/angular-translate/properties-parser.js": ["coverage"],
+      "${build.outputDirectory}/web/cache/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/dataapi/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/dojo/pentaho/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/plugin-hanler/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/prompting/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/repo/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/util/*.js": ["coverage"],
+      "${build.outputDirectory}/web/vizapi/**/*.js": ["coverage"]
     },
 
     junitReporter: {
