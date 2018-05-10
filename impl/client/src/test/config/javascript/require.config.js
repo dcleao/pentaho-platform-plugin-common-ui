@@ -18,8 +18,8 @@
   requirePaths["pentaho/i18n"] = baseTest + "/pentaho/i18nMock";
   requirePaths["pentaho/i18n/MessageBundle"] = basePath + "/pentaho/i18n/MessageBundle";
 
-  requirePaths["common-ui/jquery-clean"] = depDir + "/jqueryClean" + webjarsSubPath +
-      "/jquery/${jquery.version}/dist/jquery";
+  // requirePaths["common-ui/jquery-clean"] = depDir + "/jqueryClean" + webjarsSubPath +
+  //     "/jquery/${jquery.version}/dist/jquery";
 
   // Angular
   requirePaths["common-ui/angular"] = depWebJars + "/angular/${angular.version}/angular";

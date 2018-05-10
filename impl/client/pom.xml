@@ -24,7 +24,7 @@
     <docjs.config.template.directory>${project.basedir}/src/doc/javascript/template</docjs.config.template.directory>
     <js.build.optimizer>uglify2</js.build.optimizer>
     <requirejs.config.files.pattern>**/*-require-js-cfg.js</requirejs.config.files.pattern>
-    <webjars.target.directory>${build.dependenciesDirectory}/webjars/META-INF/resources/webjars</webjars.target.directory>
+    <webjars.target.directory>${build.dependenciesDirectory}/META-INF/resources/webjars</webjars.target.directory>
   </properties>
 
   <dependencies>
@@ -163,23 +163,23 @@
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
-          <!--<execution>-->
-            <!--&lt;!&ndash; need to copy common-ui-require-js-cfg.js to dependencies so it gets processed &ndash;&gt;-->
-            <!--<id>copy-own-config-to-dependencies</id>-->
-            <!--<phase>${javascript_unpack-dependencies-phase}</phase>-->
-            <!--<goals>-->
-              <!--<goal>copy-resources</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-              <!--<outputDirectory>${build.dependenciesDirectory}/common-ui</outputDirectory>-->
-              <!--<resources>-->
-                <!--<resource>-->
-                  <!--<filtering>true</filtering>-->
-                  <!--<directory>${basedir}/src/main/resources-filtered/web</directory>-->
-                <!--</resource>-->
-              <!--</resources>-->
-            <!--</configuration>-->
-          <!--</execution>-->
+          <execution>
+            <!-- need to copy common-ui-require-js-cfg.js to dependencies so it gets processed -->
+            <id>copy-own-config-to-dependencies</id>
+            <phase>${javascript_unpack-dependencies-phase}</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${build.dependenciesDirectory}/common-ui</outputDirectory>
+              <resources>
+                <resource>
+                  <filtering>true</filtering>
+                  <directory>${basedir}/src/main/resources-filtered/web</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
           <!--<execution>-->
             <!--<id>javascript-test_copy-resources-filtered</id>-->
             <!--<phase>${javascript-test_copy-resources-phase}</phase>-->
@@ -269,7 +269,7 @@
         <executions>
           <execution>
             <id>bundle-common-ui-platform-plugin</id>
-            <phase>generate-resources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>single</goal>
             </goals>

@@ -13,7 +13,7 @@
   <fileSets>
 
     <fileSet>
-      <directory>${build.javascriptSourceDirectory}</directory>
+      <directory>${build.javascriptSourceDirectory}/web</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
 
