@@ -17,7 +17,7 @@
     for each of the constituents (e.g. vizapi, prompting) of the current artifact.</description>
 
   <properties>
-    <js.project.list>dojo,dijit,dojo-release,jquery,jquery-i18n-properties,pentaho-cdf-js,angular-mocks,angular,angular-resource,angular-route,angular-animate,angular-aria,angular-cookies,angular-loader,angular-message-format,angular-messages,angular-parse-ext,angular-sanitize,angular-scenario,angular-touch,angular-i18n,angular-translate</js.project.list>
+    <js.project.list>dojo-release,jquery,jquery-i18n-properties,pentaho-cdf-js,angular-mocks,angular,angular-resource,angular-route,angular-animate,angular-aria,angular-cookies,angular-loader,angular-message-format,angular-messages,angular-parse-ext,angular-sanitize,angular-scenario,angular-touch,angular-i18n,angular-translate</js.project.list>
     <build.javascriptReportDirectory>target/js-reports</build.javascriptReportDirectory>
     <docjs.config.file>jsdoc-vizapi.json</docjs.config.file>
     <docjs.config.github.branch>master</docjs.config.github.branch>
@@ -28,14 +28,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>dojo</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>dijit</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.dojotoolkit.dojo</groupId>
       <artifactId>dojo-release</artifactId>
@@ -203,7 +195,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${build.directory}</outputDirectory>
+              <outputDirectory>${project.build.directory}</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/src/main/config/resources</directory>

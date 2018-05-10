@@ -5,6 +5,8 @@ module.exports = function(config) {
 
   config.set({
 
+    browserNoActivityTimeout: 20000,
+
     basePath: "${basedir}",
 
     frameworks: ["jasmine", "requirejs"],

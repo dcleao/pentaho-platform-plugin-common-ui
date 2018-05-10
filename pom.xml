@@ -35,20 +35,13 @@
     <jquery-i18n-properties.version>1.0.9</jquery-i18n-properties.version>
     <angular-translate.version>2.2.0-canary-pentaho-modified</angular-translate.version>
     <pentaho-cdf-plugin.version>8.2.0.0-SNAPSHOT</pentaho-cdf-plugin.version>
+    <!-- Removed due to custom changes in the current common-ui version -->
+    <!-- (mainly the exporting of the Handlebars global variable) -->
+    <!--<handlebars.version>4.0.5</handlebars.version>-->
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.webjars.bower</groupId>
-        <artifactId>dojo</artifactId>
-        <version>${dojo.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars.bower</groupId>
-        <artifactId>dijit</artifactId>
-        <version>${dojo.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.dojotoolkit.dojo</groupId>
         <artifactId>dojo-release</artifactId>

@@ -203,26 +203,15 @@
     </fileSet>
 
     <fileSet>
-      <directory>${webjars.target.directory}/dojo/${dojo.version}</directory>
-      <outputDirectory>dojo/dojo</outputDirectory>
+      <directory>${build.dependenciesDirectory}/dojo-release-${dojo.version}-src</directory>
+      <outputDirectory>dojo</outputDirectory>
       <excludes>
-        <exclude>tests/**</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${webjars.target.directory}/dijit/${dojo.version}</directory>
-      <outputDirectory>dojo/dijit</outputDirectory>
-      <excludes>
-        <exclude>tests/**</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${build.dependenciesDirectory}/dojo-release-${dojo.version}-src/dojox</directory>
-      <outputDirectory>dojo/dojox</outputDirectory>
-      <excludes>
-        <exclude>*/tests/**</exclude>
-        <exclude>*/*/tests/**</exclude>
-        <exclude>.gitmodules</exclude>
+        <exclude>dojox/*/tests/**</exclude>
+        <exclude>dojox/*/*/tests/**</exclude>
+        <exclude>dojox/.gitmodules</exclude>
+        <exclude>dijit/tests/**</exclude>
+        <exclude>dojo/tests/**</exclude>
+        <exclude>util/**</exclude>
       </excludes>
     </fileSet>
 
