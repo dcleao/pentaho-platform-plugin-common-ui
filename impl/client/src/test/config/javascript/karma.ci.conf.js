@@ -23,20 +23,12 @@ module.exports = function(config) {
     reporters: ["progress", "junit", "coverage"],
 
     preprocessors: {
-      src: [
-      "${build.outputDirectory}/web/pentaho/**/*.js",
-      "${build.outputDirectory}/web/angular-directives/**/*.js",
-      "${build.outputDirectory}/web/angular-translate/properties-parser.js",
-      "${build.outputDirectory}/web/cache/**/*.js",
-      "${build.outputDirectory}/web/dataapi/**/*.js",
-      "${build.outputDirectory}/web/dojo/pentaho/**/*.js",
-      "${build.outputDirectory}/web/plugin-handler/**/*.js",
-      "${build.outputDirectory}/web/prompting/**/*.js",
-      "${build.outputDirectory}/web/repo/**/*.js",
-      "${build.outputDirectory}/web/util/*.js",
-      "${build.outputDirectory}/web/vizapi/**/*.js"
-      ],
-      dest: ["coverage"]
+      // Include only the common-ui's Pentaho source code.
+      // All "bundled" external libs should be excluded.
+      "${build.outputDirectory}/web/(pentaho|angular-directives|cache|dataapi|dojo/pentaho)/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/(plugin-handler|prompting|repo|vizapi)/**/*.js": ["coverage"],
+      "${build.outputDirectory}/web/angular-translate/properties-parser.js": ["coverage"],
+      "${build.outputDirectory}/web/util/*.js": ["coverage"]
     },
 
     junitReporter: {
