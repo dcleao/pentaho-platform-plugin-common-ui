@@ -1026,7 +1026,7 @@ define([
        * locally specified extension properties.
        *
        * The merging is performed using the rules of the
-       * {@link pentaho.util.Spec#merge} method.
+       * {@link pentaho.util.spec.merge} method.
        *
        * Returns `null` when there are no local or inherited extension properties.
        *
@@ -1062,105 +1062,6 @@ define([
       // endregion
     }
   }, /** @lends pentaho.visual.base.View */{
-
-    // TODO: convert to use a view spec?
-    // region static factory sugar
-    /**
-     * Creates a view, asynchronously, given its specification.
-     *
-     * If the view specification has its type annotated inline,
-     * a view of that type is built.
-     *
-     * Otherwise, when the view type is not annotated inline in the specification,
-     * if its `model` property is specified with an already instantiated model instance,
-     * or with a type annotated specification,
-     * that model's type's default view class is used to create a view instance from
-     * the given specification.
-     * The returned promise is rejected if the provided model specification is
-     * not specified or is not type annotated.
-     * The returned promise is also rejected if the model type has no registered default view type.
-     *
-     * Unlike the {@link pentaho.type.Type#createAsync} counterpart method,
-     * this static variant can be called to create an instance of any view type,
-     * even if it isn't a subtype of `this` one.
-     *
-     * @param {pentaho.visual.base.spec.IViewEx} viewSpec - The extended view specification.
-     *
-     * @return {Promise.<pentaho.visual.base.View>} A promise for a view with the given specification.
-     *
-     * @rejects {pentaho.lang.ArgumentRequiredError} When `viewSpec` is not specified.
-     * @rejects {pentaho.lang.ArgumentRequiredError} When `viewSpec` has no annotated type, inline, and
-     * the `model` property is unspecified.
-     * @rejects {pentaho.lang.ArgumentRequiredError} When `viewSpec` has no annotated type, inline, and
-     * the `model` property is a specification which also does not have its type annotated inline.
-     * @rejects {Error} When there isn't a registered default view class for the type of `model`.
-     * @rejects {Error} When the registered default view class does not exist or otherwise fails to load
-     * by {@link pentaho.type.ILoader#resolveTypeAsync}.
-     */
-    createAsync: function(viewSpec) {
-      if(!viewSpec) return Promise.reject(error.argRequired("viewSpec"));
-
-      var promiseViewCtor;
-
-      // View is type annotated, inline?
-      if(viewSpec._) {
-        promiseViewCtor = typeLoader.resolveTypeAsync(viewSpec._);
-      } else {
-        // View has a model specified?
-        var modelSpec = viewSpec.model;
-        if(!modelSpec) return Promise.reject(error.argRequired("viewSpec.model"));
-
-        var promiseModelCtor;
-        // Is it a model specification?
-        if(modelSpec.constructor === Object) {
-          // No inline type?
-          if(!modelSpec._) return Promise.reject(error.argRequired("viewSpec.model._"));
-
-          promiseModelCtor = typeLoader.resolveTypeAsync(modelSpec._);
-        } else {
-          // Assume it is a model instance, from which the model type can be read directly.
-          promiseModelCtor = Promise.resolve(modelSpec.constructor);
-        }
-
-        promiseViewCtor = promiseModelCtor.then(function(Model) {
-          return View.getClassAsync(Model.type);
-        });
-      }
-
-      return promiseViewCtor.then(function(View) {
-        return View.type.createAsync(viewSpec);
-      });
-    },
-
-    /**
-     * Gets a promise for the view class (constructor), of the registered default type, if any,
-     * for the given model type or identifier.
-     *
-     * @param {string|pentaho.visual.base.ModelType} modelType - The visual model type or its identifier.
-     * @return {Promise.<Class.<pentaho.visual.base.View>>} A promise for a view class of the given model type.
-     *
-     * @rejects {pentaho.lang.ArgumentRequiredError} When `modelType` is not specified.
-     * @rejects {Error} When `modelType` is a string, any error returned
-     * by {@link pentaho.type.ILoader#resolveTypeAsync}.
-     * @rejects {Error} When there isn't a registered default view for `modelType`.
-     * @rejects {Error} When the registered default view does not exist or otherwise fails to load
-     * by {@link pentaho.type.ILoader#resolveTypeAsync}.
-     */
-    getClassAsync: function(modelType) {
-
-      if(!modelType) return Promise.reject(error.argRequired("modelType"));
-
-      return typeLoader.resolveTypeAsync(modelType)
-          .then(function(Model) {
-
-            var defaultView = Model.type.defaultViewAbs;
-            if(!defaultView) throw new Error("No registered default view.");
-
-            return typeLoader.resolveTypeAsync(defaultView);
-          });
-    },
-    // endregion
-
     // region Property groups - class
     // see Base.js
     /** @inheritDoc */
