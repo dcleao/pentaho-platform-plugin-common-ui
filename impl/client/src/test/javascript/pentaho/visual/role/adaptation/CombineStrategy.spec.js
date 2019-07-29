@@ -191,9 +191,9 @@ define([
           expect(inputType).toBe(List.type);
         });
 
-        it("should return the List type if given a string type and isVisualKeyEf is undefined", function() {
+        it("should return null if given a string type and isVisualKeyEf is undefined", function() {
           var inputType = Strategy.type.getInputTypeFor(PentahoString.type, undefined);
-          expect(inputType).toBe(List.type);
+          expect(inputType).toBe(null);
         });
       });
 

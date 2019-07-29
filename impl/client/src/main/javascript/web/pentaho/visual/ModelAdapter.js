@@ -111,7 +111,7 @@ define([
    * @name ModelAdapter
    * @memberOf pentaho.visual
    * @class
-   * @extends pentaho.visual.Model
+   * @extends pentaho.visual.AbstractModel
    * @abstract
    *
    * @private
@@ -127,9 +127,9 @@ define([
    */
   var ModelAdapter = AbstractModel.extend(/** @lends pentaho.visual.ModelAdapter# */{
 
-    constructor: function() {
+    constructor: function(instSpec) {
 
-      this.base.apply(this, arguments);
+      this.base(instSpec);
 
       // Although model has a default value,
       // changing the valueType of the property resets the default value.
@@ -145,7 +145,9 @@ define([
 
       // This will create a txn and a changeset and the just set adaptationModel to be replaced
       // by another one (most probably, an identical one).
+      console.group("ModelAdapter new updateInternalModel");
       this.__updateInternalModel();
+      console.groupEnd();
 
       // 1. Attaching to the event only after the previous statement has the advantage of not trying to sync the
       // internal model once more... There's no danger of other listeners interfering (and thus needing
@@ -166,6 +168,12 @@ define([
       this.model.on("change", {
         init: this.__onModelChangeInitHandler.bind(this)
       }, {priority: -Infinity, isCritical: true});
+
+      this._init(instSpec);
+    },
+
+    _init: function(instSpec) {
+      // NOOP
     },
 
     /** @inheritDoc */
@@ -260,17 +268,18 @@ define([
 
       if(__hasSingleChange(propertyNames, "selectionFilter")) {
 
-        // console.log("[ModelAdapter] change:init modelAdapter.selectionFilter " +
+        console.group("[ModelAdapter] change:init modelAdapter.selectionFilter ");// +
         //   (this.selectionFilter && this.selectionFilter.$contentKey));
 
         this.__updateInternalSelection();
 
       } else {
 
-        // console.log("[ModelAdapter] change:init other");
+        console.group("[ModelAdapter] change:init other");
 
         this.__updateInternalModel();
       }
+      console.groupEnd();
     },
 
     /**
@@ -286,9 +295,11 @@ define([
 
       if(changesetAction.hasChange("selectionFilter")) {
 
-        // console.log("[ModelAdapter] change:init model.selectionFilter");
+        console.group("[ModelAdapter] internal change:init model.selectionFilter");
 
         this.__updateExternalSelection();
+
+        console.groupEnd();
       }
     },
 

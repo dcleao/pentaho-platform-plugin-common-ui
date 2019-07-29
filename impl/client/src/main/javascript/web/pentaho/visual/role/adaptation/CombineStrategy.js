@@ -260,7 +260,12 @@ define([
       /** @inheritDoc */
       getInputTypeFor: function(outputDataType, isVisualKeyEf) {
 
-        if(isVisualKeyEf === false || !outputDataType.isSubtypeOf(PentahoString.type)) {
+        // The usefulness of applying this strategy to non-key visual roles is questionable.
+        // If the VR is a visual measure or neutral, and accepts a single string,
+        // combining enables receiving numbers and/or strings of mixed field key/measure nature,
+        // effectively mixing the "measure" nature of the combined measures.
+        // Combining keys is less obscure.
+        if(isVisualKeyEf !== true || !outputDataType.isSubtypeOf(PentahoString.type)) {
           return null;
         }
 
