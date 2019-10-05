@@ -129,6 +129,11 @@ define([
         return this.base(modelAdapter) && this._internalProperty.isApplicableOn(modelAdapter.model);
       },
 
+      // @override
+      isEnabledOn: function(modelAdapter) {
+        return this.base(modelAdapter) && this._internalProperty.isEnabledOn(modelAdapter.model);
+      },
+
       // region fields
       /**
        * Gets the metadata about the fields property of mappings of this visual role property.
