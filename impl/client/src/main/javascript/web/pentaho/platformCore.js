@@ -29,8 +29,6 @@ define([
   "pentaho/theme/main",
   "pentaho/theme/LoadThemeAnnotation",
 
-  "pentaho/csrf/service",
-
   "pentaho/lang/UserError",
   "pentaho/lang/RuntimeError",
   "pentaho/lang/Event",
