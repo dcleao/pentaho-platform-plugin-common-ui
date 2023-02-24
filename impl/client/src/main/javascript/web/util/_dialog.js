@@ -30,6 +30,7 @@ if (pho.util == null) {
 
   /** @type {jQuery} */
   var jQueryLocal = pho.util._focus.jQuery;
+  var getActiveElement = pho.util._focus.getActiveElement;
 
   var KeyCodes = {
     tab: 9
@@ -43,6 +44,10 @@ if (pho.util == null) {
     fixed: 2,
     auto: 3
   };
+
+  function setFocus($elem) {
+    pho.util._focus.setFocus($elem[0]);
+  }
 
   // region Open Dialog Contexts
   var openDialogContexts = [];
@@ -215,7 +220,7 @@ if (pho.util == null) {
       openDialogContexts.push(this);
 
       if(this._restoreFocusMode === RestoreFocusModes.auto) {
-        var activeElement = this._getActiveElement();
+        var activeElement = getActiveElement();
         this._$restoreFocus = activeElement && jQueryLocal(activeElement);
       }
 
@@ -262,7 +267,7 @@ if (pho.util == null) {
         }
       }
 
-      $targets.eq(0).trigger("focus");
+      setFocus($targets);
     },
 
     /**
@@ -293,13 +298,11 @@ if (pho.util == null) {
     _doRestoreFocus: function(nextIndex) {
       if(this._$restoreFocus != null) {
         // Focus still within the dialog?
-        var activeElement = this._getActiveElement();
+        var activeElement = getActiveElement();
         var isActiveEf = activeElement == null || this._contains(activeElement);
         if(isActiveEf) {
-          this._$restoreFocus.trigger("focus");
+          setFocus(this._$restoreFocus);
         } else if(nextIndex < openDialogContexts.length) {
-          console.log("active element null or not contained in dialog and was not top-level dialog");
-
           // Focus was already "stolen". It's best to let it be.
           // E.g. when a dialog A opens another dialog B, B's autofocus may run before A is closed.
 
@@ -327,21 +330,6 @@ if (pho.util == null) {
       }
     },
 
-    _getActiveElement: function() {
-      var activeElement = document.activeElement;
-      while(activeElement !== null && activeElement.tagName.toLowerCase() === "iframe") {
-        try {
-          activeElement = activeElement.contentDocument.activeElement;
-        } catch(ex) {
-          // Cross-site security.
-          // Just keep the iframe as the active element.
-          break;
-        }
-      }
-
-      return activeElement;
-    },
-
     _contains: function(elem) {
       var dialog = this.getElement();
       return elem === dialog || jQueryLocal.contains(dialog, elem);
@@ -363,12 +351,12 @@ if (pho.util == null) {
         // Tab forward. At last element or at dialog.
         // Focus first element.
         if(isTargetDialog || targetElem === $last[0]) {
-          $first.trigger("focus");
+          setFocus($first);
           event.preventDefault();
         }
       } else if(isTargetDialog || targetElem === $first[0]) {
         // Tab backward. At first element or at dialog.
-        $last.trigger("focus");
+        setFocus($last);
         event.preventDefault();
       }
     },

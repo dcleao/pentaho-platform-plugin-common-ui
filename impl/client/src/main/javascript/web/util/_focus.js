@@ -118,6 +118,18 @@ if (pho.util == null) {
   }
 
   /**
+   * The `setTimeout` handle for a scheduled focus operation.
+   * @type {?number}
+   */
+  var timeoutSetFocus = null;
+
+  /**
+   * The element for which the set focus operation is scheduled.
+   * @type {?Element}
+   */
+  var scheduledSetFocusElem = null;
+
+  /**
    * Contains utilities for dealing with focus.
    * @namespace
    * @private
@@ -131,6 +143,63 @@ if (pho.util == null) {
     jQuery: jQueryLocal,
 
     Selectors: Selectors,
+
+    /**
+     * Sets focus on a given element.
+     *
+     * This method sets the focus <i>after</i> the current event loop turn,
+     * so that setting the focus works regardless of whether it is called within an event handler,
+     * including one whose default action sets the focus to another element.
+     *
+     * Additionally, when setting the focus via this method, the method {@link #getActiveElement} will
+     * return the latest scheduled element to set focus on, if any, before consulting `document.activeElement`.
+     *
+     * @param elem The element to focus on.
+     */
+    setFocus: function(elem) {
+      // Cancel scheduled set focus, if any.
+      if (timeoutSetFocus != null) {
+        clearTimeout(timeoutSetFocus);
+        timeoutSetFocus = scheduledSetFocusElem = null;
+      }
+
+      scheduledSetFocusElem = elem;
+
+      if(scheduledSetFocusElem != null) {
+        timeoutSetFocus = setTimeout(function() {
+          scheduledSetFocusElem.focus();
+          timeoutSetFocus = scheduledSetFocusElem = null;
+        });
+      }
+    },
+
+    /**
+     * Gets the active element of the current document or any of its descendant documents of the same domain.
+     *
+     * If setting focus to an element has been scheduled via {@link #focus},
+     * then that element is returned instead.
+     *
+     * @return {?Element} The active element, if any; `null`, otherwise.
+     */
+    getActiveElement: function() {
+      // Prefer our own pending set focus to the actual active element.
+      if(scheduledSetFocusElem != null) {
+        return scheduledSetFocusElem;
+      }
+
+      var activeElement = document.activeElement;
+      while(activeElement !== null && activeElement.tagName.toLowerCase() === "iframe") {
+        try {
+          activeElement = activeElement.contentDocument.activeElement;
+        } catch(ex) {
+          // Cross-site security.
+          // Just keep the iframe as the active element.
+          break;
+        }
+      }
+
+      return activeElement;
+    },
 
     /**
      * Gets the descendant elements of `root` which can receive keyboard focus, in document order.
