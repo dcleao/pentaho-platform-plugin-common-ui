@@ -88,6 +88,19 @@ if (pho.util == null) {
     focusable: ":pen-focusable"
   };
 
+  var suspendFocusRingCount = 0;
+
+  function createDisposable(dispose) {
+    dispose.remove = dispose;
+
+    return dispose;
+  }
+
+  function optionalArg(o, p, dv) {
+    var v;
+    return o && (v = o[p]) != null ? v : dv;
+  }
+
   function expandSelection(contextElem, selector) {
     var expanded = [];
 
@@ -117,6 +130,10 @@ if (pho.util == null) {
     return null;
   }
 
+  function getSelectorFromFocusableArg(keyArgs) {
+    return optionalArg(keyArgs, "focusable", false) ? Selectors.focusable : Selectors.tabbable;
+  }
+
   /**
    * Contains utilities for dealing with focus.
    * @namespace
@@ -132,28 +149,89 @@ if (pho.util == null) {
 
     Selectors: Selectors,
 
-    /**
-     * Gets the descendant elements of `root` which can receive keyboard focus, in document order.
-     *
-     * For `iframe` elements from a same domain,
-     * the keyboard focusable elements of their content document are included instead.
-     *
-     * @param {?Element} [root] - The root element. Defaults to the body of this frame's document.
-     * @return {Element[]} An array of keyboard focusable elements.
-     */
-    tabbables: function(root) {
-      return expandSelection(root || document.body, function(elem) {
-        return jQueryLocal(Selectors.tabbable, elem);
-      });
+    isTabbable: function(elem, keyArgs) {
+      return elem != null && jQueryLocal(elem).filter(getSelectorFromFocusableArg(keyArgs)).length > 0;
     },
 
     /**
-     * Gets the element after the given one which can currently receive keyboard focus.
-     * @param elem The initial element.
-     * @return The next keyboard-focusable element, if any; <code>null</code>, otherwise.
+     * Gets the descendant elements of `root` which can receive focus, in document order.
+     *
+     * For `iframe` elements from a same domain,
+     * the focusable elements of their content document are included instead.
+     *
+     * @param {?Element} [root] - The root element. Defaults to the body of this frame's document.
+     * @param {?Object} [keyArgs] The keyword arguments object.
+     * @param {boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
+     *   including those just which can only be focused using the mouse or code.
+     * @param {boolean} [keyArgs.self=false] - Indicates that the root element should also be considered,
+     *   at first position.
      */
-    nextTabbable: function(elem) {
-      var tabbables = this.tabbables();
+    tabbables: function(root, keyArgs) {
+      if(root == null) {
+        root = document.body;
+      }
+
+      var selectorFun = jQueryLocal.bind(null, getSelectorFromFocusableArg(keyArgs));
+
+      var selection = expandSelection(root, selectorFun);
+
+      if(optionalArg(keyArgs, "self", false) && selectorFun(root).length > 0) {
+        selection.unshift(root);
+      }
+
+      return selection;
+    },
+
+    /**
+     * Gets the first descendant element of `root` which can receive focus, in document order.
+     *
+     * For `iframe` elements from a same domain,
+     * the focusable elements of their content document are included instead.
+     *
+     * @param {?Element} [root] - The root element. Defaults to the body of this frame's document.
+     * @param {?Object} [keyArgs] The keyword arguments object.
+     * @param {boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
+     *   including those just which can only be focused using the mouse or code.
+     * @param {boolean} [keyArgs.self=false] - Indicates that the root element should also be considered,
+     *   at first position.
+     * @return The first focusable element, if any; <code>null</code>, otherwise.
+     */
+    firstTabbable: function(root, keyArgs) {
+      return this.tabbables(root, keyArgs)[0] || null;
+    },
+
+    /**
+     * Gets the last descendant element of `root` which can receive focus, in document order.
+     *
+     * For `iframe` elements from a same domain,
+     * the focusable elements of their content document are included instead.
+     *
+     * @param {?Element} [root] - The root element. Defaults to the body of this frame's document.
+     * @param {?Object} [keyArgs] The keyword arguments object.
+     * @param {boolean} [keyArgs.focusable=false] - Indicates that all focusable elements should be considered,
+     *   including those just which can only be focused using the mouse or code.
+     * @param {boolean} [keyArgs.self=false] - Indicates that the root element should also be considered,
+     *   at first position.
+     * @return The last focusable element, if any; <code>null</code>, otherwise.
+     */
+    lastTabbable: function(root, keyArgs) {
+      var tabbables = this.tabbables(root, keyArgs);
+      var L = tabbables.length;
+      return L > 0 ? tabbables[L - 1] : null;
+    },
+
+    /**
+     * Gets the first element after the given one which can currently receive focus.
+     *
+     * @param {Element} elem The initial element.
+     * @param {?Object} [keyArgs] The keyword arguments object.
+     * @param {?Element} [keyArgs.root] - The root element. Defaults to the body of this frame's document.
+     * @param {?Element} [keyArgs.focusable] - Indicates that all focusable elements should be considered,
+     *   including those just which can only be focused using the mouse or code.
+     * @return The next focusable element, if any; <code>null</code>, otherwise.
+     */
+    nextTabbable: function(elem, keyArgs) {
+      var tabbables = this.tabbables(optionalArg(keyArgs, "root"), keyArgs);
       var L = tabbables.length;
       if(L === 0) {
         return null;
@@ -169,12 +247,16 @@ if (pho.util == null) {
     },
 
     /**
-     * Gets the element before the given one which can currently receive keyboard focus.
-     * @param elem The initial element.
-     * @return The previous keyboard-focusable element, if any; <code>null</code>, otherwise.
+     * Gets the first element before the given one which can currently receive focus.
+     * @param {Element} elem The initial element.
+     * @param {?Object} [keyArgs] The keyword arguments object.
+     * @param {?Element} [keyArgs.root] - The root element. Defaults to the body of this frame's document.
+     * @param {?Element} [keyArgs.focusable] - Indicates that all focusable elements should be considered,
+     *   including those just which can only be focused using the mouse or code.
+     * @return The previous focusable element, if any; <code>null</code>, otherwise.
      */
-    previousTabbable: function(elem) {
-      var tabbables = this.tabbables();
+    previousTabbable: function(elem, keyArgs) {
+      var tabbables = this.tabbables(optionalArg(keyArgs, "root"), keyArgs);
       var L = tabbables.length;
       if(L === 0) {
         return null;
@@ -187,6 +269,141 @@ if (pho.util == null) {
       }
 
       return tabbables[index - 1];
+    },
+
+    closestTabbable: function(elem, keyArgs) {
+      return jQueryLocal(elem).closest(getSelectorFromFocusableArg(keyArgs))[0] || null;
+    },
+
+    containsFocus: function(rootElem) {
+      var activeElem = document.activeElement;
+      return activeElem != null && rootElem.contains(activeElem);
+    },
+
+    uiKey: function(elem) {
+      return (elem && elem.dataset.penUiKey) || null;
+    },
+
+    queryByUIKey: function(root, uiKey) {
+      if(root == null) {
+        root = document.documentElement;
+      }
+
+      if(this.uiKey(root) === uiKey) {
+        return root;
+      }
+
+      return root.querySelector('[data-pen-ui-key="' + CSS.escape(uiKey) + '"]');
+    },
+
+    refreshElement: function(elem, keyArgs) {
+      if(elem == null) {
+        return null;
+      }
+
+      var root = optionalArg(keyArgs, "root") || elem.ownerDocument.documentElement;
+
+      // assert root != null
+
+      // Still contained within root?
+      if (root.contains(elem)) {
+        return elem;
+      }
+
+      // May belong to document but not be within root anymore.
+      // Try to find one/another within root.
+
+      var uiKey = this.uiKey(elem);
+      if(uiKey != null) {
+        return this.queryByUIKey(root, uiKey);
+      }
+
+      var id = elem.id;
+      if(id) {
+        // Assume it has a stable id...
+        return root.querySelector("#" + CSS.escape(id));
+      }
+
+      return null;
+    },
+
+    captureState: function(elem, keyArgs) {
+      var root = optionalArg(keyArgs, "root", null);
+      var focusable = optionalArg(keyArgs, "focusable", false);
+      var tabbables = this._previousAndSelfTabbables(elem, keyArgs);
+      
+      var me = this;
+      return {
+        closest: function() {
+          var keyArgs2 = {root: root, focusable: focusable};
+          
+          for(var i = tabbables.length - 1; i >= 0; i--) {
+            var refreshed = me.refreshElement(tabbables[i], keyArgs2);
+            if(refreshed != null && me.isTabbable(refreshed, keyArgs2)) {
+              return refreshed;
+            }
+          }
+
+          return null;
+        }
+      };
+    },
+
+    _previousAndSelfTabbables: function(elem, keyArgs) {
+      var tabbables = this.tabbables(optionalArg(keyArgs, "root"), keyArgs);
+      var L = tabbables.length;
+      if(L === 0) {
+        return [];
+      }
+
+      var index = tabbables.indexOf(elem);
+      if(index < 0) {
+        return [];
+      }
+
+      // Remove elements following elem.
+      tabbables.splice(index + 1);
+
+      return tabbables;
+    },
+
+    suspendFocusRing: function(keyArgs) {
+      var isAuto = optionalArg(keyArgs, "isAuto", true);
+      var duration = optionalArg(keyArgs, "duration", 10);
+
+      var timeoutHandle = null;
+      var suspended = true;
+
+      // Suspend it!
+      suspendFocusRingCount++;
+      if(suspendFocusRingCount === 1) {
+        document.body.classList.add("focus-ring-disabled");
+      }
+
+      // Install timeout to resume.
+      if(isAuto) {
+        timeoutHandle = setTimeout(resumeFocusRing, duration);
+      }
+
+      return createDisposable(resumeFocusRing);
+
+      function resumeFocusRing() {
+        if(!suspended) {
+          return;
+        }
+
+        suspended = false;
+
+        if(timeoutHandle != null) {
+          clearTimeout(timeoutHandle);
+          timeoutHandle = null;
+        }
+
+        suspendFocusRingCount--;
+        if(suspendFocusRingCount === 0) {
+          document.body.classList.remove("focus-ring-disabled");
+        }
+      }
     }
   };
 })();
