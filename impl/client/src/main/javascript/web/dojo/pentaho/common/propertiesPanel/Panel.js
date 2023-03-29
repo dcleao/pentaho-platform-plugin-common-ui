@@ -64,7 +64,7 @@ define([
   }
 
   function updateDomUIKey(widget) {
-    (widget.uiKeyNode || widget.domNode).dataset.penUiKey = widget.uiKey;
+    focusUtil.setUIKey(widget.uiKeyNode || widget.domNode, widget.uiKey);
   }
 
   var Panel = declare("pentaho.common.propertiesPanel.Panel", [ContentPane, Evented], {

@@ -49,6 +49,8 @@ define(["./_focus"], function(focusUtil) {
     });
 
     function actionButtonMouseDownHandler(event) {
+      // Mouse-down'ing on a button-like element should focus it.
+      // This already happens for certain HTML elements by default, but not all.
       if(!event.defaultPrevented && focusUtil.isTabbable(elem, {focusable: true})) {
         elem.focus();
       }
