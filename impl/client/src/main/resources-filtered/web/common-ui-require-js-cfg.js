@@ -399,6 +399,13 @@
     }
   };
 
+  requireModules["pentaho/visual/models/Radar"] = {
+    base: "pentaho/visual/models/Abstract",
+    annotations: {
+      "pentaho/visual/DefaultView": {module: "pentaho/visual/views/echarts/Radar"}
+    }
+  };
+
   requireModules["pentaho/visual/models/MetricPointAbstract"] = {base: "pentaho/visual/models/CartesianAbstract"};
   requireModules["pentaho/visual/models/Scatter"] = {
     base: "pentaho/visual/models/MetricPointAbstract",
@@ -496,6 +503,7 @@
   requireModules["pentaho/ccc/visual/Waterfall"] = {base: "pentaho/ccc/visual/BarAbstract"};
   requireModules["pentaho/visual/views/echarts/Funnel"] = {base: "pentaho/visual/views/echarts/Abstract"};
   requireModules["pentaho/visual/views/echarts/Gauge"] = {base: "pentaho/visual/views/echarts/Abstract"};
+  requireModules["pentaho/visual/views/echarts/Radar"] = {base: "pentaho/visual/views/echarts/Abstract"};
   // endregion
 
   // region Color Palettes
@@ -791,6 +799,7 @@
       "pentaho/visual/models/Bar",
       "pentaho/visual/models/BarHorizontal",
       "pentaho/visual/models/types/Shape",
+      "pentaho/visual/models/types/RadarShape",
       "pentaho/visual/models/BarLine",
       "pentaho/visual/models/BarNormalizedAbstract",
       "pentaho/visual/models/BarNormalized",
@@ -817,6 +826,7 @@
       "pentaho/visual/models/Sunburst",
       "pentaho/visual/models/Funnel",
       "pentaho/visual/models/Gauge",
+      "pentaho/visual/models/Radar",
       "pentaho/visual/models/types/WaterDirection",
       "pentaho/visual/models/Waterfall",
       "pentaho/visual/models/types/TreemapLayoutMode",
@@ -876,6 +886,7 @@
       "pentaho/visual/views/echarts/Abstract",
       "pentaho/visual/views/echarts/Funnel",
       "pentaho/visual/views/echarts/Gauge",
+      "pentaho/visual/views/echarts/Radar",
       "pentaho/visual/views/all"
     ];
   }

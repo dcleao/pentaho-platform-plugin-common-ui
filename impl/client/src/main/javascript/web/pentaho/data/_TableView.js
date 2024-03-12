@@ -317,7 +317,7 @@ define([
      * Gets a `Table` loaded with the
      * data accessible through the view's visible rows and columns.
      *
-     * This is method is convenience for abbreviating:
+     * This method is convenience for abbreviating:
      *
      *    require("pentaho/data/Table", function(Table) {
      *      // ...
@@ -338,7 +338,7 @@ define([
      * Creates a specification of the view, in _plain table_ format.
      *
      * This implementation creates a specification
-     * not of the views own properties but of the data it shows through.
+     * not of the views' own properties but of the data it shows through.
      * The resulting specification can be used to create a `Table`.
      *
      * The resulting model will have one attribute per distinct view column.

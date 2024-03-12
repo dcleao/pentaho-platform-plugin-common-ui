@@ -266,17 +266,8 @@ define([
 
   function createMultipleFieldsMapper(data, fieldIndexes) {
 
-    var fieldCount = fieldIndexes.length;
-
     return function multipleFieldsMapper(rowIndex) {
-      var cells = new Array(fieldCount);
-
-      var fieldIndex = fieldCount;
-      while(fieldIndex--) {
-        cells[fieldIndex] = data.getCell(rowIndex, fieldIndex);
-      }
-
-      return cells;
+      return data.getRowCells(rowIndex, fieldIndexes);
     };
   }
 });

@@ -369,6 +369,7 @@ if(!useDebug) {
     "pentaho/visual/models/Bar",
     "pentaho/visual/models/BarHorizontal",
     "pentaho/visual/models/types/Shape",
+    "pentaho/visual/models/types/RadarShape",
     "pentaho/visual/models/BarLine",
     "pentaho/visual/models/BarNormalizedAbstract",
     "pentaho/visual/models/BarNormalized",
@@ -395,6 +396,7 @@ if(!useDebug) {
     "pentaho/visual/models/Sunburst",
     "pentaho/visual/models/Funnel",
     "pentaho/visual/models/Gauge",
+    "pentaho/visual/models/Radar",
     "pentaho/visual/models/types/WaterDirection",
     "pentaho/visual/models/Waterfall",
     "pentaho/visual/models/types/TreemapLayoutMode",
@@ -454,6 +456,7 @@ if(!useDebug) {
     "pentaho/visual/views/echarts/Abstract",
     "pentaho/visual/views/echarts/Funnel",
     "pentaho/visual/views/echarts/Gauge",
+    "pentaho/visual/views/echarts/Radar",
     "pentaho/visual/views/all"
   ];
 }
